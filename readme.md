@@ -8,36 +8,36 @@ https://www.rust-lang.org/tools/install
 
 2. Install Solana v1.14.17
 
-```bash
+```sh
 sh -c "$(curl -sSfL https://release.solana.com/v1.14.17/install)"
 ```
 
 3. Install avm (Anchor Version Manager)
 
-```bash
+```sh
 cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
 ```
 
 On linux systems:
 
-```bash
+```sh
 sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y pkg-config build-essential libudev-dev libssl-dev
 ```
 
 4. Install anchor v0.27.0
 
-```bash
+```sh
 avm install 0.27.0 && avm use 0.27.0
 ```
 
 ## Build (program)
 
-```bash
+```sh
 anchor build
 ```
 
 ## Tests (program)
 
-```bash
+```sh
 anchor test
 ```
