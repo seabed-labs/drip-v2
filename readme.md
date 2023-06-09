@@ -29,3 +29,15 @@ sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y pkg-confi
 ```bash
 avm install 0.27.0 && avm use 0.27.0
 ```
+
+## Build (program)
+
+```bash
+anchor build
+```
+
+## Tests (program)
+
+```bash
+anchor test
+```
