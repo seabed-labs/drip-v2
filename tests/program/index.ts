@@ -1,10 +1,10 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { DripV2 } from "../target/types/drip_v2";
+import { DripV2 } from "../../target/types/drip_v2";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { expect } from "chai";
 
-describe("drip-v2", () => {
+describe("drip-v2 program", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
 
@@ -20,8 +20,6 @@ describe("drip-v2", () => {
         .initGlobalConfig({
           version: new anchor.BN(1),
           superAdmin: superAdmin.publicKey,
-          admins: Array(20).fill(PublicKey.default),
-          adminPermissions: Array(20).fill(new anchor.BN(0)),
           defaultDripFeeBps: new anchor.BN(100),
         })
         .accounts({

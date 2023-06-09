@@ -11,9 +11,11 @@ pub mod drip_v2 {
 
     pub fn init_global_config(
         ctx: Context<InitGlobalConfig>,
-        initial_state: GlobalConfig,
+        params: InitGlobalConfigParams,
     ) -> Result<()> {
-        ctx.accounts.global_config.set_inner(initial_state);
+        ctx.accounts.global_config.version = params.version;
+        ctx.accounts.global_config.super_admin = params.super_admin;
+        ctx.accounts.global_config.default_drip_fee_bps = params.default_drip_fee_bps;
 
         Ok(())
     }
@@ -28,4 +30,11 @@ pub struct InitGlobalConfig<'info> {
     pub global_config: Account<'info, GlobalConfig>,
 
     pub system_program: Program<'info, System>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct InitGlobalConfigParams {
+    pub version: u64,
+    pub super_admin: Pubkey,
+    pub default_drip_fee_bps: u64,
 }
