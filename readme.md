@@ -1,6 +1,11 @@
 # Drip V2
 
-## Setup (program)
+## Program
+
+<details>
+<summary>Expand for details</summary>
+
+### Setup (program)
 
 1. Install Rust v1.17.0
 
@@ -30,14 +35,29 @@ sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y pkg-confi
 avm install 0.27.0 && avm use 0.27.0
 ```
 
-## Build (program)
+### Build (program)
 
 ```sh
 anchor build
 ```
 
-## Tests (program)
+### Tests (program)
 
 ```sh
 anchor test
 ```
+
+</details>
+
+## xNFT
+
+<details>
+<summary>Expand for details</summary>
+
+### Setup (xNFT)
+
+WIP
+
+### Run (xNFT)
+
+</details>
