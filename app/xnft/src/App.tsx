@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+window.Buffer = window.Buffer ?? Buffer;
 import { registerRootComponent } from "expo";
 import { RecoilRoot } from "recoil";
 import { ActivityIndicator, View } from "react-native";
