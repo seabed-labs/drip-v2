@@ -28,4 +28,12 @@ pub mod drip_v2 {
     pub fn update_admin(ctx: Context<UpdateAdmin>, params: UpdateAdminParams) -> Result<()> {
         handle_update_admin(ctx, params)
     }
+
+    // This IX does not retro-actively update drip fees of existing positions
+    pub fn update_default_drip_fees(
+        ctx: Context<UpdateDefaultDripFees>,
+        params: UpdateDefaultDripFeesParams,
+    ) -> Result<()> {
+        handle_update_default_drip_fees(ctx, params)
+    }
 }

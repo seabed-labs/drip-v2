@@ -64,21 +64,43 @@ impl GlobalConfig {
 
         Ok(())
     }
+
+    pub fn is_authorized(&self, signer: &Signer, permission: AdminPermission) -> bool {
+        if signer.key.eq(&self.super_admin) {
+            return true;
+        }
+
+        let admin_index = self.admins.iter().position(|admin| admin.eq(signer.key));
+        let admin_index = match admin_index {
+            None => {
+                return false;
+            }
+            Some(admin_index) => admin_index,
+        };
+
+        let admin_permissions_bitmap = self.admin_permissions[admin_index];
+        permission.is_enabled(admin_permissions_bitmap)
+    }
 }
 
-const ADMIN_BITMAP_FULL_SET_MASK: u64 = u64::MAX;
+const FULL_U64_BITMAP: u64 = u64::MAX;
+const ADMIN_BITMAP_INIT_PAIR_CONFIG_MASK: u64 = 1;
+const ADMIN_BITMAP_DRIP_MASK: u64 = 1 << 1;
+const ADMIN_BITMAP_UPDATE_DEFAULT_DRIP_FEES_MASK: u64 = 1 << 2;
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub enum AdminPermission {
     InitPairConfig,
     Drip,
+    UpdateDefaultDripFees,
 }
 
 impl AdminPermission {
     fn to_mask(&self) -> u64 {
         match self {
-            Self::InitPairConfig => 0b1,
-            Self::Drip => 0b10,
+            Self::InitPairConfig => ADMIN_BITMAP_INIT_PAIR_CONFIG_MASK,
+            Self::Drip => ADMIN_BITMAP_DRIP_MASK,
+            Self::UpdateDefaultDripFees => ADMIN_BITMAP_UPDATE_DEFAULT_DRIP_FEES_MASK,
         }
     }
 
@@ -87,7 +109,11 @@ impl AdminPermission {
     }
 
     fn disable(&self, permissions_bitmap: u64) -> u64 {
-        permissions_bitmap & (ADMIN_BITMAP_FULL_SET_MASK ^ self.to_mask())
+        permissions_bitmap & (FULL_U64_BITMAP ^ self.to_mask())
+    }
+
+    pub fn is_enabled(&self, permissions_bitmap: u64) -> bool {
+        permissions_bitmap & self.to_mask() != 0
     }
 }
 

@@ -13,4 +13,7 @@ pub enum DripError {
 
     #[msg("Failed to convert u64 to usize")]
     FailedToConvertU64toUSize, // 6003 or 0x1773
+
+    #[msg("Unauthorized; Requires admin permission for this op or super admin signature")]
+    OperationUnauthorized, // 6004 or 0x1774
 }
