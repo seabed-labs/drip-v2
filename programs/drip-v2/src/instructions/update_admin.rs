@@ -27,11 +27,12 @@ pub fn handle_update_admin(ctx: Context<UpdateAdmin>, params: UpdateAdminParams)
         DripError::SuperAdminSignatureRequired
     );
 
-    let admin_index: usize = params
-        .admin_index
-        .try_into()
-        .map_err(|_| Result::<()>::Err(DripError::FailedToConvertU64toUSize.into()))
-        .unwrap();
+    let admin_index: usize = match params.admin_index.try_into() {
+        Ok(res) => res,
+        Err(_) => {
+            return err!(DripError::FailedToConvertU64toUSize);
+        }
+    };
 
     ctx.accounts
         .global_config
