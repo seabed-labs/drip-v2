@@ -5,6 +5,8 @@ import { DripV2 } from "../../target/types/drip_v2";
 import { expect } from "chai";
 import "../setup";
 
+// TODO: These tests are not exhaustive at all yet
+
 describe("Program - updateAdmin", () => {
     anchor.setProvider(anchor.AnchorProvider.env());
     const program = anchor.workspace.DripV2 as Program<DripV2>;
