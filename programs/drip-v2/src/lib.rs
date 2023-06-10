@@ -17,4 +17,15 @@ pub mod drip_v2 {
     ) -> Result<()> {
         handle_init_global_config(ctx, params)
     }
+
+    pub fn update_super_admin(
+        ctx: Context<UpdateSuperAdmin>,
+        params: UpdateSuperAdminParams,
+    ) -> Result<()> {
+        handle_update_super_admin(ctx, params)
+    }
+
+    pub fn update_admin(ctx: Context<UpdateAdmin>, params: UpdateAdminParams) -> Result<()> {
+        handle_update_admin(ctx, params)
+    }
 }
