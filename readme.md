@@ -1,5 +1,9 @@
 # Drip V2
 
+## Contributing
+
+1. Follow https://www.conventionalcommits.org/en/v1.0.0/
+
 ## Program
 
 <details>
