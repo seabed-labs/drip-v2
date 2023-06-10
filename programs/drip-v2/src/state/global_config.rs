@@ -20,7 +20,7 @@ pub struct GlobalConfig {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub enum AdminChange {
     Clear,
-    ChangeAndResetPermissions(Pubkey),
+    SetAdminAndResetPermissions(Pubkey),
     ResetPermissions,
     AddPermission(AdminPermission),
     RemovePermission(AdminPermission),
@@ -35,7 +35,7 @@ impl GlobalConfig {
                 self.admins[index] = Pubkey::default();
                 self.admin_permissions[index] = 0;
             }
-            AdminChange::ChangeAndResetPermissions(new_admin_pubkey) => {
+            AdminChange::SetAdminAndResetPermissions(new_admin_pubkey) => {
                 require!(
                     new_admin_pubkey.ne(&Pubkey::default()),
                     DripError::AdminPubkeyCannotBeDefault

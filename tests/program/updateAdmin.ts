@@ -39,7 +39,7 @@ describe("Program - updateAdmin", () => {
                 .updateAdmin({
                     adminIndex: new anchor.BN(0),
                     adminChange: {
-                        changeAndResetPermissions: { 0: PublicKey.default },
+                        setAdminAndResetPermissions: { 0: PublicKey.default },
                     },
                 })
                 .accounts({
@@ -82,7 +82,7 @@ describe("Program - updateAdmin", () => {
             .updateAdmin({
                 adminIndex: new anchor.BN(0),
                 adminChange: {
-                    changeAndResetPermissions: {
+                    setAdminAndResetPermissions: {
                         0: newAdminPubkey,
                     },
                 },
@@ -152,7 +152,7 @@ describe("Program - updateAdmin", () => {
             .updateAdmin({
                 adminIndex: new anchor.BN(0),
                 adminChange: {
-                    changeAndResetPermissions: { 0: newAdminPubkey },
+                    setAdminAndResetPermissions: { 0: newAdminPubkey },
                 },
             })
             .accounts({
