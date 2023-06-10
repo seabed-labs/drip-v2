@@ -11,3 +11,4 @@ pub struct GlobalConfig {
 }
 
 pub const GLOBAL_CONFIG_SPACE: usize = 8 + 8 + 32 + 32 * 20 + 8 * 20 + 8;
+pub const ADMIN_INIT_PAIR_CONFIG_MASK: u64 = 1;
