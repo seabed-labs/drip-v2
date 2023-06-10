@@ -5,10 +5,9 @@ use crate::errors::DripError;
 // TODO: This file could use more exhaustive unit tests
 
 pub const ADMIN_COUNT: usize = 20;
-pub const GLOBAL_CONFIG_SPACE: usize = 8 + 8 + 32 + 32 * 20 + 8 * 20 + 8;
 
 #[account]
-#[derive(Default)]
+#[derive(Default, InitSpace)]
 pub struct GlobalConfig {
     pub version: u64,                          // 8
     pub super_admin: Pubkey,                   // 32

@@ -1,4 +1,4 @@
-use crate::state::{GlobalConfig, GLOBAL_CONFIG_SPACE};
+use crate::state::GlobalConfig;
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -6,7 +6,7 @@ pub struct InitGlobalConfig<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(init, payer = payer, space = GLOBAL_CONFIG_SPACE)]
+    #[account(init, payer = payer, space = 8 + GlobalConfig::INIT_SPACE)]
     pub global_config: Account<'info, GlobalConfig>,
 
     pub system_program: Program<'info, System>,
