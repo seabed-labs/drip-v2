@@ -84,12 +84,13 @@ impl GlobalConfig {
 
 const FULL_U64_BITMAP: u64 = u64::MAX;
 
+// NOTE: DO NOT EDIT (REORDER OR REMOVE OR ADD IN BETWEEN) AFTER DEPLOYMENT, ONLY APPEND
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum AdminPermission {
-    InitPairConfig = 0,
-    Drip,
+    Drip = 0,
     UpdateDefaultDripFees,
     UpdatePythPriceFeed,
+    UpdateDefaultPairDripFees,
 }
 
 impl AdminPermission {
@@ -117,18 +118,18 @@ mod test {
     #[test]
     fn test_enable() {
         let bitmap: u64 = 0b0;
-        let new_bitmap = AdminPermission::InitPairConfig.enable(bitmap);
+        let new_bitmap = AdminPermission::Drip.enable(bitmap);
         assert_eq!(new_bitmap, 0b1);
-        let new_bitmap = AdminPermission::Drip.enable(new_bitmap);
+        let new_bitmap = AdminPermission::UpdateDefaultDripFees.enable(new_bitmap);
         assert_eq!(new_bitmap, 0b11);
     }
 
     #[test]
     fn test_disable() {
         let bitmap: u64 = 0b11;
-        let new_bitmap = AdminPermission::InitPairConfig.disable(bitmap);
+        let new_bitmap = AdminPermission::Drip.disable(bitmap);
         assert_eq!(new_bitmap, 0b10);
-        let new_bitmap = AdminPermission::Drip.disable(new_bitmap);
+        let new_bitmap = AdminPermission::UpdateDefaultDripFees.disable(new_bitmap);
         assert_eq!(new_bitmap, 0b0);
     }
 }

@@ -18,6 +18,10 @@ pub mod drip_v2 {
         handle_init_global_config(ctx, params)
     }
 
+    pub fn init_pair_config(ctx: Context<InitPairConfig>) -> Result<()> {
+        handle_init_pair_config(ctx)
+    }
+
     pub fn update_super_admin(
         ctx: Context<UpdateSuperAdmin>,
         params: UpdateSuperAdminParams,
@@ -37,11 +41,15 @@ pub mod drip_v2 {
         handle_update_default_drip_fees(ctx, params)
     }
 
-    pub fn init_pair_config(ctx: Context<InitPairConfig>) -> Result<()> {
-        handle_init_pair_config(ctx)
-    }
-
     pub fn update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Result<()> {
         handle_update_pyth_price_feed(ctx)
+    }
+
+    // This IX does not retro-actively update drip fees of existing positions with this pair
+    pub fn update_default_pair_drip_fees(
+        ctx: Context<UpdateDefaultPairDripFees>,
+        params: UpdateDefaultPairDripFeesParams,
+    ) -> Result<()> {
+        handle_update_default_pair_drip_fees(ctx, params)
     }
 }

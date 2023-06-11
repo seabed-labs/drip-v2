@@ -122,7 +122,7 @@ describe("Program - updateAdmin", () => {
         });
     });
 
-    it("can give init_pair_config permissions to an admin", async () => {
+    it("can give drip permissions to an existing admin", async () => {
         const newAdminPubkey = PublicKey.unique();
 
         const globalConfigAccountBefore =
@@ -166,7 +166,7 @@ describe("Program - updateAdmin", () => {
             .updateAdmin({
                 adminIndex: new anchor.BN(0),
                 adminChange: {
-                    addPermission: { 0: { initPairConfig: {} } },
+                    addPermission: { 0: { drip: {} } },
                 },
             })
             .accounts({
