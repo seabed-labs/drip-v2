@@ -31,6 +31,69 @@
       ]
     },
     {
+      "name": "initPairConfig",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "input_token_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "output_token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateSuperAdmin",
       "accounts": [
         {
@@ -100,86 +163,6 @@
       ]
     },
     {
-      "name": "initPairConfig",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "globalConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inputTokenMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "outputTokenMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pairConfig",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "drip-v2-pair-config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "GlobalConfig",
-                "path": "global_config"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "input_token_mint"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "output_token_mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "inputTokenPythPriceFeed",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "outputTokenPythPriceFeed",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "updatePythPriceFeed",
       "accounts": [
         {
@@ -238,6 +221,61 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateDefaultPairDripFees",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.input_token_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.output_token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpdateDefaultPairDripFeesParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -289,6 +327,10 @@
             "type": "u8"
           },
           {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
             "name": "inputTokenMint",
             "type": "publicKey"
           },
@@ -299,6 +341,14 @@
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "defaultPairDripFeeBps",
+            "type": "u64"
+          },
+          {
+            "name": "inputTokenDripFeePortionBps",
+            "type": "u64"
           },
           {
             "name": "inputTokenPriceOracle",
@@ -364,6 +414,18 @@
       }
     },
     {
+      "name": "UpdateDefaultPairDripFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "newDefaultPairDripFeesBps",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateSuperAdminParams",
       "type": {
         "kind": "struct",
@@ -417,9 +479,6 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "InitPairConfig"
-          },
-          {
             "name": "Drip"
           },
           {
@@ -427,6 +486,9 @@
           },
           {
             "name": "UpdatePythPriceFeed"
+          },
+          {
+            "name": "UpdateDefaultPairDripFees"
           }
         ]
       }
