@@ -426,7 +426,7 @@ export type DripV2 = {
             "name": "UpdateDefaultDripFees"
           },
           {
-            "name": "UpdatePairConfigPythPriceFeed"
+            "name": "UpdatePythPriceFeed"
           }
         ]
       }
@@ -919,7 +919,7 @@ export const IDL: DripV2 = {
             "name": "UpdateDefaultDripFees"
           },
           {
-            "name": "UpdatePairConfigPythPriceFeed"
+            "name": "UpdatePythPriceFeed"
           }
         ]
       }

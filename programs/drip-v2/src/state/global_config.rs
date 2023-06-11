@@ -89,7 +89,7 @@ pub enum AdminPermission {
     InitPairConfig = 0,
     Drip,
     UpdateDefaultDripFees,
-    UpdatePairConfigPythPriceFeed,
+    UpdatePythPriceFeed,
 }
 
 impl AdminPermission {

@@ -28,10 +28,9 @@ pub struct UpdatePythPriceFeed<'info> {
 
 pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Result<()> {
     require!(
-        ctx.accounts.global_config.is_authorized(
-            &ctx.accounts.signer,
-            AdminPermission::UpdatePairConfigPythPriceFeed
-        ),
+        ctx.accounts
+            .global_config
+            .is_authorized(&ctx.accounts.signer, AdminPermission::UpdatePythPriceFeed),
         DripError::OperationUnauthorized
     );
 
