@@ -15,14 +15,15 @@ pub struct UpdatePythPriceFeed<'info> {
         seeds = [
             b"drip-v2-pair-config",
             global_config.key().as_ref(),
-            pair_config.input_mint.key().as_ref(),
-            pair_config.output_mint.key().as_ref(),
+            pair_config.input_token_mint.key().as_ref(),
+            pair_config.output_token_mint.key().as_ref(),
         ],
         bump = pair_config.bump,
     )]
-    pub pair_config: Account<'info, PairConfig>,
+    pub pair_config: Box<Account<'info, PairConfig>>,
 
-    pub pyth_price_feed: Option<Account<'info, PriceFeed>>,
+    pub input_token_pyth_price_feed: Option<Account<'info, PriceFeed>>,
+    pub output_token_pyth_price_feed: Option<Account<'info, PriceFeed>>,
 }
 
 pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Result<()> {
@@ -34,9 +35,15 @@ pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Resul
         DripError::OperationUnauthorized
     );
 
-    ctx.accounts.pair_config.pyth_price_feed = ctx
+    ctx.accounts.pair_config.input_token_pyth_price_feed = ctx
         .accounts
-        .pyth_price_feed
+        .input_token_pyth_price_feed
+        .as_ref()
+        .map_or(None, |p| Some(p.key()));
+
+    ctx.accounts.pair_config.output_token_pyth_price_feed = ctx
+        .accounts
+        .output_token_pyth_price_feed
         .as_ref()
         .map_or(None, |p| Some(p.key()));
 

@@ -51,8 +51,9 @@ impl Deref for PriceFeed {
 #[account]
 #[derive(Default, InitSpace)]
 pub struct PairConfig {
-    pub input_mint: Pubkey,
-    pub output_mint: Pubkey,
-    pub pyth_price_feed: Option<Pubkey>,
+    pub input_token_mint: Pubkey,
+    pub output_token_mint: Pubkey,
+    pub input_token_pyth_price_feed: Option<Pubkey>,
+    pub output_token_pyth_price_feed: Option<Pubkey>,
     pub bump: u8,
 }

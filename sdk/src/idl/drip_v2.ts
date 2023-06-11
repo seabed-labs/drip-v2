@@ -118,12 +118,12 @@ export type DripV2 = {
           "isSigner": false
         },
         {
-          "name": "inputMint",
+          "name": "inputTokenMint",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "outputMint",
+          "name": "outputTokenMint",
           "isMut": false,
           "isSigner": false
         },
@@ -148,19 +148,25 @@ export type DripV2 = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Mint",
-                "path": "input_mint"
+                "path": "input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Mint",
-                "path": "output_mint"
+                "path": "output_token_mint"
               }
             ]
           }
         },
         {
-          "name": "pythPriceFeed",
+          "name": "inputTokenPythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "outputTokenPythPriceFeed",
           "isMut": false,
           "isSigner": false,
           "isOptional": true
@@ -207,19 +213,25 @@ export type DripV2 = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "PairConfig",
-                "path": "pair_config.input_mint"
+                "path": "pair_config.input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "PairConfig",
-                "path": "pair_config.output_mint"
+                "path": "pair_config.output_token_mint"
               }
             ]
           }
         },
         {
-          "name": "pythPriceFeed",
+          "name": "inputTokenPythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "outputTokenPythPriceFeed",
           "isMut": false,
           "isSigner": false,
           "isOptional": true
@@ -273,15 +285,21 @@ export type DripV2 = {
         "kind": "struct",
         "fields": [
           {
-            "name": "inputMint",
+            "name": "inputTokenMint",
             "type": "publicKey"
           },
           {
-            "name": "outputMint",
+            "name": "outputTokenMint",
             "type": "publicKey"
           },
           {
-            "name": "pythPriceFeed",
+            "name": "inputTokenPythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "outputTokenPythPriceFeed",
             "type": {
               "option": "publicKey"
             }
@@ -573,12 +591,12 @@ export const IDL: DripV2 = {
           "isSigner": false
         },
         {
-          "name": "inputMint",
+          "name": "inputTokenMint",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "outputMint",
+          "name": "outputTokenMint",
           "isMut": false,
           "isSigner": false
         },
@@ -603,19 +621,25 @@ export const IDL: DripV2 = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Mint",
-                "path": "input_mint"
+                "path": "input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "Mint",
-                "path": "output_mint"
+                "path": "output_token_mint"
               }
             ]
           }
         },
         {
-          "name": "pythPriceFeed",
+          "name": "inputTokenPythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "outputTokenPythPriceFeed",
           "isMut": false,
           "isSigner": false,
           "isOptional": true
@@ -662,19 +686,25 @@ export const IDL: DripV2 = {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "PairConfig",
-                "path": "pair_config.input_mint"
+                "path": "pair_config.input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
                 "account": "PairConfig",
-                "path": "pair_config.output_mint"
+                "path": "pair_config.output_token_mint"
               }
             ]
           }
         },
         {
-          "name": "pythPriceFeed",
+          "name": "inputTokenPythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "outputTokenPythPriceFeed",
           "isMut": false,
           "isSigner": false,
           "isOptional": true
@@ -728,15 +758,21 @@ export const IDL: DripV2 = {
         "kind": "struct",
         "fields": [
           {
-            "name": "inputMint",
+            "name": "inputTokenMint",
             "type": "publicKey"
           },
           {
-            "name": "outputMint",
+            "name": "outputTokenMint",
             "type": "publicKey"
           },
           {
-            "name": "pythPriceFeed",
+            "name": "inputTokenPythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "outputTokenPythPriceFeed",
             "type": {
               "option": "publicKey"
             }

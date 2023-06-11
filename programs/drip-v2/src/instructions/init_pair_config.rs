@@ -13,16 +13,16 @@ pub struct InitPairConfig<'info> {
     pub payer: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
-    pub input_mint: Box<Account<'info, Mint>>,
-    pub output_mint: Box<Account<'info, Mint>>,
+    pub input_token_mint: Box<Account<'info, Mint>>,
+    pub output_token_mint: Box<Account<'info, Mint>>,
 
     #[account(
         init,
         seeds = [
             b"drip-v2-pair-config",
             global_config.key().as_ref(),
-            input_mint.key().as_ref(),
-            output_mint.key().as_ref(),
+            input_token_mint.key().as_ref(),
+            output_token_mint.key().as_ref(),
         ],
         bump,
         payer = payer,
@@ -30,7 +30,8 @@ pub struct InitPairConfig<'info> {
     )]
     pub pair_config: Box<Account<'info, PairConfig>>,
 
-    pub pyth_price_feed: Option<Account<'info, PriceFeed>>,
+    pub input_token_pyth_price_feed: Option<Account<'info, PriceFeed>>,
+    pub output_token_pyth_price_feed: Option<Account<'info, PriceFeed>>,
 
     pub system_program: Program<'info, System>,
 }
@@ -43,12 +44,19 @@ pub fn handle_init_pair_config(ctx: Context<InitPairConfig>) -> Result<()> {
         DripError::OperationUnauthorized
     );
 
-    ctx.accounts.pair_config.input_mint = ctx.accounts.input_mint.key();
-    ctx.accounts.pair_config.output_mint = ctx.accounts.output_mint.key();
+    ctx.accounts.pair_config.input_token_mint = ctx.accounts.input_token_mint.key();
+    ctx.accounts.pair_config.output_token_mint = ctx.accounts.output_token_mint.key();
     ctx.accounts.pair_config.bump = *ctx.bumps.get("pair_config").unwrap();
-    ctx.accounts.pair_config.pyth_price_feed = ctx
+
+    ctx.accounts.pair_config.input_token_pyth_price_feed = ctx
         .accounts
-        .pyth_price_feed
+        .input_token_pyth_price_feed
+        .as_ref()
+        .map_or(None, |p| Some(p.key()));
+
+    ctx.accounts.pair_config.output_token_pyth_price_feed = ctx
+        .accounts
+        .output_token_pyth_price_feed
         .as_ref()
         .map_or(None, |p| Some(p.key()));
 
