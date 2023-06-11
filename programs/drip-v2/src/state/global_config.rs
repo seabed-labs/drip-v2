@@ -14,7 +14,7 @@ pub struct GlobalConfig {
     pub admins: [Pubkey; ADMIN_COUNT],
     pub admin_permissions: [u64; ADMIN_COUNT],
     pub default_drip_fee_bps: u64,
-    pub fee_collector: Pubkey,
+    pub global_signer: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

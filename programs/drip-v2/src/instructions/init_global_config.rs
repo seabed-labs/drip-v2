@@ -1,4 +1,4 @@
-use crate::state::{FeeCollector, GlobalConfig};
+use crate::state::{GlobalConfig, GlobalSigner};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -12,14 +12,14 @@ pub struct InitGlobalConfig<'info> {
     #[account(
         init,
         seeds = [
-            b"drip-v2-fee-collector",
+            b"drip-v2-global-signer",
             global_config.key().as_ref(),
         ],
         bump,
         payer = payer,
-        space = 8 + FeeCollector::INIT_SPACE
+        space = 8 + GlobalSigner::INIT_SPACE
     )]
-    pub fee_collector: Account<'info, FeeCollector>,
+    pub global_signer: Account<'info, GlobalSigner>,
 
     pub system_program: Program<'info, System>,
 }
@@ -37,10 +37,10 @@ pub fn handle_init_global_config(
     ctx.accounts.global_config.version = 0;
     ctx.accounts.global_config.super_admin = params.super_admin;
     ctx.accounts.global_config.default_drip_fee_bps = params.default_drip_fee_bps;
-    ctx.accounts.global_config.fee_collector = ctx.accounts.fee_collector.key();
+    ctx.accounts.global_config.global_signer = ctx.accounts.global_signer.key();
 
-    ctx.accounts.fee_collector.global_config = ctx.accounts.global_config.key();
-    ctx.accounts.fee_collector.bump = *ctx.bumps.get("fee_collector").unwrap();
+    ctx.accounts.global_signer.global_config = ctx.accounts.global_config.key();
+    ctx.accounts.global_signer.bump = *ctx.bumps.get("global_signer").unwrap();
 
     Ok(())
 }

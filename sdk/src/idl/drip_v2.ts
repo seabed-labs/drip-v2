@@ -16,7 +16,7 @@ export type DripV2 = {
           "isSigner": true
         },
         {
-          "name": "feeCollector",
+          "name": "globalSigner",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -24,7 +24,7 @@ export type DripV2 = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "drip-v2-fee-collector"
+                "value": "drip-v2-global-signer"
               },
               {
                 "kind": "account",
@@ -311,7 +311,7 @@ export type DripV2 = {
           "isSigner": false
         },
         {
-          "name": "feeCollector",
+          "name": "globalSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -319,7 +319,7 @@ export type DripV2 = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "drip-v2-fee-collector"
+                "value": "drip-v2-global-signer"
               },
               {
                 "kind": "account",
@@ -354,11 +354,192 @@ export type DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "initDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftHolder",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "global_signer"
+          ]
+        },
+        {
+          "name": "globalSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-global-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          },
+          "relations": [
+            "global_config"
+          ]
+        },
+        {
+          "name": "inputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "owner_nft_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitDripPositionParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
     {
-      "name": "feeCollector",
+      "name": "dripPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "autoCreditEnabled",
+            "type": "bool"
+          },
+          {
+            "name": "inputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "inputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          },
+          {
+            "name": "totalInputTokenDripped",
+            "type": "u64"
+          },
+          {
+            "name": "totalOutputTokenReceived",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "globalSigner",
       "type": {
         "kind": "struct",
         "fields": [
@@ -413,7 +594,7 @@ export type DripV2 = {
             "type": "u64"
           },
           {
-            "name": "feeCollector",
+            "name": "globalSigner",
             "type": "publicKey"
           }
         ]
@@ -469,6 +650,22 @@ export type DripV2 = {
     }
   ],
   "types": [
+    {
+      "name": "InitDripPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "InitGlobalConfigParams",
       "type": {
@@ -684,8 +881,8 @@ export type DripV2 = {
     },
     {
       "code": 6010,
-      "name": "GlobalConfigFeeCollectorMismatch",
-      "msg": "Global config and fee collector mismatch"
+      "name": "GlobalConfigGlobalSignerMismatch",
+      "msg": "Global config and global signer mismatch"
     }
   ]
 };
@@ -708,7 +905,7 @@ export const IDL: DripV2 = {
           "isSigner": true
         },
         {
-          "name": "feeCollector",
+          "name": "globalSigner",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -716,7 +913,7 @@ export const IDL: DripV2 = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "drip-v2-fee-collector"
+                "value": "drip-v2-global-signer"
               },
               {
                 "kind": "account",
@@ -1003,7 +1200,7 @@ export const IDL: DripV2 = {
           "isSigner": false
         },
         {
-          "name": "feeCollector",
+          "name": "globalSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -1011,7 +1208,7 @@ export const IDL: DripV2 = {
               {
                 "kind": "const",
                 "type": "string",
-                "value": "drip-v2-fee-collector"
+                "value": "drip-v2-global-signer"
               },
               {
                 "kind": "account",
@@ -1046,11 +1243,192 @@ export const IDL: DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "initDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftHolder",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "ownerNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false,
+          "relations": [
+            "global_signer"
+          ]
+        },
+        {
+          "name": "globalSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-global-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          },
+          "relations": [
+            "global_config"
+          ]
+        },
+        {
+          "name": "inputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "owner_nft_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitDripPositionParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
     {
-      "name": "feeCollector",
+      "name": "dripPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "autoCreditEnabled",
+            "type": "bool"
+          },
+          {
+            "name": "inputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "inputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          },
+          {
+            "name": "totalInputTokenDripped",
+            "type": "u64"
+          },
+          {
+            "name": "totalOutputTokenReceived",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "globalSigner",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1105,7 +1483,7 @@ export const IDL: DripV2 = {
             "type": "u64"
           },
           {
-            "name": "feeCollector",
+            "name": "globalSigner",
             "type": "publicKey"
           }
         ]
@@ -1161,6 +1539,22 @@ export const IDL: DripV2 = {
     }
   ],
   "types": [
+    {
+      "name": "InitDripPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "InitGlobalConfigParams",
       "type": {
@@ -1376,8 +1770,8 @@ export const IDL: DripV2 = {
     },
     {
       "code": 6010,
-      "name": "GlobalConfigFeeCollectorMismatch",
-      "msg": "Global config and fee collector mismatch"
+      "name": "GlobalConfigGlobalSignerMismatch",
+      "msg": "Global config and global signer mismatch"
     }
   ]
 };

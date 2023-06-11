@@ -61,4 +61,11 @@ pub mod drip_v2 {
     pub fn withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesParams) -> Result<()> {
         handle_withdraw_fees(ctx, params)
     }
+
+    pub fn init_drip_position(
+        ctx: Context<InitDripPosition>,
+        params: InitDripPositionParams,
+    ) -> Result<()> {
+        handle_init_drip(ctx, params)
+    }
 }

@@ -2,6 +2,11 @@ import * as AdminStateUpdate from "./AdminStateUpdate"
 import * as AdminPermission from "./AdminPermission"
 import * as PriceOracle from "./PriceOracle"
 
+export { InitDripPositionParams } from "./InitDripPositionParams"
+export type {
+  InitDripPositionParamsFields,
+  InitDripPositionParamsJSON,
+} from "./InitDripPositionParams"
 export { InitGlobalConfigParams } from "./InitGlobalConfigParams"
 export type {
   InitGlobalConfigParamsFields,
@@ -27,6 +32,11 @@ export type {
   UpdateSuperAdminParamsFields,
   UpdateSuperAdminParamsJSON,
 } from "./UpdateSuperAdminParams"
+export { WithdrawFeesParams } from "./WithdrawFeesParams"
+export type {
+  WithdrawFeesParamsFields,
+  WithdrawFeesParamsJSON,
+} from "./WithdrawFeesParams"
 export { AdminStateUpdate }
 
 export type AdminStateUpdateKind =
@@ -49,11 +59,13 @@ export type AdminPermissionKind =
   | AdminPermission.UpdateDefaultDripFees
   | AdminPermission.UpdatePythPriceFeed
   | AdminPermission.UpdateDefaultPairDripFees
+  | AdminPermission.WithdrawFees
 export type AdminPermissionJSON =
   | AdminPermission.DripJSON
   | AdminPermission.UpdateDefaultDripFeesJSON
   | AdminPermission.UpdatePythPriceFeedJSON
   | AdminPermission.UpdateDefaultPairDripFeesJSON
+  | AdminPermission.WithdrawFeesJSON
 
 export { PriceOracle }
 

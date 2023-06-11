@@ -14,9 +14,9 @@ describe("Program - initGlobalConfig", () => {
         const superAdmin = new Keypair();
         const provider = anchor.getProvider();
 
-        const [feeCollectorPubkey] = PublicKey.findProgramAddressSync(
+        const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
             [
-                Buffer.from("drip-v2-fee-collector"),
+                Buffer.from("drip-v2-global-signer"),
                 globalConfigKeypair.publicKey.toBuffer(),
             ],
             program.programId
@@ -31,7 +31,7 @@ describe("Program - initGlobalConfig", () => {
                 payer: provider.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
                 systemProgram: SystemProgram.programId,
-                feeCollector: feeCollectorPubkey,
+                globalSigner: globalSignerPubkey,
             })
             .signers([globalConfigKeypair])
             .rpc();
@@ -40,8 +40,8 @@ describe("Program - initGlobalConfig", () => {
             globalConfigKeypair.publicKey
         );
 
-        const feeCollectorAccount = await program.account.feeCollector.fetch(
-            feeCollectorPubkey
+        const feeCollectorAccount = await program.account.globalSigner.fetch(
+            globalSignerPubkey
         );
 
         expect({
@@ -52,7 +52,7 @@ describe("Program - initGlobalConfig", () => {
                 (admin) => admin.toString()
             ),
             defaultDripFeeBps: globalConfigAccount.defaultDripFeeBps.toString(),
-            feeCollectorPubkey: globalConfigAccount.feeCollector.toString(),
+            globalSigner: globalConfigAccount.globalSigner.toString(),
         }).to.deep.equal({
             version: "0",
             superAdmin: superAdmin.publicKey.toBase58(),
@@ -61,7 +61,7 @@ describe("Program - initGlobalConfig", () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill("0"),
             defaultDripFeeBps: "100",
-            feeCollectorPubkey: feeCollectorPubkey.toBase58(),
+            globalSigner: globalSignerPubkey.toBase58(),
         });
 
         expect({

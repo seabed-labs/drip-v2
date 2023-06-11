@@ -6,6 +6,10 @@ export type CustomError =
   | OperationUnauthorized
   | CannotSerializePriceFeedAccount
   | PythPriceFeedLoadError
+  | UnexpectedFeeTokenAccount
+  | FeeRecipientMismatch
+  | GlobalConfigMismatch
+  | GlobalConfigGlobalSignerMismatch
 
 export class SuperAdminSignatureRequired extends Error {
   static readonly code = 6000
@@ -87,6 +91,50 @@ export class PythPriceFeedLoadError extends Error {
   }
 }
 
+export class UnexpectedFeeTokenAccount extends Error {
+  static readonly code = 6007
+  readonly code = 6007
+  readonly name = "UnexpectedFeeTokenAccount"
+  readonly msg = "Unexpected fee token account"
+
+  constructor(readonly logs?: string[]) {
+    super("6007: Unexpected fee token account")
+  }
+}
+
+export class FeeRecipientMismatch extends Error {
+  static readonly code = 6008
+  readonly code = 6008
+  readonly name = "FeeRecipientMismatch"
+  readonly msg = "Fee recipient token account owner does not match"
+
+  constructor(readonly logs?: string[]) {
+    super("6008: Fee recipient token account owner does not match")
+  }
+}
+
+export class GlobalConfigMismatch extends Error {
+  static readonly code = 6009
+  readonly code = 6009
+  readonly name = "GlobalConfigMismatch"
+  readonly msg = "Global config mismatch"
+
+  constructor(readonly logs?: string[]) {
+    super("6009: Global config mismatch")
+  }
+}
+
+export class GlobalConfigGlobalSignerMismatch extends Error {
+  static readonly code = 6010
+  readonly code = 6010
+  readonly name = "GlobalConfigGlobalSignerMismatch"
+  readonly msg = "Global config and global signer mismatch"
+
+  constructor(readonly logs?: string[]) {
+    super("6010: Global config and global signer mismatch")
+  }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
   switch (code) {
     case 6000:
@@ -103,6 +151,14 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
       return new CannotSerializePriceFeedAccount(logs)
     case 6006:
       return new PythPriceFeedLoadError(logs)
+    case 6007:
+      return new UnexpectedFeeTokenAccount(logs)
+    case 6008:
+      return new FeeRecipientMismatch(logs)
+    case 6009:
+      return new GlobalConfigMismatch(logs)
+    case 6010:
+      return new GlobalConfigGlobalSignerMismatch(logs)
   }
 
   return null

@@ -10,6 +10,7 @@ export interface GlobalConfigFields {
   admins: Array<PublicKey>
   adminPermissions: Array<BN>
   defaultDripFeeBps: BN
+  globalSigner: PublicKey
 }
 
 export interface GlobalConfigJSON {
@@ -18,6 +19,7 @@ export interface GlobalConfigJSON {
   admins: Array<string>
   adminPermissions: Array<string>
   defaultDripFeeBps: string
+  globalSigner: string
 }
 
 export class GlobalConfig {
@@ -26,6 +28,7 @@ export class GlobalConfig {
   readonly admins: Array<PublicKey>
   readonly adminPermissions: Array<BN>
   readonly defaultDripFeeBps: BN
+  readonly globalSigner: PublicKey
 
   static readonly discriminator = Buffer.from([
     149, 8, 156, 202, 160, 252, 176, 217,
@@ -37,6 +40,7 @@ export class GlobalConfig {
     borsh.array(borsh.publicKey(), 20, "admins"),
     borsh.array(borsh.u64(), 20, "adminPermissions"),
     borsh.u64("defaultDripFeeBps"),
+    borsh.publicKey("globalSigner"),
   ])
 
   constructor(fields: GlobalConfigFields) {
@@ -45,6 +49,7 @@ export class GlobalConfig {
     this.admins = fields.admins
     this.adminPermissions = fields.adminPermissions
     this.defaultDripFeeBps = fields.defaultDripFeeBps
+    this.globalSigner = fields.globalSigner
   }
 
   static async fetch(
@@ -94,6 +99,7 @@ export class GlobalConfig {
       admins: dec.admins,
       adminPermissions: dec.adminPermissions,
       defaultDripFeeBps: dec.defaultDripFeeBps,
+      globalSigner: dec.globalSigner,
     })
   }
 
@@ -104,6 +110,7 @@ export class GlobalConfig {
       admins: this.admins.map((item) => item.toString()),
       adminPermissions: this.adminPermissions.map((item) => item.toString()),
       defaultDripFeeBps: this.defaultDripFeeBps.toString(),
+      globalSigner: this.globalSigner.toString(),
     }
   }
 
@@ -114,6 +121,7 @@ export class GlobalConfig {
       admins: obj.admins.map((item) => new PublicKey(item)),
       adminPermissions: obj.adminPermissions.map((item) => new BN(item)),
       defaultDripFeeBps: new BN(obj.defaultDripFeeBps),
+      globalSigner: new PublicKey(obj.globalSigner),
     })
   }
 }

@@ -16,7 +16,7 @@ export interface GlobalConfigAccount {
     admins: PublicKey[];
     adminPermissions: BigInt[];
     defaultDripFeeBps: bigint;
-    feeCollector: PublicKey;
+    globalSigner: PublicKey;
 }
 
 export class Drip {
@@ -55,7 +55,7 @@ export class Drip {
                 BigInt(permission.toString())
             ),
             defaultDripFeeBps: BigInt(account.defaultDripFeeBps.toString()),
-            feeCollector: account.feeCollector,
+            globalSigner: account.globalSigner,
         };
     }
 
@@ -69,9 +69,9 @@ export class Drip {
         const _globalConfigPubkey =
             globalConfigPubkey ?? globalConfigKeypair.publicKey;
 
-        const [feeCollector] = PublicKey.findProgramAddressSync(
+        const [globalSigner] = PublicKey.findProgramAddressSync(
             [
-                Buffer.from("drip-v2-fee-collector"),
+                Buffer.from("drip-v2-global-signer"),
                 _globalConfigPubkey.toBuffer(),
             ],
             this.program.programId
@@ -86,7 +86,7 @@ export class Drip {
                 payer: payer ?? this.program.provider.publicKey,
                 globalConfig: _globalConfigPubkey,
                 systemProgram: SystemProgram.programId,
-                feeCollector,
+                globalSigner,
             });
 
         if (!globalConfigPubkey) {
