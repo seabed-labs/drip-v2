@@ -34,14 +34,11 @@ pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Resul
         DripError::OperationUnauthorized
     );
 
-    match &ctx.accounts.pyth_price_feed {
-        Some(pyth_price_feed) => {
-            ctx.accounts.pair_config.pyth_price_feed = Some(pyth_price_feed.key());
-        }
-        None => {
-            ctx.accounts.pair_config.pyth_price_feed = None;
-        }
-    }
+    ctx.accounts.pair_config.pyth_price_feed = ctx
+        .accounts
+        .pyth_price_feed
+        .as_ref()
+        .map_or(None, |p| Some(p.key()));
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{AdminPermission, GlobalConfig, PairConfig},
+    state::{AdminPermission, GlobalConfig, PairConfig, PriceFeed},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
@@ -30,18 +30,12 @@ pub struct InitPairConfig<'info> {
     )]
     pub pair_config: Box<Account<'info, PairConfig>>,
 
+    pub pyth_price_feed: Option<Account<'info, PriceFeed>>,
+
     pub system_program: Program<'info, System>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct InitPairConfigParams {
-    pub pyth_price_feed: Option<Pubkey>,
-}
-
-pub fn handle_init_pair_config(
-    ctx: Context<InitPairConfig>,
-    params: InitPairConfigParams,
-) -> Result<()> {
+pub fn handle_init_pair_config(ctx: Context<InitPairConfig>) -> Result<()> {
     require!(
         ctx.accounts
             .global_config
@@ -51,8 +45,12 @@ pub fn handle_init_pair_config(
 
     ctx.accounts.pair_config.input_mint = ctx.accounts.input_mint.key();
     ctx.accounts.pair_config.output_mint = ctx.accounts.output_mint.key();
-    ctx.accounts.pair_config.pyth_price_feed = params.pyth_price_feed;
     ctx.accounts.pair_config.bump = *ctx.bumps.get("pair_config").unwrap();
+    ctx.accounts.pair_config.pyth_price_feed = ctx
+        .accounts
+        .pyth_price_feed
+        .as_ref()
+        .map_or(None, |p| Some(p.key()));
 
     Ok(())
 }

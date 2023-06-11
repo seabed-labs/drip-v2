@@ -160,19 +160,18 @@ export type DripV2 = {
           }
         },
         {
+          "name": "pythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "InitPairConfigParams"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "updatePythPriceFeed",
@@ -312,20 +311,6 @@ export type DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitPairConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pythPriceFeed",
-            "type": {
-              "option": "publicKey"
-            }
           }
         ]
       }
@@ -630,19 +615,18 @@ export const IDL: DripV2 = {
           }
         },
         {
+          "name": "pythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "InitPairConfigParams"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "updatePythPriceFeed",
@@ -782,20 +766,6 @@ export const IDL: DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitPairConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pythPriceFeed",
-            "type": {
-              "option": "publicKey"
-            }
           }
         ]
       }
