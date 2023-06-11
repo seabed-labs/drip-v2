@@ -53,9 +53,9 @@ impl Deref for PriceFeed {
 pub struct PairConfig {
     pub input_token_mint: Pubkey,
     pub output_token_mint: Pubkey,
+    pub bump: u8,
     pub input_token_price_oracle: PriceOracle,
     pub output_token_price_oracle: PriceOracle,
-    pub bump: u8,
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
