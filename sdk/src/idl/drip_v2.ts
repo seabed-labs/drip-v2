@@ -16,6 +16,26 @@ export type DripV2 = {
           "isSigner": true
         },
         {
+          "name": "feeCollector",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -280,6 +300,18 @@ export type DripV2 = {
   ],
   "accounts": [
     {
+      "name": "feeCollector",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "globalConfig",
       "type": {
         "kind": "struct",
@@ -313,6 +345,10 @@ export type DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          },
+          {
+            "name": "feeCollector",
+            "type": "publicKey"
           }
         ]
       }
@@ -571,6 +607,26 @@ export const IDL: DripV2 = {
           "isSigner": true
         },
         {
+          "name": "feeCollector",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -835,6 +891,18 @@ export const IDL: DripV2 = {
   ],
   "accounts": [
     {
+      "name": "feeCollector",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "globalConfig",
       "type": {
         "kind": "struct",
@@ -868,6 +936,10 @@ export const IDL: DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          },
+          {
+            "name": "feeCollector",
+            "type": "publicKey"
           }
         ]
       }

@@ -16,6 +16,7 @@ export interface GlobalConfigAccount {
     admins: PublicKey[];
     adminPermissions: BigInt[];
     defaultDripFeeBps: bigint;
+    feeCollector: PublicKey;
 }
 
 export class Drip {
@@ -54,6 +55,7 @@ export class Drip {
                 BigInt(permission.toString())
             ),
             defaultDripFeeBps: BigInt(account.defaultDripFeeBps.toString()),
+            feeCollector: account.feeCollector,
         };
     }
 
@@ -64,6 +66,16 @@ export class Drip {
         payer?: PublicKey
     ): Promise<{ tx: Transaction; globalConfigPubkey: PublicKey }> {
         const globalConfigKeypair = Keypair.generate();
+        const _globalConfigPubkey =
+            globalConfigPubkey ?? globalConfigKeypair.publicKey;
+
+        const [feeCollector] = PublicKey.findProgramAddressSync(
+            [
+                Buffer.from("drip-v2-fee-collector"),
+                _globalConfigPubkey.toBuffer(),
+            ],
+            this.program.programId
+        );
 
         let txBuilder = this.program.methods
             .initGlobalConfig({
@@ -72,9 +84,9 @@ export class Drip {
             })
             .accounts({
                 payer: payer ?? this.program.provider.publicKey,
-                globalConfig:
-                    globalConfigPubkey ?? globalConfigKeypair.publicKey,
+                globalConfig: _globalConfigPubkey,
                 systemProgram: SystemProgram.programId,
+                feeCollector,
             });
 
         if (!globalConfigPubkey) {
@@ -83,8 +95,7 @@ export class Drip {
 
         return {
             tx: await txBuilder.transaction(),
-            globalConfigPubkey:
-                globalConfigPubkey ?? globalConfigKeypair.publicKey,
+            globalConfigPubkey: _globalConfigPubkey,
         };
     }
 }
