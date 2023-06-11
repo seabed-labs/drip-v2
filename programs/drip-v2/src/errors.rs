@@ -16,4 +16,10 @@ pub enum DripError {
 
     #[msg("Unauthorized; Requires admin permission for this op or super admin signature")]
     OperationUnauthorized, // 6004 or 0x1774
+
+    #[msg("Pyth PriceFeed account serialization not supported")]
+    CannotSerializePriceFeedAccount, // 6005 or 0x1775
+
+    #[msg("Error when loading price from Pyth PriceFeed")]
+    PythPriceFeedLoadError, // 6005 or 0x1775
 }

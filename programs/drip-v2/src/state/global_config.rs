@@ -83,24 +83,18 @@ impl GlobalConfig {
 }
 
 const FULL_U64_BITMAP: u64 = u64::MAX;
-const ADMIN_BITMAP_INIT_PAIR_CONFIG_MASK: u64 = 1;
-const ADMIN_BITMAP_DRIP_MASK: u64 = 1 << 1;
-const ADMIN_BITMAP_UPDATE_DEFAULT_DRIP_FEES_MASK: u64 = 1 << 2;
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum AdminPermission {
-    InitPairConfig,
+    InitPairConfig = 0,
     Drip,
     UpdateDefaultDripFees,
+    UpdatePairConfigPythPriceFeed,
 }
 
 impl AdminPermission {
     fn to_mask(&self) -> u64 {
-        match self {
-            Self::InitPairConfig => ADMIN_BITMAP_INIT_PAIR_CONFIG_MASK,
-            Self::Drip => ADMIN_BITMAP_DRIP_MASK,
-            Self::UpdateDefaultDripFees => ADMIN_BITMAP_UPDATE_DEFAULT_DRIP_FEES_MASK,
-        }
+        1 << (self.clone() as u64)
     }
 
     fn enable(&self, permissions_bitmap: u64) -> u64 {

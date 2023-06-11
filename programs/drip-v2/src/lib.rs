@@ -36,4 +36,17 @@ pub mod drip_v2 {
     ) -> Result<()> {
         handle_update_default_drip_fees(ctx, params)
     }
+
+    pub fn init_pair_config(
+        ctx: Context<InitPairConfig>,
+        params: InitPairConfigParams,
+    ) -> Result<()> {
+        handle_init_pair_config(ctx, params)
+    }
+
+    pub fn update_pair_config_pyth_price_feed(
+        ctx: Context<UpdatePairConfigPythPriceFeed>,
+    ) -> Result<()> {
+        handle_update_pair_config_pyth_price_feed(ctx)
+    }
 }

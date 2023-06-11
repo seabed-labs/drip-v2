@@ -98,6 +98,135 @@ export type DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "initPairConfig",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "input_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "output_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitPairConfigParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updatePairConfigPythPriceFeed",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.input_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.output_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -138,6 +267,32 @@ export type DripV2 = {
           }
         ]
       }
+    },
+    {
+      "name": "pairConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inputMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -157,6 +312,20 @@ export type DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitPairConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -252,6 +421,9 @@ export type DripV2 = {
           },
           {
             "name": "UpdateDefaultDripFees"
+          },
+          {
+            "name": "UpdatePairConfigPythPriceFeed"
           }
         ]
       }
@@ -282,6 +454,16 @@ export type DripV2 = {
       "code": 6004,
       "name": "OperationUnauthorized",
       "msg": "Unauthorized; Requires admin permission for this op or super admin signature"
+    },
+    {
+      "code": 6005,
+      "name": "CannotSerializePriceFeedAccount",
+      "msg": "Pyth PriceFeed account serialization not supported"
+    },
+    {
+      "code": 6006,
+      "name": "PythPriceFeedLoadError",
+      "msg": "Error when loading price from Pyth PriceFeed"
     }
   ]
 };
@@ -386,6 +568,135 @@ export const IDL: DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "initPairConfig",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "input_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "output_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitPairConfigParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updatePairConfigPythPriceFeed",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.input_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "PairConfig",
+                "path": "pair_config.output_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pythPriceFeed",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -426,6 +737,32 @@ export const IDL: DripV2 = {
           }
         ]
       }
+    },
+    {
+      "name": "pairConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inputMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
     }
   ],
   "types": [
@@ -445,6 +782,20 @@ export const IDL: DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitPairConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pythPriceFeed",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -540,6 +891,9 @@ export const IDL: DripV2 = {
           },
           {
             "name": "UpdateDefaultDripFees"
+          },
+          {
+            "name": "UpdatePairConfigPythPriceFeed"
           }
         ]
       }
@@ -570,6 +924,16 @@ export const IDL: DripV2 = {
       "code": 6004,
       "name": "OperationUnauthorized",
       "msg": "Unauthorized; Requires admin permission for this op or super admin signature"
+    },
+    {
+      "code": 6005,
+      "name": "CannotSerializePriceFeedAccount",
+      "msg": "Pyth PriceFeed account serialization not supported"
+    },
+    {
+      "code": 6006,
+      "name": "PythPriceFeedLoadError",
+      "msg": "Error when loading price from Pyth PriceFeed"
     }
   ]
 };
