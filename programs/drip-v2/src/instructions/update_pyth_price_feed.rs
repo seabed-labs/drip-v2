@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{AdminPermission, GlobalConfig, PairConfig, PriceFeed, PriceOracle},
+    state::{AdminPermission, Authorizer, GlobalConfig, PairConfig, PriceFeed, PriceOracle},
 };
 use anchor_lang::prelude::*;
 
@@ -28,9 +28,10 @@ pub struct UpdatePythPriceFeed<'info> {
 
 pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Result<()> {
     require!(
-        ctx.accounts
-            .global_config
-            .is_authorized(&ctx.accounts.signer, AdminPermission::UpdatePythPriceFeed),
+        ctx.accounts.signer.is_authorized(
+            &ctx.accounts.global_config,
+            AdminPermission::UpdatePythPriceFeed
+        ),
         DripError::OperationUnauthorized
     );
 

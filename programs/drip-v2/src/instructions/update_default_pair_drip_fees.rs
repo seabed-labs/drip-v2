@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::errors::DripError;
-use crate::state::{AdminPermission, GlobalConfig, PairConfig};
+use crate::state::{AdminPermission, Authorizer, GlobalConfig, PairConfig};
 
 #[derive(Accounts)]
 pub struct UpdateDefaultPairDripFees<'info> {
@@ -32,8 +32,8 @@ pub fn handle_update_default_pair_drip_fees(
     params: UpdateDefaultPairDripFeesParams,
 ) -> Result<()> {
     require!(
-        ctx.accounts.global_config.is_authorized(
-            &ctx.accounts.signer,
+        ctx.accounts.signer.is_authorized(
+            &ctx.accounts.global_config,
             AdminPermission::UpdateDefaultPairDripFees
         ),
         DripError::OperationUnauthorized

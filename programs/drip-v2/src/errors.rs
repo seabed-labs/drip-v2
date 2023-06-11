@@ -31,4 +31,7 @@ pub enum DripError {
 
     #[msg("Global config mismatch")]
     GlobalConfigMismatch, // 6009 or 0x1779
+
+    #[msg("Global config and fee collector mismatch")]
+    GlobalConfigFeeCollectorMismatch, // 6010 or 0x177A
 }

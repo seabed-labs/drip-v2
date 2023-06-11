@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{AdminPermission, FeeCollector, GlobalConfig},
+    state::{AdminPermission, Authorizer, FeeCollector, GlobalConfig},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -9,7 +9,7 @@ use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 pub struct WithdrawFees<'info> {
     pub signer: Signer<'info>,
 
-    pub global_config: Account<'info, GlobalConfig>,
+    pub global_config: Box<Account<'info, GlobalConfig>>,
 
     #[account(
         seeds = [
@@ -35,13 +35,14 @@ pub struct WithdrawFeesParams {
 pub fn handle_withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesParams) -> Result<()> {
     require!(
         ctx.accounts
-            .global_config
-            .is_authorized(&ctx.accounts.signer, AdminPermission::WithdrawFees),
+            .signer
+            .is_authorized(&ctx.accounts.global_config, AdminPermission::WithdrawFees),
         DripError::OperationUnauthorized
     );
 
     require!(
-        ctx.accounts.fee_collector.global_config == ctx.accounts.global_config.key(),
+        ctx.accounts.fee_collector.global_config == ctx.accounts.global_config.key()
+            && ctx.accounts.global_config.fee_collector == ctx.accounts.fee_collector.key(),
         DripError::GlobalConfigMismatch
     );
 
