@@ -17,7 +17,6 @@ describe("Program - updateSuperAdmin", () => {
 
         await program.methods
             .initGlobalConfig({
-                version: new anchor.BN(1),
                 superAdmin: superAdmin1.publicKey,
                 defaultDripFeeBps: new anchor.BN(100),
             })
@@ -46,7 +45,7 @@ describe("Program - updateSuperAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountBefore.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdmin1.publicKey.toBase58(),
             admins: Array<PublicKey>(20)
                 .fill(PublicKey.default)
@@ -83,7 +82,7 @@ describe("Program - updateSuperAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountAfter.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdmin2.publicKey.toBase58(),
             admins: Array<PublicKey>(20)
                 .fill(PublicKey.default)
@@ -101,7 +100,6 @@ describe("Program - updateSuperAdmin", () => {
 
         await program.methods
             .initGlobalConfig({
-                version: new anchor.BN(1),
                 superAdmin: superAdmin1.publicKey,
                 defaultDripFeeBps: new anchor.BN(100),
             })
@@ -135,7 +133,6 @@ describe("Program - updateSuperAdmin", () => {
 
         await program.methods
             .initGlobalConfig({
-                version: new anchor.BN(1),
                 superAdmin: superAdmin1.publicKey,
                 defaultDripFeeBps: new anchor.BN(100),
             })

@@ -248,7 +248,7 @@ export type DripV2 = {
         "fields": [
           {
             "name": "version",
-            "type": "u64"
+            "type": "u8"
           },
           {
             "name": "superAdmin",
@@ -285,12 +285,20 @@ export type DripV2 = {
         "kind": "struct",
         "fields": [
           {
+            "name": "version",
+            "type": "u8"
+          },
+          {
             "name": "inputTokenMint",
             "type": "publicKey"
           },
           {
             "name": "outputTokenMint",
             "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           },
           {
             "name": "inputTokenPriceOracle",
@@ -303,10 +311,6 @@ export type DripV2 = {
             "type": {
               "defined": "PriceOracle"
             }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -318,10 +322,6 @@ export type DripV2 = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "version",
-            "type": "u64"
-          },
           {
             "name": "superAdmin",
             "type": "publicKey"
@@ -741,7 +741,7 @@ export const IDL: DripV2 = {
         "fields": [
           {
             "name": "version",
-            "type": "u64"
+            "type": "u8"
           },
           {
             "name": "superAdmin",
@@ -778,12 +778,20 @@ export const IDL: DripV2 = {
         "kind": "struct",
         "fields": [
           {
+            "name": "version",
+            "type": "u8"
+          },
+          {
             "name": "inputTokenMint",
             "type": "publicKey"
           },
           {
             "name": "outputTokenMint",
             "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           },
           {
             "name": "inputTokenPriceOracle",
@@ -796,10 +804,6 @@ export const IDL: DripV2 = {
             "type": {
               "defined": "PriceOracle"
             }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -811,10 +815,6 @@ export const IDL: DripV2 = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "version",
-            "type": "u64"
-          },
           {
             "name": "superAdmin",
             "type": "publicKey"

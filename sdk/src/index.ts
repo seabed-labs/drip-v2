@@ -58,7 +58,6 @@ export class Drip {
     }
 
     public async initGlobalConfig(
-        version: number,
         superAdmin: PublicKey,
         defaultDripFeeBps: BigInt,
         globalConfigPubkey?: PublicKey,
@@ -68,7 +67,6 @@ export class Drip {
 
         let txBuilder = this.program.methods
             .initGlobalConfig({
-                version: new anchor.BN(version.toString()),
                 superAdmin: superAdmin,
                 defaultDripFeeBps: new anchor.BN(defaultDripFeeBps.toString()),
             })

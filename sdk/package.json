@@ -5,7 +5,8 @@
   "author": "Dcaf Labs",
   "license": "UNLICENSED",
   "scripts": {
-    "build": "yarn run tsc"
+    "build": "yarn run tsc",
+    "clean": "rm -rf dist && rm tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "typescript": "^5.1.3"

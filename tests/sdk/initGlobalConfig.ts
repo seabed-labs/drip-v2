@@ -24,7 +24,6 @@ describe("SDK - initGlobalConfig", () => {
         );
 
         const { tx, globalConfigPubkey } = await drip.initGlobalConfig(
-            1,
             superAdmin.publicKey,
             BigInt(100),
             globalConfigKeypair.publicKey,
@@ -56,7 +55,7 @@ describe("SDK - initGlobalConfig", () => {
                 defaultDripFeeBps:
                     globalConfigAccount.defaultDripFeeBps.toString(),
             }).to.deep.equal({
-                version: "1",
+                version: "0",
                 superAdmin: superAdmin.publicKey.toBase58(),
                 admins: Array<PublicKey>(20)
                     .fill(PublicKey.default)

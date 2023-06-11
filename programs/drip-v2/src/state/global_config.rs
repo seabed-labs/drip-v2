@@ -9,11 +9,11 @@ pub const ADMIN_COUNT: usize = 20;
 #[account]
 #[derive(Default, InitSpace)]
 pub struct GlobalConfig {
-    pub version: u64,                          // 8
-    pub super_admin: Pubkey,                   // 32
-    pub admins: [Pubkey; ADMIN_COUNT],         // 32*20
-    pub admin_permissions: [u64; ADMIN_COUNT], // 8*20
-    pub default_drip_fee_bps: u64,             // 8
+    pub version: u8,
+    pub super_admin: Pubkey,
+    pub admins: [Pubkey; ADMIN_COUNT],
+    pub admin_permissions: [u64; ADMIN_COUNT],
+    pub default_drip_fee_bps: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

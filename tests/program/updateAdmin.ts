@@ -20,7 +20,6 @@ describe("Program - updateAdmin", () => {
 
         await program.methods
             .initGlobalConfig({
-                version: new anchor.BN(1),
                 superAdmin: superAdminKeypair.publicKey,
                 defaultDripFeeBps: new anchor.BN(100),
             })
@@ -71,7 +70,7 @@ describe("Program - updateAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountBefore.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdminKeypair.publicKey.toBase58(),
             admins: Array<PublicKey>(20)
                 .fill(PublicKey.default)
@@ -111,7 +110,7 @@ describe("Program - updateAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountAfter.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdminKeypair.publicKey.toBase58(),
             admins: [newAdminPubkey.toBase58()].concat(
                 Array<PublicKey>(19)
@@ -141,7 +140,7 @@ describe("Program - updateAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountBefore.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdminKeypair.publicKey.toBase58(),
             admins: Array<PublicKey>(20)
                 .fill(PublicKey.default)
@@ -200,7 +199,7 @@ describe("Program - updateAdmin", () => {
             defaultDripFeeBps:
                 globalConfigAccountAfter.defaultDripFeeBps.toString(),
         }).to.deep.equal({
-            version: "1",
+            version: "0",
             superAdmin: superAdminKeypair.publicKey.toBase58(),
             admins: [newAdminPubkey.toBase58()].concat(
                 Array<PublicKey>(19)
