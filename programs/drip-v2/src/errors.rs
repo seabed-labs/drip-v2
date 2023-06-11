@@ -21,5 +21,17 @@ pub enum DripError {
     CannotSerializePriceFeedAccount, // 6005 or 0x1775
 
     #[msg("Error when loading price from Pyth PriceFeed")]
-    PythPriceFeedLoadError, // 6005 or 0x1775
+    PythPriceFeedLoadError, // 6006 or 0x1776
+
+    #[msg("Unexpected fee token account")]
+    UnexpectedFeeTokenAccount, // 6007 or 0x1777
+
+    #[msg("Fee recipient token account owner does not match")]
+    FeeRecipientMismatch, // 6008 or 0x1778
+
+    #[msg("Global config mismatch")]
+    GlobalConfigMismatch, // 6009 or 0x1779
+
+    #[msg("Global config and fee collector mismatch")]
+    GlobalConfigFeeCollectorMismatch, // 6010 or 0x177A
 }

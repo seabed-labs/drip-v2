@@ -16,6 +16,26 @@ export type DripV2 = {
           "isSigner": true
         },
         {
+          "name": "feeCollector",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -276,9 +296,87 @@ export type DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "withdrawFees",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeCollector",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "feeTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipientTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawFeesParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "feeCollector",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "globalConfig",
       "type": {
@@ -313,6 +411,10 @@ export type DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          },
+          {
+            "name": "feeCollector",
+            "type": "publicKey"
           }
         ]
       }
@@ -438,6 +540,18 @@ export type DripV2 = {
       }
     },
     {
+      "name": "WithdrawFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "AdminStateUpdate",
       "type": {
         "kind": "enum",
@@ -489,6 +603,9 @@ export type DripV2 = {
           },
           {
             "name": "UpdateDefaultPairDripFees"
+          },
+          {
+            "name": "WithdrawFees"
           }
         ]
       }
@@ -549,6 +666,26 @@ export type DripV2 = {
       "code": 6006,
       "name": "PythPriceFeedLoadError",
       "msg": "Error when loading price from Pyth PriceFeed"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedFeeTokenAccount",
+      "msg": "Unexpected fee token account"
+    },
+    {
+      "code": 6008,
+      "name": "FeeRecipientMismatch",
+      "msg": "Fee recipient token account owner does not match"
+    },
+    {
+      "code": 6009,
+      "name": "GlobalConfigMismatch",
+      "msg": "Global config mismatch"
+    },
+    {
+      "code": 6010,
+      "name": "GlobalConfigFeeCollectorMismatch",
+      "msg": "Global config and fee collector mismatch"
     }
   ]
 };
@@ -571,6 +708,26 @@ export const IDL: DripV2 = {
           "isSigner": true
         },
         {
+          "name": "feeCollector",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -831,9 +988,87 @@ export const IDL: DripV2 = {
           }
         }
       ]
+    },
+    {
+      "name": "withdrawFees",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeCollector",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-fee-collector"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "feeTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipientTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawFeesParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "feeCollector",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "globalConfig",
       "type": {
@@ -868,6 +1103,10 @@ export const IDL: DripV2 = {
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          },
+          {
+            "name": "feeCollector",
+            "type": "publicKey"
           }
         ]
       }
@@ -993,6 +1232,18 @@ export const IDL: DripV2 = {
       }
     },
     {
+      "name": "WithdrawFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "AdminStateUpdate",
       "type": {
         "kind": "enum",
@@ -1044,6 +1295,9 @@ export const IDL: DripV2 = {
           },
           {
             "name": "UpdateDefaultPairDripFees"
+          },
+          {
+            "name": "WithdrawFees"
           }
         ]
       }
@@ -1104,6 +1358,26 @@ export const IDL: DripV2 = {
       "code": 6006,
       "name": "PythPriceFeedLoadError",
       "msg": "Error when loading price from Pyth PriceFeed"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedFeeTokenAccount",
+      "msg": "Unexpected fee token account"
+    },
+    {
+      "code": 6008,
+      "name": "FeeRecipientMismatch",
+      "msg": "Fee recipient token account owner does not match"
+    },
+    {
+      "code": 6009,
+      "name": "GlobalConfigMismatch",
+      "msg": "Global config mismatch"
+    },
+    {
+      "code": 6010,
+      "name": "GlobalConfigFeeCollectorMismatch",
+      "msg": "Global config and fee collector mismatch"
     }
   ]
 };

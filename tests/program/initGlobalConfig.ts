@@ -14,6 +14,14 @@ describe("Program - initGlobalConfig", () => {
         const superAdmin = new Keypair();
         const provider = anchor.getProvider();
 
+        const [feeCollectorPubkey] = PublicKey.findProgramAddressSync(
+            [
+                Buffer.from("drip-v2-fee-collector"),
+                globalConfigKeypair.publicKey.toBuffer(),
+            ],
+            program.programId
+        );
+
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin.publicKey,
@@ -23,12 +31,17 @@ describe("Program - initGlobalConfig", () => {
                 payer: provider.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
                 systemProgram: SystemProgram.programId,
+                feeCollector: feeCollectorPubkey,
             })
             .signers([globalConfigKeypair])
             .rpc();
 
         const globalConfigAccount = await program.account.globalConfig.fetch(
             globalConfigKeypair.publicKey
+        );
+
+        const feeCollectorAccount = await program.account.feeCollector.fetch(
+            feeCollectorPubkey
         );
 
         expect({
@@ -39,6 +52,7 @@ describe("Program - initGlobalConfig", () => {
                 (admin) => admin.toString()
             ),
             defaultDripFeeBps: globalConfigAccount.defaultDripFeeBps.toString(),
+            feeCollectorPubkey: globalConfigAccount.feeCollector.toString(),
         }).to.deep.equal({
             version: "0",
             superAdmin: superAdmin.publicKey.toBase58(),
@@ -47,6 +61,13 @@ describe("Program - initGlobalConfig", () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill("0"),
             defaultDripFeeBps: "100",
+            feeCollectorPubkey: feeCollectorPubkey.toBase58(),
+        });
+
+        expect({
+            globalConfig: feeCollectorAccount.globalConfig.toString(),
+        }).to.deep.equal({
+            globalConfig: globalConfigKeypair.publicKey.toBase58(),
         });
     });
 });

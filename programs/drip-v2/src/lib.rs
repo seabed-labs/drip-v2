@@ -7,6 +7,11 @@ use instructions::*;
 
 declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 
+// TODO: Check and ensure exhaustive validations for each IX in its handler
+// TODO: Add exhaustive integration tests
+// TODO: Add SDK support + happy path SDK tests
+// TODO: Make sure all IXs support token 2022 (use interfaces, tried but was erroring out - might be a version issue?)
+
 #[program]
 pub mod drip_v2 {
     use super::*;
@@ -51,5 +56,9 @@ pub mod drip_v2 {
         params: UpdateDefaultPairDripFeesParams,
     ) -> Result<()> {
         handle_update_default_pair_drip_fees(ctx, params)
+    }
+
+    pub fn withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesParams) -> Result<()> {
+        handle_withdraw_fees(ctx, params)
     }
 }

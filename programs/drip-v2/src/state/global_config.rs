@@ -14,6 +14,7 @@ pub struct GlobalConfig {
     pub admins: [Pubkey; ADMIN_COUNT],
     pub admin_permissions: [u64; ADMIN_COUNT],
     pub default_drip_fee_bps: u64,
+    pub fee_collector: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -63,13 +64,23 @@ impl GlobalConfig {
 
         Ok(())
     }
+}
 
-    pub fn is_authorized(&self, signer: &Signer, permission: AdminPermission) -> bool {
-        if signer.key.eq(&self.super_admin) {
+pub trait Authorizer {
+    fn is_authorized(&self, global_config: &GlobalConfig, permission: AdminPermission) -> bool;
+}
+
+impl<'info> Authorizer for Signer<'info> {
+    fn is_authorized(&self, global_config: &GlobalConfig, permission: AdminPermission) -> bool {
+        if global_config.super_admin.eq(self.key) {
             return true;
         }
 
-        let admin_index = self.admins.iter().position(|admin| admin.eq(signer.key));
+        let admin_index = global_config
+            .admins
+            .iter()
+            .position(|admin| admin.eq(self.key));
+
         let admin_index = match admin_index {
             None => {
                 return false;
@@ -77,7 +88,7 @@ impl GlobalConfig {
             Some(admin_index) => admin_index,
         };
 
-        let admin_permissions_bitmap = self.admin_permissions[admin_index];
+        let admin_permissions_bitmap = global_config.admin_permissions[admin_index];
         permission.is_enabled(admin_permissions_bitmap)
     }
 }
@@ -91,6 +102,7 @@ pub enum AdminPermission {
     UpdateDefaultDripFees,
     UpdatePythPriceFeed,
     UpdateDefaultPairDripFees,
+    WithdrawFees,
 }
 
 impl AdminPermission {
