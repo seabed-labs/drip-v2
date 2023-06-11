@@ -1,11 +1,13 @@
 {
+    "author": "Dcaf Labs",
+    "license": "UNLICENSED",
     "scripts": {
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
     },
     "dependencies": {
-        "@coral-xyz/anchor": "0.27.0",
         "@dcaf/drip": "file:./sdk/dist",
+        "@coral-xyz/anchor": "0.27.0",
         "@types/chai-as-promised": "^7.1.5",
         "chai-as-promised": "^7.1.1"
     },
