@@ -293,15 +293,15 @@ export type DripV2 = {
             "type": "publicKey"
           },
           {
-            "name": "inputTokenPythPriceFeed",
+            "name": "inputTokenPriceOracle",
             "type": {
-              "option": "publicKey"
+              "defined": "PriceOracle"
             }
           },
           {
-            "name": "outputTokenPythPriceFeed",
+            "name": "outputTokenPriceOracle",
             "type": {
-              "option": "publicKey"
+              "defined": "PriceOracle"
             }
           },
           {
@@ -427,6 +427,26 @@ export type DripV2 = {
           },
           {
             "name": "UpdatePairConfigPythPriceFeed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceOracle",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable"
+          },
+          {
+            "name": "Pyth",
+            "fields": [
+              {
+                "name": "pyth_price_feed_account",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
@@ -766,15 +786,15 @@ export const IDL: DripV2 = {
             "type": "publicKey"
           },
           {
-            "name": "inputTokenPythPriceFeed",
+            "name": "inputTokenPriceOracle",
             "type": {
-              "option": "publicKey"
+              "defined": "PriceOracle"
             }
           },
           {
-            "name": "outputTokenPythPriceFeed",
+            "name": "outputTokenPriceOracle",
             "type": {
-              "option": "publicKey"
+              "defined": "PriceOracle"
             }
           },
           {
@@ -900,6 +920,26 @@ export const IDL: DripV2 = {
           },
           {
             "name": "UpdatePairConfigPythPriceFeed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceOracle",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable"
+          },
+          {
+            "name": "Pyth",
+            "fields": [
+              {
+                "name": "pyth_price_feed_account",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }

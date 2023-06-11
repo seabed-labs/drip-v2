@@ -53,7 +53,19 @@ impl Deref for PriceFeed {
 pub struct PairConfig {
     pub input_token_mint: Pubkey,
     pub output_token_mint: Pubkey,
-    pub input_token_pyth_price_feed: Option<Pubkey>,
-    pub output_token_pyth_price_feed: Option<Pubkey>,
+    pub input_token_price_oracle: PriceOracle,
+    pub output_token_price_oracle: PriceOracle,
     pub bump: u8,
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
+pub enum PriceOracle {
+    Unavailable,
+    Pyth { pyth_price_feed_account: Pubkey },
+}
+
+impl Default for PriceOracle {
+    fn default() -> Self {
+        PriceOracle::Unavailable
+    }
 }

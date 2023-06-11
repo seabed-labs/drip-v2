@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{AdminPermission, GlobalConfig, PairConfig, PriceFeed},
+    state::{AdminPermission, GlobalConfig, PairConfig, PriceFeed, PriceOracle},
 };
 use anchor_lang::prelude::*;
 
@@ -35,17 +35,21 @@ pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Resul
         DripError::OperationUnauthorized
     );
 
-    ctx.accounts.pair_config.input_token_pyth_price_feed = ctx
+    ctx.accounts.pair_config.input_token_price_oracle = ctx
         .accounts
         .input_token_pyth_price_feed
         .as_ref()
-        .map_or(None, |p| Some(p.key()));
+        .map_or(PriceOracle::Unavailable, |price_feed| PriceOracle::Pyth {
+            pyth_price_feed_account: price_feed.key(),
+        });
 
-    ctx.accounts.pair_config.output_token_pyth_price_feed = ctx
+    ctx.accounts.pair_config.output_token_price_oracle = ctx
         .accounts
         .output_token_pyth_price_feed
         .as_ref()
-        .map_or(None, |p| Some(p.key()));
+        .map_or(PriceOracle::Unavailable, |price_feed| PriceOracle::Pyth {
+            pyth_price_feed_account: price_feed.key(),
+        });
 
     Ok(())
 }
