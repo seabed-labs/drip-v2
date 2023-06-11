@@ -5,7 +5,7 @@ use crate::{
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
-pub struct UpdatePairConfigPythPriceFeed<'info> {
+pub struct UpdatePythPriceFeed<'info> {
     pub signer: Signer<'info>,
 
     pub global_config: Account<'info, GlobalConfig>,
@@ -25,9 +25,7 @@ pub struct UpdatePairConfigPythPriceFeed<'info> {
     pub pyth_price_feed: Option<Account<'info, PriceFeed>>,
 }
 
-pub fn handle_update_pair_config_pyth_price_feed(
-    ctx: Context<UpdatePairConfigPythPriceFeed>,
-) -> Result<()> {
+pub fn handle_update_pyth_price_feed(ctx: Context<UpdatePythPriceFeed>) -> Result<()> {
     require!(
         ctx.accounts.global_config.is_authorized(
             &ctx.accounts.signer,

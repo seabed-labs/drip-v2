@@ -175,7 +175,7 @@ export type DripV2 = {
       ]
     },
     {
-      "name": "updatePairConfigPythPriceFeed",
+      "name": "updatePythPriceFeed",
       "accounts": [
         {
           "name": "signer",
@@ -645,7 +645,7 @@ export const IDL: DripV2 = {
       ]
     },
     {
-      "name": "updatePairConfigPythPriceFeed",
+      "name": "updatePythPriceFeed",
       "accounts": [
         {
           "name": "signer",
