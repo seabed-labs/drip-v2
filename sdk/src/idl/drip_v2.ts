@@ -345,7 +345,7 @@ export type DripV2 = {
           {
             "name": "adminChange",
             "type": {
-              "defined": "AdminChange"
+              "defined": "AdminStateUpdate"
             }
           }
         ]
@@ -376,7 +376,7 @@ export type DripV2 = {
       }
     },
     {
-      "name": "AdminChange",
+      "name": "AdminStateUpdate",
       "type": {
         "kind": "enum",
         "variants": [
@@ -838,7 +838,7 @@ export const IDL: DripV2 = {
           {
             "name": "adminChange",
             "type": {
-              "defined": "AdminChange"
+              "defined": "AdminStateUpdate"
             }
           }
         ]
@@ -869,7 +869,7 @@ export const IDL: DripV2 = {
       }
     },
     {
-      "name": "AdminChange",
+      "name": "AdminStateUpdate",
       "type": {
         "kind": "enum",
         "variants": [

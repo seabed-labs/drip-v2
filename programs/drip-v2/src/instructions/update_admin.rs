@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::errors::DripError;
-use crate::state::{AdminChange, GlobalConfig};
+use crate::state::{AdminStateUpdate, GlobalConfig};
 
 #[derive(Accounts)]
 pub struct UpdateAdmin<'info> {
@@ -15,7 +15,7 @@ pub struct UpdateAdmin<'info> {
 pub struct UpdateAdminParams {
     // Anchor doesn't support usize
     pub admin_index: u64,
-    pub admin_change: AdminChange,
+    pub admin_change: AdminStateUpdate,
 }
 
 pub fn handle_update_admin(ctx: Context<UpdateAdmin>, params: UpdateAdminParams) -> Result<()> {

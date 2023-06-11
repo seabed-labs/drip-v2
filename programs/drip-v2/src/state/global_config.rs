@@ -17,7 +17,7 @@ pub struct GlobalConfig {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub enum AdminChange {
+pub enum AdminStateUpdate {
     Clear,
     SetAdminAndResetPermissions(Pubkey),
     ResetPermissions,
@@ -26,15 +26,15 @@ pub enum AdminChange {
 }
 
 impl GlobalConfig {
-    pub fn update_admin(&mut self, index: usize, admin_change: AdminChange) -> Result<()> {
+    pub fn update_admin(&mut self, index: usize, admin_change: AdminStateUpdate) -> Result<()> {
         require!(index < ADMIN_COUNT, DripError::AdminIndexOutOfBounds);
 
         match admin_change {
-            AdminChange::Clear => {
+            AdminStateUpdate::Clear => {
                 self.admins[index] = Pubkey::default();
                 self.admin_permissions[index] = 0;
             }
-            AdminChange::SetAdminAndResetPermissions(new_admin_pubkey) => {
+            AdminStateUpdate::SetAdminAndResetPermissions(new_admin_pubkey) => {
                 require!(
                     new_admin_pubkey.ne(&Pubkey::default()),
                     DripError::AdminPubkeyCannotBeDefault
@@ -42,17 +42,17 @@ impl GlobalConfig {
                 self.admins[index] = new_admin_pubkey;
                 self.admin_permissions[index] = 0;
             }
-            AdminChange::ResetPermissions => {
+            AdminStateUpdate::ResetPermissions => {
                 self.admin_permissions[index] = 0;
             }
-            AdminChange::AddPermission(permission) => {
+            AdminStateUpdate::AddPermission(permission) => {
                 require!(
                     self.admins[index].ne(&Pubkey::default()),
                     DripError::AdminPubkeyCannotBeDefault
                 );
                 self.admin_permissions[index] = permission.enable(self.admin_permissions[index]);
             }
-            AdminChange::RemovePermission(permission) => {
+            AdminStateUpdate::RemovePermission(permission) => {
                 require!(
                     self.admins[index].ne(&Pubkey::default()),
                     DripError::AdminPubkeyCannotBeDefault
