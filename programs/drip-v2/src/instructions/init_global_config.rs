@@ -40,6 +40,7 @@ pub fn handle_init_global_config(
     ctx.accounts.global_config.fee_collector = ctx.accounts.fee_collector.key();
 
     ctx.accounts.fee_collector.global_config = ctx.accounts.global_config.key();
+    ctx.accounts.fee_collector.bump = *ctx.bumps.get("fee_collector").unwrap();
 
     Ok(())
 }
