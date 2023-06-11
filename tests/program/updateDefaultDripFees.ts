@@ -151,7 +151,7 @@ describe("Program - updateDefaultDripFees", () => {
                     .fill(PublicKey.default)
                     .map((key) => key.toString())
             ),
-            adminPermissions: ["4"].concat(Array(19).fill("0")),
+            adminPermissions: ["2"].concat(Array(19).fill("0")),
             defaultDripFeeBps: "100",
         });
 
@@ -188,7 +188,7 @@ describe("Program - updateDefaultDripFees", () => {
                     .fill(PublicKey.default)
                     .map((key) => key.toString())
             ),
-            adminPermissions: ["4"].concat(Array(19).fill("0")),
+            adminPermissions: ["2"].concat(Array(19).fill("0")),
             defaultDripFeeBps: "50",
         });
     });
@@ -252,7 +252,7 @@ describe("Program - updateDefaultDripFees", () => {
                     .fill(PublicKey.default)
                     .map((key) => key.toString())
             ),
-            adminPermissions: ["2"].concat(Array(19).fill("0")),
+            adminPermissions: ["1"].concat(Array(19).fill("0")),
             defaultDripFeeBps: "100",
         });
 
@@ -330,7 +330,7 @@ describe("Program - updateDefaultDripFees", () => {
                     .fill(PublicKey.default)
                     .map((key) => key.toString())
             ),
-            adminPermissions: ["2"].concat(Array(19).fill("0")),
+            adminPermissions: ["1"].concat(Array(19).fill("0")),
             defaultDripFeeBps: "100",
         });
 
