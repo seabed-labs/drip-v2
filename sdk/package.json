@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "yarn run tsc",
-    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true"
+    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated"
   },
   "devDependencies": {
     "typescript": "^5.1.3"
