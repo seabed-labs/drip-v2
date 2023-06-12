@@ -10,16 +10,14 @@ export interface InitDripPositionArgs {
 
 export interface InitDripPositionAccounts {
   payer: PublicKey
-  ownerNftHolder: PublicKey
-  ownerNftMint: PublicKey
-  ownerNftAccount: PublicKey
+  owner: PublicKey
   globalConfig: PublicKey
-  globalConfigSigner: PublicKey
   inputTokenMint: PublicKey
   outputTokenMint: PublicKey
   inputTokenAccount: PublicKey
   outputTokenAccount: PublicKey
   dripPosition: PublicKey
+  dripPositionSigner: PublicKey
   systemProgram: PublicKey
   tokenProgram: PublicKey
   associatedTokenProgram: PublicKey
@@ -35,16 +33,14 @@ export function initDripPosition(
 ) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
-    { pubkey: accounts.ownerNftHolder, isSigner: true, isWritable: false },
-    { pubkey: accounts.ownerNftMint, isSigner: true, isWritable: true },
-    { pubkey: accounts.ownerNftAccount, isSigner: false, isWritable: true },
+    { pubkey: accounts.owner, isSigner: true, isWritable: false },
     { pubkey: accounts.globalConfig, isSigner: false, isWritable: false },
-    { pubkey: accounts.globalConfigSigner, isSigner: false, isWritable: false },
     { pubkey: accounts.inputTokenMint, isSigner: false, isWritable: false },
     { pubkey: accounts.outputTokenMint, isSigner: false, isWritable: false },
     { pubkey: accounts.inputTokenAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.outputTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: accounts.dripPosition, isSigner: false, isWritable: true },
+    { pubkey: accounts.dripPosition, isSigner: true, isWritable: true },
+    { pubkey: accounts.dripPositionSigner, isSigner: false, isWritable: true },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     {

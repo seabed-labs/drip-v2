@@ -7,6 +7,7 @@ import { PROGRAM_ID } from "../programId"
 export interface DripPositionFields {
   globalConfig: PublicKey
   owner: types.DripPositionOwnerKind
+  dripPositionSigner: PublicKey
   autoCreditEnabled: boolean
   inputTokenMint: PublicKey
   outputTokenMint: PublicKey
@@ -16,12 +17,12 @@ export interface DripPositionFields {
   frequencyInSeconds: BN
   totalInputTokenDripped: BN
   totalOutputTokenReceived: BN
-  bump: number
 }
 
 export interface DripPositionJSON {
   globalConfig: string
   owner: types.DripPositionOwnerJSON
+  dripPositionSigner: string
   autoCreditEnabled: boolean
   inputTokenMint: string
   outputTokenMint: string
@@ -31,12 +32,12 @@ export interface DripPositionJSON {
   frequencyInSeconds: string
   totalInputTokenDripped: string
   totalOutputTokenReceived: string
-  bump: number
 }
 
 export class DripPosition {
   readonly globalConfig: PublicKey
   readonly owner: types.DripPositionOwnerKind
+  readonly dripPositionSigner: PublicKey
   readonly autoCreditEnabled: boolean
   readonly inputTokenMint: PublicKey
   readonly outputTokenMint: PublicKey
@@ -46,7 +47,6 @@ export class DripPosition {
   readonly frequencyInSeconds: BN
   readonly totalInputTokenDripped: BN
   readonly totalOutputTokenReceived: BN
-  readonly bump: number
 
   static readonly discriminator = Buffer.from([
     4, 250, 161, 172, 41, 156, 53, 219,
@@ -55,6 +55,7 @@ export class DripPosition {
   static readonly layout = borsh.struct([
     borsh.publicKey("globalConfig"),
     types.DripPositionOwner.layout("owner"),
+    borsh.publicKey("dripPositionSigner"),
     borsh.bool("autoCreditEnabled"),
     borsh.publicKey("inputTokenMint"),
     borsh.publicKey("outputTokenMint"),
@@ -64,12 +65,12 @@ export class DripPosition {
     borsh.u64("frequencyInSeconds"),
     borsh.u64("totalInputTokenDripped"),
     borsh.u64("totalOutputTokenReceived"),
-    borsh.u8("bump"),
   ])
 
   constructor(fields: DripPositionFields) {
     this.globalConfig = fields.globalConfig
     this.owner = fields.owner
+    this.dripPositionSigner = fields.dripPositionSigner
     this.autoCreditEnabled = fields.autoCreditEnabled
     this.inputTokenMint = fields.inputTokenMint
     this.outputTokenMint = fields.outputTokenMint
@@ -79,7 +80,6 @@ export class DripPosition {
     this.frequencyInSeconds = fields.frequencyInSeconds
     this.totalInputTokenDripped = fields.totalInputTokenDripped
     this.totalOutputTokenReceived = fields.totalOutputTokenReceived
-    this.bump = fields.bump
   }
 
   static async fetch(
@@ -126,6 +126,7 @@ export class DripPosition {
     return new DripPosition({
       globalConfig: dec.globalConfig,
       owner: types.DripPositionOwner.fromDecoded(dec.owner),
+      dripPositionSigner: dec.dripPositionSigner,
       autoCreditEnabled: dec.autoCreditEnabled,
       inputTokenMint: dec.inputTokenMint,
       outputTokenMint: dec.outputTokenMint,
@@ -135,7 +136,6 @@ export class DripPosition {
       frequencyInSeconds: dec.frequencyInSeconds,
       totalInputTokenDripped: dec.totalInputTokenDripped,
       totalOutputTokenReceived: dec.totalOutputTokenReceived,
-      bump: dec.bump,
     })
   }
 
@@ -143,6 +143,7 @@ export class DripPosition {
     return {
       globalConfig: this.globalConfig.toString(),
       owner: this.owner.toJSON(),
+      dripPositionSigner: this.dripPositionSigner.toString(),
       autoCreditEnabled: this.autoCreditEnabled,
       inputTokenMint: this.inputTokenMint.toString(),
       outputTokenMint: this.outputTokenMint.toString(),
@@ -152,7 +153,6 @@ export class DripPosition {
       frequencyInSeconds: this.frequencyInSeconds.toString(),
       totalInputTokenDripped: this.totalInputTokenDripped.toString(),
       totalOutputTokenReceived: this.totalOutputTokenReceived.toString(),
-      bump: this.bump,
     }
   }
 
@@ -160,6 +160,7 @@ export class DripPosition {
     return new DripPosition({
       globalConfig: new PublicKey(obj.globalConfig),
       owner: types.DripPositionOwner.fromJSON(obj.owner),
+      dripPositionSigner: new PublicKey(obj.dripPositionSigner),
       autoCreditEnabled: obj.autoCreditEnabled,
       inputTokenMint: new PublicKey(obj.inputTokenMint),
       outputTokenMint: new PublicKey(obj.outputTokenMint),
@@ -169,7 +170,6 @@ export class DripPosition {
       frequencyInSeconds: new BN(obj.frequencyInSeconds),
       totalInputTokenDripped: new BN(obj.totalInputTokenDripped),
       totalOutputTokenReceived: new BN(obj.totalOutputTokenReceived),
-      bump: obj.bump,
     })
   }
 }

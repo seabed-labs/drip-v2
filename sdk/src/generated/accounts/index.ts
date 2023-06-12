@@ -1,5 +1,10 @@
 export { DripPosition } from "./DripPosition"
 export type { DripPositionFields, DripPositionJSON } from "./DripPosition"
+export { DripPositionSigner } from "./DripPositionSigner"
+export type {
+  DripPositionSignerFields,
+  DripPositionSignerJSON,
+} from "./DripPositionSigner"
 export { GlobalConfigSigner } from "./GlobalConfigSigner"
 export type {
   GlobalConfigSignerFields,

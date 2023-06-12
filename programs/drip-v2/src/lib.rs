@@ -66,6 +66,6 @@ pub mod drip_v2 {
         ctx: Context<InitDripPosition>,
         params: InitDripPositionParams,
     ) -> Result<()> {
-        handle_init_drip(ctx, params)
+        handle_init_drip_position(ctx, params)
     }
 }

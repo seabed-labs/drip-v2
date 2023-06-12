@@ -5,6 +5,7 @@ use anchor_lang::prelude::*;
 pub struct DripPosition {
     pub global_config: Pubkey,
     pub owner: DripPositionOwner,
+    pub drip_position_signer: Pubkey,
     pub auto_credit_enabled: bool,
     pub input_token_mint: Pubkey,
     pub output_token_mint: Pubkey,
@@ -14,7 +15,6 @@ pub struct DripPosition {
     pub frequency_in_seconds: u64,
     pub total_input_token_dripped: u64,
     pub total_output_token_received: u64,
-    pub bump: u8,
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
@@ -29,4 +29,11 @@ impl Default for DripPositionOwner {
             owner_nft_mint: Pubkey::default(),
         }
     }
+}
+
+#[account]
+#[derive(Default, InitSpace)]
+pub struct DripPositionSigner {
+    pub drip_position: Pubkey,
+    pub bump: u8,
 }
