@@ -5,6 +5,7 @@ edition = "2021"
 
 
 [dependencies]
+json_env_logger = { version = "0.1", features = ["backtrace"] }
 dill = { version = "0.6.0"}
 diesel = { version = "2.1.0", features = ["postgres"] }
 dotenvy = "0.15"
