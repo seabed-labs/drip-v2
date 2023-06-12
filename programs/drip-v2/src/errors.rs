@@ -39,7 +39,7 @@ pub enum DripError {
     DripPositionSignerMismatch, // 6011 or 0x177B
 
     #[msg("Drip position owner not a signer")]
-    DripPositionOwnerNotSigner1, // 6012 or 0x177C
+    DripPositionOwnerNotSigner, // 6012 or 0x177C
 
     #[msg("Drip position already tokenized")]
     DripPositionAlreadyTokenized, // 6013 or 0x177D

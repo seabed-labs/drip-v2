@@ -24,6 +24,13 @@ impl DripPosition {
             DripPositionOwner::Tokenized { .. } => true,
         }
     }
+
+    pub fn is_directly_owned_by(&self, signer: Pubkey) -> bool {
+        match self.owner {
+            DripPositionOwner::Direct { owner } => signer.eq(&owner),
+            DripPositionOwner::Tokenized { .. } => false,
+        }
+    }
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]

@@ -66,6 +66,13 @@ pub struct TokenizeDripPosition<'info> {
 
 pub fn handle_tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
     require!(
+        ctx.accounts
+            .drip_position
+            .is_directly_owned_by(ctx.accounts.owner.key()),
+        DripError::DripPositionOwnerNotSigner
+    );
+
+    require!(
         !ctx.accounts.drip_position.is_tokenized(),
         DripError::DripPositionAlreadyTokenized
     );
