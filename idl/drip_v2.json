@@ -16,7 +16,7 @@
           "isSigner": true
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -311,7 +311,7 @@
           "isSigner": false
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -383,11 +383,11 @@
           "isMut": false,
           "isSigner": false,
           "relations": [
-            "global_signer"
+            "global_config_signer"
           ]
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -539,7 +539,7 @@
       }
     },
     {
-      "name": "GlobalSigner",
+      "name": "GlobalConfigSigner",
       "type": {
         "kind": "struct",
         "fields": [
@@ -594,7 +594,7 @@
             "type": "u64"
           },
           {
-            "name": "globalSigner",
+            "name": "globalConfigSigner",
             "type": "publicKey"
           }
         ]

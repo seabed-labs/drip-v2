@@ -11,7 +11,7 @@ export interface WithdrawFeesArgs {
 export interface WithdrawFeesAccounts {
   signer: PublicKey
   globalConfig: PublicKey
-  globalSigner: PublicKey
+  globalConfigSigner: PublicKey
   feeTokenAccount: PublicKey
   recipientTokenAccount: PublicKey
   tokenProgram: PublicKey
@@ -26,7 +26,7 @@ export function withdrawFees(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: false },
     { pubkey: accounts.globalConfig, isSigner: false, isWritable: false },
-    { pubkey: accounts.globalSigner, isSigner: false, isWritable: false },
+    { pubkey: accounts.globalConfigSigner, isSigner: false, isWritable: false },
     { pubkey: accounts.feeTokenAccount, isSigner: false, isWritable: false },
     {
       pubkey: accounts.recipientTokenAccount,

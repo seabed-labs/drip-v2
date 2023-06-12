@@ -31,7 +31,7 @@ describe("Program - initGlobalConfig", () => {
                 payer: provider.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
                 systemProgram: SystemProgram.programId,
-                globalSigner: globalSignerPubkey,
+                globalConfigSigner: globalSignerPubkey,
             })
             .signers([globalConfigKeypair])
             .rpc();
@@ -40,9 +40,8 @@ describe("Program - initGlobalConfig", () => {
             globalConfigKeypair.publicKey
         );
 
-        const feeCollectorAccount = await program.account.globalSigner.fetch(
-            globalSignerPubkey
-        );
+        const feeCollectorAccount =
+            await program.account.globalConfigSigner.fetch(globalSignerPubkey);
 
         expect({
             version: globalConfigAccount.version.toString(),
@@ -52,7 +51,8 @@ describe("Program - initGlobalConfig", () => {
                 (admin) => admin.toString()
             ),
             defaultDripFeeBps: globalConfigAccount.defaultDripFeeBps.toString(),
-            globalSigner: globalConfigAccount.globalSigner.toString(),
+            globalConfigSigner:
+                globalConfigAccount.globalConfigSigner.toString(),
         }).to.deep.equal({
             version: "0",
             superAdmin: superAdmin.publicKey.toBase58(),
@@ -61,7 +61,7 @@ describe("Program - initGlobalConfig", () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill("0"),
             defaultDripFeeBps: "100",
-            globalSigner: globalSignerPubkey.toBase58(),
+            globalConfigSigner: globalSignerPubkey.toBase58(),
         });
 
         expect({

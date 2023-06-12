@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{AdminPermission, Authorizer, GlobalConfig, GlobalSigner},
+    state::{AdminPermission, Authorizer, GlobalConfig, GlobalConfigSigner},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -16,9 +16,9 @@ pub struct WithdrawFees<'info> {
             b"drip-v2-global-signer",
             global_config.key().as_ref(),
         ],
-        bump = global_signer.bump,
+        bump = global_config_signer.bump,
     )]
-    pub global_signer: Account<'info, GlobalSigner>,
+    pub global_config_signer: Account<'info, GlobalConfigSigner>,
 
     pub fee_token_account: Account<'info, TokenAccount>,
 
@@ -41,13 +41,14 @@ pub fn handle_withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesPara
     );
 
     require!(
-        ctx.accounts.global_signer.global_config == ctx.accounts.global_config.key()
-            && ctx.accounts.global_config.global_signer == ctx.accounts.global_signer.key(),
+        ctx.accounts.global_config_signer.global_config == ctx.accounts.global_config.key()
+            && ctx.accounts.global_config.global_config_signer
+                == ctx.accounts.global_config_signer.key(),
         DripError::GlobalConfigMismatch
     );
 
     require!(
-        ctx.accounts.fee_token_account.owner == ctx.accounts.global_signer.key(),
+        ctx.accounts.fee_token_account.owner == ctx.accounts.global_config_signer.key(),
         DripError::UnexpectedFeeTokenAccount
     );
 
@@ -62,12 +63,12 @@ pub fn handle_withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesPara
             Transfer {
                 from: ctx.accounts.fee_token_account.to_account_info(),
                 to: ctx.accounts.recipient_token_account.to_account_info(),
-                authority: ctx.accounts.global_signer.to_account_info(),
+                authority: ctx.accounts.global_config_signer.to_account_info(),
             },
             &[&[
                 b"drip-v2-global-signer".as_ref(),
                 ctx.accounts.global_config.key().as_ref(),
-                &[ctx.accounts.global_signer.bump],
+                &[ctx.accounts.global_config_signer.bump],
             ]],
         ),
         ctx.accounts.fee_token_account.amount,

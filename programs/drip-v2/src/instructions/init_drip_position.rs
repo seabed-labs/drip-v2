@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{DripPosition, GlobalConfig, GlobalSigner},
+    state::{DripPosition, GlobalConfig, GlobalConfigSigner},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -31,7 +31,7 @@ pub struct InitDripPosition<'info> {
     )]
     pub owner_nft_account: Box<Account<'info, TokenAccount>>,
 
-    #[account(has_one = global_signer @ DripError::GlobalConfigGlobalSignerMismatch)]
+    #[account(has_one = global_config_signer @ DripError::GlobalConfigGlobalSignerMismatch)]
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
     #[account(
@@ -39,10 +39,10 @@ pub struct InitDripPosition<'info> {
             b"drip-v2-global-signer",
             global_config.key().as_ref(),
         ],
-        bump = global_signer.bump,
+        bump = global_config_signer.bump,
         has_one = global_config @ DripError::GlobalConfigGlobalSignerMismatch
     )]
-    pub global_signer: Box<Account<'info, GlobalSigner>>,
+    pub global_config_signer: Box<Account<'info, GlobalConfigSigner>>,
 
     pub input_token_mint: Account<'info, Mint>,
 

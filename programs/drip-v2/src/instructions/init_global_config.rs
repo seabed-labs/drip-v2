@@ -1,4 +1,4 @@
-use crate::state::{GlobalConfig, GlobalSigner};
+use crate::state::{GlobalConfig, GlobalConfigSigner};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -17,9 +17,9 @@ pub struct InitGlobalConfig<'info> {
         ],
         bump,
         payer = payer,
-        space = 8 + GlobalSigner::INIT_SPACE
+        space = 8 + GlobalConfigSigner::INIT_SPACE
     )]
-    pub global_signer: Account<'info, GlobalSigner>,
+    pub global_config_signer: Account<'info, GlobalConfigSigner>,
 
     pub system_program: Program<'info, System>,
 }
@@ -37,10 +37,10 @@ pub fn handle_init_global_config(
     ctx.accounts.global_config.version = 0;
     ctx.accounts.global_config.super_admin = params.super_admin;
     ctx.accounts.global_config.default_drip_fee_bps = params.default_drip_fee_bps;
-    ctx.accounts.global_config.global_signer = ctx.accounts.global_signer.key();
+    ctx.accounts.global_config.global_config_signer = ctx.accounts.global_config_signer.key();
 
-    ctx.accounts.global_signer.global_config = ctx.accounts.global_config.key();
-    ctx.accounts.global_signer.bump = *ctx.bumps.get("global_signer").unwrap();
+    ctx.accounts.global_config_signer.global_config = ctx.accounts.global_config.key();
+    ctx.accounts.global_config_signer.bump = *ctx.bumps.get("global_config_signer").unwrap();
 
     Ok(())
 }

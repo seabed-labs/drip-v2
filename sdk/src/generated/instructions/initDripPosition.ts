@@ -14,7 +14,7 @@ export interface InitDripPositionAccounts {
   ownerNftMint: PublicKey
   ownerNftAccount: PublicKey
   globalConfig: PublicKey
-  globalSigner: PublicKey
+  globalConfigSigner: PublicKey
   inputTokenMint: PublicKey
   outputTokenMint: PublicKey
   inputTokenAccount: PublicKey
@@ -39,7 +39,7 @@ export function initDripPosition(
     { pubkey: accounts.ownerNftMint, isSigner: true, isWritable: true },
     { pubkey: accounts.ownerNftAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.globalConfig, isSigner: false, isWritable: false },
-    { pubkey: accounts.globalSigner, isSigner: false, isWritable: false },
+    { pubkey: accounts.globalConfigSigner, isSigner: false, isWritable: false },
     { pubkey: accounts.inputTokenMint, isSigner: false, isWritable: false },
     { pubkey: accounts.outputTokenMint, isSigner: false, isWritable: false },
     { pubkey: accounts.inputTokenAccount, isSigner: false, isWritable: true },

@@ -16,7 +16,7 @@ export type DripV2 = {
           "isSigner": true
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -311,7 +311,7 @@ export type DripV2 = {
           "isSigner": false
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -383,11 +383,11 @@ export type DripV2 = {
           "isMut": false,
           "isSigner": false,
           "relations": [
-            "global_signer"
+            "global_config_signer"
           ]
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -539,7 +539,7 @@ export type DripV2 = {
       }
     },
     {
-      "name": "globalSigner",
+      "name": "globalConfigSigner",
       "type": {
         "kind": "struct",
         "fields": [
@@ -594,7 +594,7 @@ export type DripV2 = {
             "type": "u64"
           },
           {
-            "name": "globalSigner",
+            "name": "globalConfigSigner",
             "type": "publicKey"
           }
         ]
@@ -905,7 +905,7 @@ export const IDL: DripV2 = {
           "isSigner": true
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": true,
           "isSigner": false,
           "pda": {
@@ -1200,7 +1200,7 @@ export const IDL: DripV2 = {
           "isSigner": false
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -1272,11 +1272,11 @@ export const IDL: DripV2 = {
           "isMut": false,
           "isSigner": false,
           "relations": [
-            "global_signer"
+            "global_config_signer"
           ]
         },
         {
-          "name": "globalSigner",
+          "name": "globalConfigSigner",
           "isMut": false,
           "isSigner": false,
           "pda": {
@@ -1428,7 +1428,7 @@ export const IDL: DripV2 = {
       }
     },
     {
-      "name": "globalSigner",
+      "name": "globalConfigSigner",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1483,7 +1483,7 @@ export const IDL: DripV2 = {
             "type": "u64"
           },
           {
-            "name": "globalSigner",
+            "name": "globalConfigSigner",
             "type": "publicKey"
           }
         ]
