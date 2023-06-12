@@ -32,6 +32,21 @@ pub enum DripError {
     #[msg("Global config mismatch")]
     GlobalConfigMismatch, // 6009 or 0x1779
 
-    #[msg("Global config and global signer mismatch")]
+    #[msg("Global config and global config signer mismatch")]
     GlobalConfigGlobalSignerMismatch, // 6010 or 0x177A
+
+    #[msg("Drip position and drip position signer mismatch")]
+    DripPositionSignerMismatch, // 6011 or 0x177B
+
+    #[msg("Drip position owner not a signer")]
+    DripPositionOwnerNotSigner1, // 6012 or 0x177C
+
+    #[msg("Drip position already tokenized")]
+    DripPositionAlreadyTokenized, // 6013 or 0x177D
+
+    #[msg("Cannot tokenize auto-credit enabled drip position")]
+    CannotTokenizeAutoCreditEnabledDripPosition, // 6014 or 0x177E
+
+    #[msg("Drip position nft mint supply invariant failed")]
+    DripPositionNftSupplyInvariantFailed, // 6015 or 0x177F
 }

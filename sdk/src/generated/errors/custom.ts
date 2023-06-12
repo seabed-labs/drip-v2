@@ -10,6 +10,11 @@ export type CustomError =
   | FeeRecipientMismatch
   | GlobalConfigMismatch
   | GlobalConfigGlobalSignerMismatch
+  | DripPositionSignerMismatch
+  | DripPositionOwnerNotSigner1
+  | DripPositionAlreadyTokenized
+  | CannotTokenizeAutoCreditEnabledDripPosition
+  | DripPositionNftSupplyInvariantFailed
 
 export class SuperAdminSignatureRequired extends Error {
   static readonly code = 6000
@@ -128,10 +133,65 @@ export class GlobalConfigGlobalSignerMismatch extends Error {
   static readonly code = 6010
   readonly code = 6010
   readonly name = "GlobalConfigGlobalSignerMismatch"
-  readonly msg = "Global config and global signer mismatch"
+  readonly msg = "Global config and global config signer mismatch"
 
   constructor(readonly logs?: string[]) {
-    super("6010: Global config and global signer mismatch")
+    super("6010: Global config and global config signer mismatch")
+  }
+}
+
+export class DripPositionSignerMismatch extends Error {
+  static readonly code = 6011
+  readonly code = 6011
+  readonly name = "DripPositionSignerMismatch"
+  readonly msg = "Drip position and drip position signer mismatch"
+
+  constructor(readonly logs?: string[]) {
+    super("6011: Drip position and drip position signer mismatch")
+  }
+}
+
+export class DripPositionOwnerNotSigner1 extends Error {
+  static readonly code = 6012
+  readonly code = 6012
+  readonly name = "DripPositionOwnerNotSigner1"
+  readonly msg = "Drip position owner not a signer"
+
+  constructor(readonly logs?: string[]) {
+    super("6012: Drip position owner not a signer")
+  }
+}
+
+export class DripPositionAlreadyTokenized extends Error {
+  static readonly code = 6013
+  readonly code = 6013
+  readonly name = "DripPositionAlreadyTokenized"
+  readonly msg = "Drip position already tokenized"
+
+  constructor(readonly logs?: string[]) {
+    super("6013: Drip position already tokenized")
+  }
+}
+
+export class CannotTokenizeAutoCreditEnabledDripPosition extends Error {
+  static readonly code = 6014
+  readonly code = 6014
+  readonly name = "CannotTokenizeAutoCreditEnabledDripPosition"
+  readonly msg = "Cannot tokenize auto-credit enabled drip position"
+
+  constructor(readonly logs?: string[]) {
+    super("6014: Cannot tokenize auto-credit enabled drip position")
+  }
+}
+
+export class DripPositionNftSupplyInvariantFailed extends Error {
+  static readonly code = 6015
+  readonly code = 6015
+  readonly name = "DripPositionNftSupplyInvariantFailed"
+  readonly msg = "Drip position nft mint supply invariant failed"
+
+  constructor(readonly logs?: string[]) {
+    super("6015: Drip position nft mint supply invariant failed")
   }
 }
 
@@ -159,6 +219,16 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
       return new GlobalConfigMismatch(logs)
     case 6010:
       return new GlobalConfigGlobalSignerMismatch(logs)
+    case 6011:
+      return new DripPositionSignerMismatch(logs)
+    case 6012:
+      return new DripPositionOwnerNotSigner1(logs)
+    case 6013:
+      return new DripPositionAlreadyTokenized(logs)
+    case 6014:
+      return new CannotTokenizeAutoCreditEnabledDripPosition(logs)
+    case 6015:
+      return new DripPositionNftSupplyInvariantFailed(logs)
   }
 
   return null

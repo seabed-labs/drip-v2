@@ -31,3 +31,5 @@ export type {
   InitDripPositionArgs,
   InitDripPositionAccounts,
 } from "./initDripPosition"
+export { tokenizeDripPosition } from "./tokenizeDripPosition"
+export type { TokenizeDripPositionAccounts } from "./tokenizeDripPosition"

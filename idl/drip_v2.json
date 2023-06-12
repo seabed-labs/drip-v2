@@ -442,6 +442,98 @@
           }
         }
       ]
+    },
+    {
+      "name": "tokenizeDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPositionNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionNftMapping",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-nft-mapping"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "drip_position_nft_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -515,6 +607,22 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionNftMapping",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripPositionNftMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "dripPosition",
+            "type": "publicKey"
           }
         ]
       }
@@ -889,7 +997,32 @@
     {
       "code": 6010,
       "name": "GlobalConfigGlobalSignerMismatch",
-      "msg": "Global config and global signer mismatch"
+      "msg": "Global config and global config signer mismatch"
+    },
+    {
+      "code": 6011,
+      "name": "DripPositionSignerMismatch",
+      "msg": "Drip position and drip position signer mismatch"
+    },
+    {
+      "code": 6012,
+      "name": "DripPositionOwnerNotSigner1",
+      "msg": "Drip position owner not a signer"
+    },
+    {
+      "code": 6013,
+      "name": "DripPositionAlreadyTokenized",
+      "msg": "Drip position already tokenized"
+    },
+    {
+      "code": 6014,
+      "name": "CannotTokenizeAutoCreditEnabledDripPosition",
+      "msg": "Cannot tokenize auto-credit enabled drip position"
+    },
+    {
+      "code": 6015,
+      "name": "DripPositionNftSupplyInvariantFailed",
+      "msg": "Drip position nft mint supply invariant failed"
     }
   ]
 }

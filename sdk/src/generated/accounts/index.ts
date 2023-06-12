@@ -5,6 +5,11 @@ export type {
   DripPositionSignerFields,
   DripPositionSignerJSON,
 } from "./DripPositionSigner"
+export { DripPositionNftMapping } from "./DripPositionNftMapping"
+export type {
+  DripPositionNftMappingFields,
+  DripPositionNftMappingJSON,
+} from "./DripPositionNftMapping"
 export { GlobalConfigSigner } from "./GlobalConfigSigner"
 export type {
   GlobalConfigSignerFields,
