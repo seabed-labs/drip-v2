@@ -1,60 +1,30 @@
-mod repository;
 mod queue;
+mod repository;
 mod workers;
 
-use shaku::{module, Component, Interface, HasComponent, HasProvider};
-use std::sync::Arc;
 use crate::repository::{PostgresRepository, Repository};
-use crate::workers::{AccountWorker, TransactionWorker, Worker, AppWorkers};
-
-trait Logger: Interface {
-    fn log(&self, content: &str);
-}
-
-trait DateLogger: Interface {
-    fn log_date(&self);
-}
-
-#[derive(Component)]
-#[shaku(interface = Logger)]
-struct LoggerImpl;
-
-impl Logger for LoggerImpl {
-    fn log(&self, content: &str) {
-        println!("{}", content);
-    }
-}
-
-#[derive(Component)]
-#[shaku(interface = DateLogger)]
-struct DateLoggerImpl {
-    #[shaku(inject)]
-    logger: Arc<dyn Logger>,
-    today: String,
-    year: usize,
-}
-
-impl DateLogger for DateLoggerImpl {
-    fn log_date(&self) {
-        self.logger.log(&format!("Today is {}, {}", self.today, self.year));
-    }
-}
-
-module! {
-    App {
-        components = [],
-        providers = [PostgresRepository, TransactionWorker]
-    }
-}
+use crate::workers::{AccountWorker, TransactionWorker, Worker};
+use dill::{AllOf, CatalogBuilder};
+use std::thread::spawn;
 
 fn main() {
-    let module = App::builder()
-        // .with_component_parameters::<DateLoggerImpl>(DateLoggerImplParameters {
-        //     today: "Jan 26".to_string(),
-        //     year: 2020
-        // })
+    let catalog = CatalogBuilder::new()
+        .add::<TransactionWorker>()
+        .bind::<dyn Worker, TransactionWorker>()
+        .add::<AccountWorker>()
+        .bind::<dyn Worker, AccountWorker>()
+        .add::<PostgresRepository>()
+        .bind::<dyn Repository, PostgresRepository>()
         .build();
-
-    let worker: Box<dyn Worker> = module.provide().unwrap();
-    worker.run();
+    let workers = catalog.get::<AllOf<dyn Worker>>().unwrap();
+    let mut threads = Vec::new();
+    for worker in workers {
+        let thread = spawn(move || worker.run());
+        threads.push(thread);
+    }
+    for thread in threads {
+        if let Err(err) = thread.join().unwrap() {
+            eprintln!("Thread Error: {:?}", err);
+        }
+    }
 }
