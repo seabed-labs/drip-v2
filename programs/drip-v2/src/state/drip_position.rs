@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 #[derive(Default, InitSpace)]
 pub struct DripPosition {
     pub global_config: Pubkey,
-    pub owner: Pubkey,
+    pub owner: DripPositionOwner,
     pub auto_credit_enabled: bool,
     pub input_token_mint: Pubkey,
     pub output_token_mint: Pubkey,
@@ -15,4 +15,18 @@ pub struct DripPosition {
     pub total_input_token_dripped: u64,
     pub total_output_token_received: u64,
     pub bump: u8,
+}
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
+pub enum DripPositionOwner {
+    Direct { owner: Pubkey },
+    Tokenized { owner_nft_mint: Pubkey },
+}
+
+impl Default for DripPositionOwner {
+    fn default() -> Self {
+        Self::Tokenized {
+            owner_nft_mint: Pubkey::default(),
+        }
+    }
 }

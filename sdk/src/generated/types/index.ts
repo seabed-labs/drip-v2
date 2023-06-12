@@ -1,3 +1,4 @@
+import * as DripPositionOwner from "./DripPositionOwner"
 import * as AdminStateUpdate from "./AdminStateUpdate"
 import * as AdminPermission from "./AdminPermission"
 import * as PriceOracle from "./PriceOracle"
@@ -37,6 +38,15 @@ export type {
   WithdrawFeesParamsFields,
   WithdrawFeesParamsJSON,
 } from "./WithdrawFeesParams"
+export { DripPositionOwner }
+
+export type DripPositionOwnerKind =
+  | DripPositionOwner.Direct
+  | DripPositionOwner.Tokenized
+export type DripPositionOwnerJSON =
+  | DripPositionOwner.DirectJSON
+  | DripPositionOwner.TokenizedJSON
+
 export { AdminStateUpdate }
 
 export type AdminStateUpdateKind =

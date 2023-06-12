@@ -6,7 +6,7 @@ import { PROGRAM_ID } from "../programId"
 
 export interface DripPositionFields {
   globalConfig: PublicKey
-  owner: PublicKey
+  owner: types.DripPositionOwnerKind
   autoCreditEnabled: boolean
   inputTokenMint: PublicKey
   outputTokenMint: PublicKey
@@ -21,7 +21,7 @@ export interface DripPositionFields {
 
 export interface DripPositionJSON {
   globalConfig: string
-  owner: string
+  owner: types.DripPositionOwnerJSON
   autoCreditEnabled: boolean
   inputTokenMint: string
   outputTokenMint: string
@@ -36,7 +36,7 @@ export interface DripPositionJSON {
 
 export class DripPosition {
   readonly globalConfig: PublicKey
-  readonly owner: PublicKey
+  readonly owner: types.DripPositionOwnerKind
   readonly autoCreditEnabled: boolean
   readonly inputTokenMint: PublicKey
   readonly outputTokenMint: PublicKey
@@ -54,7 +54,7 @@ export class DripPosition {
 
   static readonly layout = borsh.struct([
     borsh.publicKey("globalConfig"),
-    borsh.publicKey("owner"),
+    types.DripPositionOwner.layout("owner"),
     borsh.bool("autoCreditEnabled"),
     borsh.publicKey("inputTokenMint"),
     borsh.publicKey("outputTokenMint"),
@@ -125,7 +125,7 @@ export class DripPosition {
 
     return new DripPosition({
       globalConfig: dec.globalConfig,
-      owner: dec.owner,
+      owner: types.DripPositionOwner.fromDecoded(dec.owner),
       autoCreditEnabled: dec.autoCreditEnabled,
       inputTokenMint: dec.inputTokenMint,
       outputTokenMint: dec.outputTokenMint,
@@ -142,7 +142,7 @@ export class DripPosition {
   toJSON(): DripPositionJSON {
     return {
       globalConfig: this.globalConfig.toString(),
-      owner: this.owner.toString(),
+      owner: this.owner.toJSON(),
       autoCreditEnabled: this.autoCreditEnabled,
       inputTokenMint: this.inputTokenMint.toString(),
       outputTokenMint: this.outputTokenMint.toString(),
@@ -159,7 +159,7 @@ export class DripPosition {
   static fromJSON(obj: DripPositionJSON): DripPosition {
     return new DripPosition({
       globalConfig: new PublicKey(obj.globalConfig),
-      owner: new PublicKey(obj.owner),
+      owner: types.DripPositionOwner.fromJSON(obj.owner),
       autoCreditEnabled: obj.autoCreditEnabled,
       inputTokenMint: new PublicKey(obj.inputTokenMint),
       outputTokenMint: new PublicKey(obj.outputTokenMint),

@@ -1,6 +1,6 @@
 use crate::{
     errors::DripError,
-    state::{DripPosition, GlobalConfig, GlobalConfigSigner},
+    state::{DripPosition, DripPositionOwner, GlobalConfig, GlobalConfigSigner},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -96,7 +96,10 @@ pub fn handle_init_drip(
 
     let drip_position = &mut ctx.accounts.drip_position;
     drip_position.global_config = ctx.accounts.global_config.key();
-    drip_position.owner = ctx.accounts.owner_nft_mint.key();
+    drip_position.owner = DripPositionOwner::Tokenized {
+        owner_nft_mint: ctx.accounts.owner_nft_mint.key(),
+    };
+
     drip_position.auto_credit_enabled = false;
     drip_position.input_token_mint = ctx.accounts.input_token_mint.key();
     drip_position.output_token_mint = ctx.accounts.output_token_mint.key();

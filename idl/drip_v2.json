@@ -493,7 +493,9 @@
           },
           {
             "name": "owner",
-            "type": "publicKey"
+            "type": {
+              "defined": "DripPositionOwner"
+            }
           },
           {
             "name": "autoCreditEnabled",
@@ -744,6 +746,32 @@
           {
             "name": "recipient",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionOwner",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct",
+            "fields": [
+              {
+                "name": "owner",
+                "type": "publicKey"
+              }
+            ]
+          },
+          {
+            "name": "Tokenized",
+            "fields": [
+              {
+                "name": "owner_nft_mint",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }

@@ -493,7 +493,9 @@ export type DripV2 = {
           },
           {
             "name": "owner",
-            "type": "publicKey"
+            "type": {
+              "defined": "DripPositionOwner"
+            }
           },
           {
             "name": "autoCreditEnabled",
@@ -744,6 +746,32 @@ export type DripV2 = {
           {
             "name": "recipient",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionOwner",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct",
+            "fields": [
+              {
+                "name": "owner",
+                "type": "publicKey"
+              }
+            ]
+          },
+          {
+            "name": "Tokenized",
+            "fields": [
+              {
+                "name": "owner_nft_mint",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
@@ -1382,7 +1410,9 @@ export const IDL: DripV2 = {
           },
           {
             "name": "owner",
-            "type": "publicKey"
+            "type": {
+              "defined": "DripPositionOwner"
+            }
           },
           {
             "name": "autoCreditEnabled",
@@ -1633,6 +1663,32 @@ export const IDL: DripV2 = {
           {
             "name": "recipient",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionOwner",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct",
+            "fields": [
+              {
+                "name": "owner",
+                "type": "publicKey"
+              }
+            ]
+          },
+          {
+            "name": "Tokenized",
+            "fields": [
+              {
+                "name": "owner_nft_mint",
+                "type": "publicKey"
+              }
+            ]
           }
         ]
       }
