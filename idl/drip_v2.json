@@ -16,6 +16,26 @@
           "isSigner": true
         },
         {
+          "name": "globalConfigSigner",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-global-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -276,9 +296,249 @@
           }
         }
       ]
+    },
+    {
+      "name": "withdrawFees",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "globalConfigSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-global-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "feeTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipientTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "WithdrawFeesParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "InitDripPositionParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "DripPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": {
+              "defined": "DripPositionOwner"
+            }
+          },
+          {
+            "name": "dripPositionSigner",
+            "type": "publicKey"
+          },
+          {
+            "name": "autoCreditEnabled",
+            "type": "bool"
+          },
+          {
+            "name": "inputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "inputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          },
+          {
+            "name": "totalInputTokenDripped",
+            "type": "u64"
+          },
+          {
+            "name": "totalOutputTokenReceived",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionSigner",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripPosition",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalConfigSigner",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "globalConfig",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "GlobalConfig",
       "type": {
@@ -313,6 +573,10 @@
           {
             "name": "defaultDripFeeBps",
             "type": "u64"
+          },
+          {
+            "name": "globalConfigSigner",
+            "type": "publicKey"
           }
         ]
       }
@@ -367,6 +631,22 @@
     }
   ],
   "types": [
+    {
+      "name": "InitDripPositionParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "frequencyInSeconds",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "InitGlobalConfigParams",
       "type": {
@@ -438,6 +718,44 @@
       }
     },
     {
+      "name": "WithdrawFeesParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DripPositionOwner",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Direct",
+            "fields": [
+              {
+                "name": "owner",
+                "type": "publicKey"
+              }
+            ]
+          },
+          {
+            "name": "Tokenized",
+            "fields": [
+              {
+                "name": "owner_nft_mint",
+                "type": "publicKey"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "AdminStateUpdate",
       "type": {
         "kind": "enum",
@@ -489,6 +807,9 @@
           },
           {
             "name": "UpdateDefaultPairDripFees"
+          },
+          {
+            "name": "WithdrawFees"
           }
         ]
       }
@@ -549,6 +870,26 @@
       "code": 6006,
       "name": "PythPriceFeedLoadError",
       "msg": "Error when loading price from Pyth PriceFeed"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedFeeTokenAccount",
+      "msg": "Unexpected fee token account"
+    },
+    {
+      "code": 6008,
+      "name": "FeeRecipientMismatch",
+      "msg": "Fee recipient token account owner does not match"
+    },
+    {
+      "code": 6009,
+      "name": "GlobalConfigMismatch",
+      "msg": "Global config mismatch"
+    },
+    {
+      "code": 6010,
+      "name": "GlobalConfigGlobalSignerMismatch",
+      "msg": "Global config and global signer mismatch"
     }
   ]
 }

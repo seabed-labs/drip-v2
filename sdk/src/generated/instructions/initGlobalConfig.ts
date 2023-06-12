@@ -11,6 +11,7 @@ export interface InitGlobalConfigArgs {
 export interface InitGlobalConfigAccounts {
   payer: PublicKey
   globalConfig: PublicKey
+  globalConfigSigner: PublicKey
   systemProgram: PublicKey
 }
 
@@ -25,6 +26,7 @@ export function initGlobalConfig(
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.payer, isSigner: true, isWritable: true },
     { pubkey: accounts.globalConfig, isSigner: true, isWritable: true },
+    { pubkey: accounts.globalConfigSigner, isSigner: false, isWritable: true },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([140, 136, 214, 48, 87, 0, 120, 255])

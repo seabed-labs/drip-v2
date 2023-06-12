@@ -1,3 +1,15 @@
+export { DripPosition } from "./DripPosition"
+export type { DripPositionFields, DripPositionJSON } from "./DripPosition"
+export { DripPositionSigner } from "./DripPositionSigner"
+export type {
+  DripPositionSignerFields,
+  DripPositionSignerJSON,
+} from "./DripPositionSigner"
+export { GlobalConfigSigner } from "./GlobalConfigSigner"
+export type {
+  GlobalConfigSignerFields,
+  GlobalConfigSignerJSON,
+} from "./GlobalConfigSigner"
 export { GlobalConfig } from "./GlobalConfig"
 export type { GlobalConfigFields, GlobalConfigJSON } from "./GlobalConfig"
 export { PairConfig } from "./PairConfig"

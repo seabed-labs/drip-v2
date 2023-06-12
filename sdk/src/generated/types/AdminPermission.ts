@@ -95,6 +95,29 @@ export class UpdateDefaultPairDripFees {
   }
 }
 
+export interface WithdrawFeesJSON {
+  kind: "WithdrawFees"
+}
+
+export class WithdrawFees {
+  static readonly discriminator = 4
+  static readonly kind = "WithdrawFees"
+  readonly discriminator = 4
+  readonly kind = "WithdrawFees"
+
+  toJSON(): WithdrawFeesJSON {
+    return {
+      kind: "WithdrawFees",
+    }
+  }
+
+  toEncodable() {
+    return {
+      WithdrawFees: {},
+    }
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function fromDecoded(obj: any): types.AdminPermissionKind {
   if (typeof obj !== "object") {
@@ -112,6 +135,9 @@ export function fromDecoded(obj: any): types.AdminPermissionKind {
   }
   if ("UpdateDefaultPairDripFees" in obj) {
     return new UpdateDefaultPairDripFees()
+  }
+  if ("WithdrawFees" in obj) {
+    return new WithdrawFees()
   }
 
   throw new Error("Invalid enum object")
@@ -133,6 +159,9 @@ export function fromJSON(
     case "UpdateDefaultPairDripFees": {
       return new UpdateDefaultPairDripFees()
     }
+    case "WithdrawFees": {
+      return new WithdrawFees()
+    }
   }
 }
 
@@ -142,6 +171,7 @@ export function layout(property?: string) {
     borsh.struct([], "UpdateDefaultDripFees"),
     borsh.struct([], "UpdatePythPriceFeed"),
     borsh.struct([], "UpdateDefaultPairDripFees"),
+    borsh.struct([], "WithdrawFees"),
   ])
   if (property !== undefined) {
     return ret.replicate(property)
