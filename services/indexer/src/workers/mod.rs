@@ -1,34 +1,43 @@
-use crate::repository::Repository;
-use dill::component;
 use std::sync::Arc;
+use log::info;
+use crate::repository::Repository;
 
 pub trait Worker: Send + Sync {
     fn run(&self) -> Result<i32, ()>;
 }
 
-#[component]
 pub struct AccountWorker {
-    repository: Arc<dyn Repository>,
+    repository:  Arc<dyn Repository>,
 }
 
 impl Worker for AccountWorker {
     fn run(&self) -> Result<i32, ()> {
         loop {
-            println!("Account worker")
+            info!("Account worker")
         }
     }
 }
 
-#[component]
+impl AccountWorker {
+    pub fn new(repository: Arc<dyn Repository>) -> Self {
+        AccountWorker{ repository }
+    }
+}
+
 pub struct TransactionWorker {
-    repository: Arc<dyn Repository>,
+    repository:  Arc<dyn Repository>,
 }
 
 impl Worker for TransactionWorker {
     fn run(&self) -> Result<i32, ()> {
         loop {
-            println!("Transaction Worker");
-            println!("{:?}", self.repository.upsert_position())
+            info!("Transaction Worker");
         }
+    }
+}
+
+impl TransactionWorker {
+    pub fn new(repository: Arc<dyn Repository>) -> Self {
+        TransactionWorker{ repository }
     }
 }

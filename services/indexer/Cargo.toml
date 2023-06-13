@@ -5,6 +5,9 @@ edition = "2021"
 
 
 [dependencies]
-dill = { version = "0.6.0"}
+log = { version = "0.4.17", features = ["kv_unstable_std"] }
+json_env_logger = { version = "0.1", features = ["backtrace"] }
 diesel = { version = "2.1.0", features = ["postgres"] }
 dotenvy = "0.15"
+syrette = "0.4.2"
+dotenv = "0.15.0"
