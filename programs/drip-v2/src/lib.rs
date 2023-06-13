@@ -11,6 +11,7 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Add exhaustive integration tests
 // TODO: Add SDK support + happy path SDK tests
 // TODO: Make sure all IXs support token 2022 (use interfaces, tried but was erroring out - might be a version issue?)
+// TODO: Add invariant checks to all IXs if needed
 
 #[program]
 pub mod drip_v2 {
