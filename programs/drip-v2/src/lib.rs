@@ -12,6 +12,8 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Add SDK support + happy path SDK tests
 // TODO: Make sure all IXs support token 2022 (use interfaces, tried but was erroring out - might be a version issue?)
 // TODO: Add invariant checks to all IXs if needed
+// TODO: Be aggressive with signer requirements to avoid accidental unchecked params being blindly used
+//       (already done for super admin update and init_drip_position)
 
 #[program]
 pub mod drip_v2 {
@@ -28,11 +30,8 @@ pub mod drip_v2 {
         handle_init_pair_config(ctx)
     }
 
-    pub fn update_super_admin(
-        ctx: Context<UpdateSuperAdmin>,
-        params: UpdateSuperAdminParams,
-    ) -> Result<()> {
-        handle_update_super_admin(ctx, params)
+    pub fn update_super_admin(ctx: Context<UpdateSuperAdmin>) -> Result<()> {
+        handle_update_super_admin(ctx)
     }
 
     pub fn update_admin(ctx: Context<UpdateAdmin>, params: UpdateAdminParams) -> Result<()> {

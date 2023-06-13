@@ -28,11 +28,6 @@ export type {
   UpdateDefaultPairDripFeesParamsFields,
   UpdateDefaultPairDripFeesParamsJSON,
 } from "./UpdateDefaultPairDripFeesParams"
-export { UpdateSuperAdminParams } from "./UpdateSuperAdminParams"
-export type {
-  UpdateSuperAdminParamsFields,
-  UpdateSuperAdminParamsJSON,
-} from "./UpdateSuperAdminParams"
 export { WithdrawFeesParams } from "./WithdrawFeesParams"
 export type {
   WithdrawFeesParamsFields,

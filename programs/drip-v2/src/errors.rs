@@ -8,6 +8,7 @@ pub enum DripError {
     #[msg("Admin index out of bounds")]
     AdminIndexOutOfBounds, // 6001 or 0x1771
 
+    // TODO: THIS ERROR IS UNUSED, can be reused for the next new error
     #[msg("SuperAdmin/Admin pubkey cannot be default")]
     AdminPubkeyCannotBeDefault, // 6002 or 0x1772
 
