@@ -7,8 +7,11 @@ test: program sdk
 clean:
 	rm -rf target
 	cd sdk && yarn clean
+	cargo clean
 
 program:
+	# program needs sdk/dist to exist or else we can't yarn...
+	cd sdk && yarn && yarn build
 	yarn
 	anchor build
 	cp target/idl/drip_v2.json ./idl/drip_v2.json
