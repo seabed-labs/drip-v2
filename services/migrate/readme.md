@@ -5,7 +5,7 @@ as well as the shared local db via docker-compose.
 
 ```bash
 cp .env.txt .env
-docker-compose --file .docker-compose.yaml up --remove-orphans -d
+docker-compose --file ./docker-compose.yaml up --remove-orphans -d
 go run main.go
 ```
 

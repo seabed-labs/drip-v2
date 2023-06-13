@@ -1,3 +1,6 @@
+mod schema;
+mod models;
+
 use log::info;
 
 pub trait Repository: Send + Sync {
