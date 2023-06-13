@@ -6,20 +6,13 @@ use crate::state::GlobalConfig;
 #[derive(Accounts)]
 pub struct UpdateSuperAdmin<'info> {
     pub signer: Signer<'info>,
+    pub new_super_admin: Signer<'info>,
 
     #[account(mut)]
     pub global_config: Account<'info, GlobalConfig>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct UpdateSuperAdminParams {
-    pub new_super_admin: Pubkey,
-}
-
-pub fn handle_update_super_admin(
-    ctx: Context<UpdateSuperAdmin>,
-    params: UpdateSuperAdminParams,
-) -> Result<()> {
+pub fn handle_update_super_admin(ctx: Context<UpdateSuperAdmin>) -> Result<()> {
     require!(
         ctx.accounts
             .signer
@@ -28,12 +21,7 @@ pub fn handle_update_super_admin(
         DripError::SuperAdminSignatureRequired
     );
 
-    require!(
-        params.new_super_admin.ne(&Pubkey::default()),
-        DripError::AdminPubkeyCannotBeDefault
-    );
-
-    ctx.accounts.global_config.super_admin = params.new_super_admin;
+    ctx.accounts.global_config.super_admin = ctx.accounts.new_super_admin.key();
 
     Ok(())
 }

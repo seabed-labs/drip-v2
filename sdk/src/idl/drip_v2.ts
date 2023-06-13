@@ -122,19 +122,17 @@ export type DripV2 = {
           "isSigner": true
         },
         {
+          "name": "newSuperAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
           "name": "globalConfig",
           "isMut": true,
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateSuperAdminParams"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "updateAdmin",
@@ -809,18 +807,6 @@ export type DripV2 = {
           {
             "name": "newDefaultPairDripFeesBps",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateSuperAdminParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "newSuperAdmin",
-            "type": "publicKey"
           }
         ]
       }
@@ -1151,19 +1137,17 @@ export const IDL: DripV2 = {
           "isSigner": true
         },
         {
+          "name": "newSuperAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
           "name": "globalConfig",
           "isMut": true,
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "UpdateSuperAdminParams"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "updateAdmin",
@@ -1838,18 +1822,6 @@ export const IDL: DripV2 = {
           {
             "name": "newDefaultPairDripFeesBps",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateSuperAdminParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "newSuperAdmin",
-            "type": "publicKey"
           }
         ]
       }

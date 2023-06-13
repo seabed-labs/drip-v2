@@ -55,14 +55,13 @@ describe("Program - updateSuperAdmin", () => {
         });
 
         await program.methods
-            .updateSuperAdmin({
-                newSuperAdmin: superAdmin2.publicKey,
-            })
+            .updateSuperAdmin()
             .accounts({
                 signer: superAdmin1.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
+                newSuperAdmin: superAdmin2.publicKey,
             })
-            .signers([superAdmin1])
+            .signers([superAdmin1, superAdmin2])
             .rpc();
 
         const globalConfigAccountAfter =
@@ -92,7 +91,7 @@ describe("Program - updateSuperAdmin", () => {
         });
     });
 
-    it("errors out if super admin doesn't sign", async () => {
+    it("errors out if neither old nor new super admins sign", async () => {
         const globalConfigKeypair = new Keypair();
         const superAdmin1 = Keypair.generate();
         const superAdmin2 = Keypair.generate();
@@ -111,24 +110,24 @@ describe("Program - updateSuperAdmin", () => {
             .signers([globalConfigKeypair])
             .rpc();
 
-        const asyncTx = program.methods
-            .updateSuperAdmin({
-                newSuperAdmin: superAdmin2.publicKey,
-            })
+        const asyncTx3 = program.methods
+            .updateSuperAdmin()
             .accounts({
                 signer: superAdmin1.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
+                newSuperAdmin: superAdmin2.publicKey,
             })
             .rpc();
 
-        await expect(asyncTx).to.eventually.be.rejectedWith(
+        await expect(asyncTx3).to.eventually.be.rejectedWith(
             /Signature verification failed/
         );
     });
 
-    it("doesn't allow default pubkey", async () => {
+    it("errors out if only old super admin signs", async () => {
         const globalConfigKeypair = new Keypair();
         const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
         const provider = program.provider;
 
         await program.methods
@@ -144,19 +143,52 @@ describe("Program - updateSuperAdmin", () => {
             .signers([globalConfigKeypair])
             .rpc();
 
-        const asyncTx = program.methods
-            .updateSuperAdmin({
-                newSuperAdmin: PublicKey.default,
-            })
+        const asyncTx3 = program.methods
+            .updateSuperAdmin()
             .accounts({
                 signer: superAdmin1.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
+                newSuperAdmin: superAdmin2.publicKey,
             })
             .signers([superAdmin1])
             .rpc();
 
-        await expect(asyncTx).to.eventually.be.rejectedWith(
-            /AdminPubkeyCannotBeDefault.*6002/
+        await expect(asyncTx3).to.eventually.be.rejectedWith(
+            /Signature verification failed/
+        );
+    });
+
+    it("errors out if only new super admin signs", async () => {
+        const globalConfigKeypair = new Keypair();
+        const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
+        const provider = program.provider;
+
+        await program.methods
+            .initGlobalConfig({
+                superAdmin: superAdmin1.publicKey,
+                defaultDripFeeBps: new anchor.BN(100),
+            })
+            .accounts({
+                payer: provider.publicKey,
+                globalConfig: globalConfigKeypair.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([globalConfigKeypair])
+            .rpc();
+
+        const asyncTx3 = program.methods
+            .updateSuperAdmin()
+            .accounts({
+                signer: superAdmin1.publicKey,
+                globalConfig: globalConfigKeypair.publicKey,
+                newSuperAdmin: superAdmin2.publicKey,
+            })
+            .signers([superAdmin2])
+            .rpc();
+
+        await expect(asyncTx3).to.eventually.be.rejectedWith(
+            /Signature verification failed/
         );
     });
 });

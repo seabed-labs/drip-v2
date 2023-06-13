@@ -6,10 +6,7 @@ export type {
 export { initPairConfig } from "./initPairConfig"
 export type { InitPairConfigAccounts } from "./initPairConfig"
 export { updateSuperAdmin } from "./updateSuperAdmin"
-export type {
-  UpdateSuperAdminArgs,
-  UpdateSuperAdminAccounts,
-} from "./updateSuperAdmin"
+export type { UpdateSuperAdminAccounts } from "./updateSuperAdmin"
 export { updateAdmin } from "./updateAdmin"
 export type { UpdateAdminArgs, UpdateAdminAccounts } from "./updateAdmin"
 export { updateDefaultDripFees } from "./updateDefaultDripFees"
