@@ -1,24 +1,22 @@
-use dill::component;
+use log::info;
 
 pub trait Repository: Send + Sync {
     fn upsert_position(&self) -> Result<i32, ()>;
 }
 
 pub struct PostgresRepository {
-    random: i32,
 }
 
-#[component(pub)]
 impl PostgresRepository {
     pub fn new() -> Self {
-        println!("Instantiating repository");
-        PostgresRepository { random: 9 }
+        info!("Instantiating repository");
+        PostgresRepository { }
     }
 }
 
 impl Repository for PostgresRepository {
     fn upsert_position(&self) -> Result<i32, ()> {
-        println!("Upserting positions");
-        Ok(self.random)
+        info!("Upserting positions");
+        Ok(1)
     }
 }
