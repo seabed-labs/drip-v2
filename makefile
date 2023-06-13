@@ -1,7 +1,7 @@
 # Default target
 test: program sdk
 	yarn install --force
-	cargo test
+	cargo test -p drip-v2
 	anchor test
 
 clean:

@@ -17,6 +17,22 @@ pub struct DripPosition {
     pub total_output_token_received: u64,
 }
 
+impl DripPosition {
+    pub fn is_tokenized(&self) -> bool {
+        match self.owner {
+            DripPositionOwner::Tokenized { .. } => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_directly_owned_by(&self, signer: Pubkey) -> bool {
+        match self.owner {
+            DripPositionOwner::Direct { owner } => signer.eq(&owner),
+            DripPositionOwner::Tokenized { .. } => false,
+        }
+    }
+}
+
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
 pub enum DripPositionOwner {
     Direct { owner: Pubkey },
@@ -36,4 +52,12 @@ impl Default for DripPositionOwner {
 pub struct DripPositionSigner {
     pub drip_position: Pubkey,
     pub bump: u8,
+}
+
+#[account]
+#[derive(Default, InitSpace)]
+// The goal of this account is to be able to get from the tokenized position NFT pubkey to the position pubkey by walking through an intermediary PDA
+pub struct DripPositionNftMapping {
+    pub drip_position_nft_mint: Pubkey,
+    pub drip_position: Pubkey,
 }

@@ -68,4 +68,8 @@ pub mod drip_v2 {
     ) -> Result<()> {
         handle_init_drip_position(ctx, params)
     }
+
+    pub fn tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
+        handle_tokenize_drip_position(ctx)
+    }
 }
