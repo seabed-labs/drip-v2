@@ -3,7 +3,7 @@ use log::info;
 use crate::repository::Repository;
 
 pub trait Worker: Send + Sync {
-    fn run(&self) -> Result<i32, ()>;
+    fn run(&self) -> Result<i32, String>;
 }
 
 pub struct AccountWorker {
@@ -11,9 +11,14 @@ pub struct AccountWorker {
 }
 
 impl Worker for AccountWorker {
-    fn run(&self) -> Result<i32, ()> {
+    fn run(&self) -> Result<i32, String> {
+        let mut i = 0;
         loop {
-            info!("Account worker")
+            i += 1;
+            info!("Account worker");
+            if i == 15 {
+                return Err(String::from("account worker error"));
+            }
         }
     }
 }
@@ -29,9 +34,14 @@ pub struct TransactionWorker {
 }
 
 impl Worker for TransactionWorker {
-    fn run(&self) -> Result<i32, ()> {
+    fn run(&self) -> Result<i32, String> {
+        let mut i = 0;
         loop {
+            i += 1;
             info!("Transaction Worker");
+            if i == 10 {
+                return Err(String::from("transaction worker error"));
+            }
         }
     }
 }

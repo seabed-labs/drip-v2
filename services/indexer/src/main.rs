@@ -5,28 +5,35 @@ mod workers;
 use std::sync::Arc;
 use crate::repository::{PostgresRepository, Repository};
 use crate::workers::{AccountWorker, TransactionWorker, Worker};
-use std::thread::spawn;
 use dotenvy::dotenv;
-use log::{error};
+use log::{error, info};
+use tokio::task::JoinSet;
 
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenv().ok();
     json_env_logger::init();
     json_env_logger::panic_hook();
 
     let repository: Arc<dyn Repository> = Arc::from(PostgresRepository::new());
+
     let account_worker: Box<dyn Worker> =  Box::from(AccountWorker::new(repository.clone()));
     let transaction_worker: Box<dyn Worker> =  Box::from(TransactionWorker::new(repository.clone()));
+
     let workers = Vec::from([account_worker, transaction_worker]);
-    let mut threads = Vec::new();
+
+    let mut work_set = JoinSet::new();
     for worker in workers {
-        let thread = spawn(move || worker.run());
-        threads.push(thread);
+        work_set.spawn(async move {
+            worker.run()
+        });
     }
-    for thread in threads {
-        if let Err(err) = thread.join().unwrap() {
-            error!("Thread Error: {:?}", err);
+
+    while let Some(res) = work_set.join_next().await {
+        match res {
+            Ok(indx) => info!("done thread {:?}", indx),
+            Err(e) => error!("thread error: {:?}", e)
         }
     }
 }
