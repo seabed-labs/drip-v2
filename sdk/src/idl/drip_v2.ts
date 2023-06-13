@@ -1006,7 +1006,7 @@ export type DripV2 = {
     },
     {
       "code": 6012,
-      "name": "DripPositionOwnerNotSigner1",
+      "name": "DripPositionOwnerNotSigner",
       "msg": "Drip position owner not a signer"
     },
     {
@@ -2035,7 +2035,7 @@ export const IDL: DripV2 = {
     },
     {
       "code": 6012,
-      "name": "DripPositionOwnerNotSigner1",
+      "name": "DripPositionOwnerNotSigner",
       "msg": "Drip position owner not a signer"
     },
     {

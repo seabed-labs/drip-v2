@@ -11,7 +11,7 @@ export type CustomError =
   | GlobalConfigMismatch
   | GlobalConfigGlobalSignerMismatch
   | DripPositionSignerMismatch
-  | DripPositionOwnerNotSigner1
+  | DripPositionOwnerNotSigner
   | DripPositionAlreadyTokenized
   | CannotTokenizeAutoCreditEnabledDripPosition
   | DripPositionNftSupplyInvariantFailed
@@ -151,10 +151,10 @@ export class DripPositionSignerMismatch extends Error {
   }
 }
 
-export class DripPositionOwnerNotSigner1 extends Error {
+export class DripPositionOwnerNotSigner extends Error {
   static readonly code = 6012
   readonly code = 6012
-  readonly name = "DripPositionOwnerNotSigner1"
+  readonly name = "DripPositionOwnerNotSigner"
   readonly msg = "Drip position owner not a signer"
 
   constructor(readonly logs?: string[]) {
@@ -222,7 +222,7 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
     case 6011:
       return new DripPositionSignerMismatch(logs)
     case 6012:
-      return new DripPositionOwnerNotSigner1(logs)
+      return new DripPositionOwnerNotSigner(logs)
     case 6013:
       return new DripPositionAlreadyTokenized(logs)
     case 6014:

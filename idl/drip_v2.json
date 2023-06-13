@@ -1006,7 +1006,7 @@
     },
     {
       "code": 6012,
-      "name": "DripPositionOwnerNotSigner1",
+      "name": "DripPositionOwnerNotSigner",
       "msg": "Drip position owner not a signer"
     },
     {
