@@ -5,7 +5,10 @@ use crate::{
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self, Mint, MintTo, Token, TokenAccount},
+    token::{
+        self, spl_token::instruction::AuthorityType, Mint, MintTo, SetAuthority, Token,
+        TokenAccount,
+    },
 };
 
 #[derive(Accounts)]
@@ -77,6 +80,9 @@ pub fn handle_tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Resu
         DripError::DripPositionAlreadyTokenized
     );
 
+    // We don't want auto-credits to be enabled for tokenized positions.
+    // The reason is that the token account we credit to then becomes dynamic and that increases complexity.
+    // If a user wants to move an auto-credit enabled position, disable it, tokenize, move, de-tokenize and then re-enable it.
     require!(
         !ctx.accounts.drip_position.auto_credit_enabled,
         DripError::CannotTokenizeAutoCreditEnabledDripPosition
@@ -109,11 +115,37 @@ pub fn handle_tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Resu
         1,
     )?;
 
+    // Remove authority of the drip_position_signer from this mint so that we can't mint anymore position tokens
+    token::set_authority(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            SetAuthority {
+                current_authority: ctx.accounts.drip_position_signer.to_account_info(),
+                account_or_mint: ctx.accounts.drip_position_nft_mint.to_account_info(),
+            },
+            &[&[
+                b"drip-v2-drip-position-signer".as_ref(),
+                ctx.accounts.drip_position.key().as_ref(),
+                &[ctx.accounts.drip_position_signer.bump],
+            ]],
+        ),
+        AuthorityType::MintTokens,
+        None,
+    )?;
+
     ctx.accounts.drip_position_nft_mint.reload()?;
+    ctx.accounts.drip_position_nft_account.reload()?;
 
     require!(
-        ctx.accounts.drip_position_nft_mint.supply == 1,
-        DripError::DripPositionNftSupplyInvariantFailed
+        ctx.accounts.drip_position_nft_mint.supply == 1
+            && ctx.accounts.drip_position_nft_account.amount == 1
+            && ctx
+                .accounts
+                .drip_position_nft_account
+                .owner
+                .eq(ctx.accounts.owner.key)
+            && ctx.accounts.drip_position_nft_mint.mint_authority.is_none(),
+        DripError::DripPositionNftInvariantsFailed
     );
 
     Ok(())

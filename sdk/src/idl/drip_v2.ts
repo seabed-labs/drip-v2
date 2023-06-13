@@ -1021,8 +1021,8 @@ export type DripV2 = {
     },
     {
       "code": 6015,
-      "name": "DripPositionNftSupplyInvariantFailed",
-      "msg": "Drip position nft mint supply invariant failed"
+      "name": "DripPositionNftInvariantsFailed",
+      "msg": "Drip position nft mint invariants failed"
     }
   ]
 };
@@ -2050,8 +2050,8 @@ export const IDL: DripV2 = {
     },
     {
       "code": 6015,
-      "name": "DripPositionNftSupplyInvariantFailed",
-      "msg": "Drip position nft mint supply invariant failed"
+      "name": "DripPositionNftInvariantsFailed",
+      "msg": "Drip position nft mint invariants failed"
     }
   ]
 };

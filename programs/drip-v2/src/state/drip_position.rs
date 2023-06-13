@@ -20,8 +20,8 @@ pub struct DripPosition {
 impl DripPosition {
     pub fn is_tokenized(&self) -> bool {
         match self.owner {
-            DripPositionOwner::Direct { .. } => false,
             DripPositionOwner::Tokenized { .. } => true,
+            _ => false,
         }
     }
 

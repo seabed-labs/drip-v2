@@ -14,7 +14,7 @@ export type CustomError =
   | DripPositionOwnerNotSigner
   | DripPositionAlreadyTokenized
   | CannotTokenizeAutoCreditEnabledDripPosition
-  | DripPositionNftSupplyInvariantFailed
+  | DripPositionNftInvariantsFailed
 
 export class SuperAdminSignatureRequired extends Error {
   static readonly code = 6000
@@ -184,14 +184,14 @@ export class CannotTokenizeAutoCreditEnabledDripPosition extends Error {
   }
 }
 
-export class DripPositionNftSupplyInvariantFailed extends Error {
+export class DripPositionNftInvariantsFailed extends Error {
   static readonly code = 6015
   readonly code = 6015
-  readonly name = "DripPositionNftSupplyInvariantFailed"
-  readonly msg = "Drip position nft mint supply invariant failed"
+  readonly name = "DripPositionNftInvariantsFailed"
+  readonly msg = "Drip position nft mint invariants failed"
 
   constructor(readonly logs?: string[]) {
-    super("6015: Drip position nft mint supply invariant failed")
+    super("6015: Drip position nft mint invariants failed")
   }
 }
 
@@ -228,7 +228,7 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
     case 6014:
       return new CannotTokenizeAutoCreditEnabledDripPosition(logs)
     case 6015:
-      return new DripPositionNftSupplyInvariantFailed(logs)
+      return new DripPositionNftInvariantsFailed(logs)
   }
 
   return null
