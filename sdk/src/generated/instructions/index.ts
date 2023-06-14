@@ -30,3 +30,5 @@ export type {
 } from "./initDripPosition"
 export { tokenizeDripPosition } from "./tokenizeDripPosition"
 export type { TokenizeDripPositionAccounts } from "./tokenizeDripPosition"
+export { toggleAutoCredit } from "./toggleAutoCredit"
+export type { ToggleAutoCreditAccounts } from "./toggleAutoCredit"
