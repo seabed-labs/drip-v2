@@ -50,4 +50,7 @@ pub enum DripError {
 
     #[msg("Drip position nft mint invariants failed")]
     DripPositionNftInvariantsFailed, // 6015 or 0x177F
+
+    #[msg("Cannot enable auto-credit with tokenized position")]
+    CannotEnableAutoCreditWithTokenizedPosition, // 6016 or 0x1780
 }

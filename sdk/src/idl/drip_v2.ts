@@ -532,6 +532,22 @@ export type DripV2 = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "toggleAutoCredit",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1009,6 +1025,11 @@ export type DripV2 = {
       "code": 6015,
       "name": "DripPositionNftInvariantsFailed",
       "msg": "Drip position nft mint invariants failed"
+    },
+    {
+      "code": 6016,
+      "name": "CannotEnableAutoCreditWithTokenizedPosition",
+      "msg": "Cannot enable auto-credit with tokenized position"
     }
   ]
 };
@@ -1547,6 +1568,22 @@ export const IDL: DripV2 = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "toggleAutoCredit",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -2024,6 +2061,11 @@ export const IDL: DripV2 = {
       "code": 6015,
       "name": "DripPositionNftInvariantsFailed",
       "msg": "Drip position nft mint invariants failed"
+    },
+    {
+      "code": 6016,
+      "name": "CannotEnableAutoCreditWithTokenizedPosition",
+      "msg": "Cannot enable auto-credit with tokenized position"
     }
   ]
 };

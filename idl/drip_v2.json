@@ -532,6 +532,22 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "toggleAutoCredit",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1009,6 +1025,11 @@
       "code": 6015,
       "name": "DripPositionNftInvariantsFailed",
       "msg": "Drip position nft mint invariants failed"
+    },
+    {
+      "code": 6016,
+      "name": "CannotEnableAutoCreditWithTokenizedPosition",
+      "msg": "Cannot enable auto-credit with tokenized position"
     }
   ]
 }

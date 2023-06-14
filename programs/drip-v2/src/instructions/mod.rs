@@ -1,6 +1,7 @@
 mod init_drip_position;
 mod init_global_config;
 mod init_pair_config;
+mod toggle_auto_credit;
 mod tokenize_drip_position;
 mod update_admin;
 mod update_default_drip_fees;
@@ -12,6 +13,7 @@ mod withdraw_fees;
 pub use init_drip_position::*;
 pub use init_global_config::*;
 pub use init_pair_config::*;
+pub use toggle_auto_credit::*;
 pub use tokenize_drip_position::*;
 pub use update_admin::*;
 pub use update_default_drip_fees::*;

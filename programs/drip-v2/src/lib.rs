@@ -72,4 +72,8 @@ pub mod drip_v2 {
     pub fn tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
         handle_tokenize_drip_position(ctx)
     }
+
+    pub fn toggle_auto_credit(ctx: Context<ToggleAutoCredit>) -> Result<()> {
+        handle_toggle_auto_credit(ctx)
+    }
 }

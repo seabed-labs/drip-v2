@@ -15,6 +15,7 @@ export type CustomError =
   | DripPositionAlreadyTokenized
   | CannotTokenizeAutoCreditEnabledDripPosition
   | DripPositionNftInvariantsFailed
+  | CannotEnableAutoCreditWithTokenizedPosition
 
 export class SuperAdminSignatureRequired extends Error {
   static readonly code = 6000
@@ -195,6 +196,17 @@ export class DripPositionNftInvariantsFailed extends Error {
   }
 }
 
+export class CannotEnableAutoCreditWithTokenizedPosition extends Error {
+  static readonly code = 6016
+  readonly code = 6016
+  readonly name = "CannotEnableAutoCreditWithTokenizedPosition"
+  readonly msg = "Cannot enable auto-credit with tokenized position"
+
+  constructor(readonly logs?: string[]) {
+    super("6016: Cannot enable auto-credit with tokenized position")
+  }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
   switch (code) {
     case 6000:
@@ -229,6 +241,8 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
       return new CannotTokenizeAutoCreditEnabledDripPosition(logs)
     case 6015:
       return new DripPositionNftInvariantsFailed(logs)
+    case 6016:
+      return new CannotEnableAutoCreditWithTokenizedPosition(logs)
   }
 
   return null
