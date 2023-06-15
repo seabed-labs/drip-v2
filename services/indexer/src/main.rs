@@ -3,7 +3,9 @@ mod queue;
 mod repository;
 mod workers;
 
-use crate::repository::{PostgresConfig, PostgresRepository, Repository, RepositoryConfig};
+use crate::config::{IndexerConfig, QueueConfig};
+use crate::queue::{AccountQueue, AccountQueueImpl, TransactionQueue, TransactionQueueImpl};
+use crate::repository::{PostgresRepositoryImpl, Repository};
 use crate::workers::{AccountWorker, TransactionWorker, Worker};
 use dotenvy::dotenv;
 use log::{error, info};
@@ -16,12 +18,24 @@ async fn main() {
     json_env_logger::init();
     json_env_logger::panic_hook();
 
-    let repository_config: Arc<dyn RepositoryConfig> = Arc::from(PostgresConfig::new());
-    let postgres_repository = Arc::from(PostgresRepository::new(repository_config).await);
-    let account_worker: Box<dyn Worker> =
-        Box::from(AccountWorker::new(postgres_repository.clone()));
-    let transaction_worker: Box<dyn Worker> =
-        Box::from(TransactionWorker::new(postgres_repository.clone()));
+    let indexer_config = Arc::from(IndexerConfig::new());
+    let indexer_repository = Arc::from(PostgresRepositoryImpl::new(indexer_config).await);
+
+    let queue_config = Arc::from(QueueConfig::new());
+    let account_queue: Arc<dyn AccountQueue> =
+        Arc::from(AccountQueueImpl::new(queue_config.clone()).await);
+    let tx_queue: Arc<dyn TransactionQueue> =
+        Arc::from(TransactionQueueImpl::new(queue_config).await);
+
+    let account_worker: Box<dyn Worker> = Box::from(AccountWorker::new(
+        account_queue.clone(),
+        indexer_repository.clone(),
+    ));
+    let transaction_worker: Box<dyn Worker> = Box::from(TransactionWorker::new(
+        account_queue,
+        tx_queue,
+        indexer_repository,
+    ));
 
     let workers = Vec::from([account_worker, transaction_worker]);
 
