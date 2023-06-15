@@ -1,13 +1,13 @@
-use std::sync::Arc;
-use log::info;
 use crate::repository::Repository;
+use log::info;
+use std::sync::Arc;
 
 pub trait Worker: Send + Sync {
     fn run(&self) -> Result<i32, String>;
 }
 
 pub struct AccountWorker {
-    repository:  Arc<dyn Repository>,
+    repository: Arc<dyn Repository>,
 }
 
 impl Worker for AccountWorker {
@@ -25,12 +25,12 @@ impl Worker for AccountWorker {
 
 impl AccountWorker {
     pub fn new(repository: Arc<dyn Repository>) -> Self {
-        AccountWorker{ repository }
+        AccountWorker { repository }
     }
 }
 
 pub struct TransactionWorker {
-    repository:  Arc<dyn Repository>,
+    repository: Arc<dyn Repository>,
 }
 
 impl Worker for TransactionWorker {
@@ -48,6 +48,6 @@ impl Worker for TransactionWorker {
 
 impl TransactionWorker {
     pub fn new(repository: Arc<dyn Repository>) -> Self {
-        TransactionWorker{ repository }
+        TransactionWorker { repository }
     }
 }
