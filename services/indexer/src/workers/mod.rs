@@ -1,3 +1,4 @@
+use crate::queue::{AccountQueue, Queue, TransactionQueue};
 use crate::repository::Repository;
 use log::info;
 use std::sync::Arc;
@@ -7,6 +8,7 @@ pub trait Worker: Send + Sync {
 }
 
 pub struct AccountWorker {
+    account_queue: Arc<dyn AccountQueue>,
     repository: Arc<dyn Repository>,
 }
 
@@ -24,13 +26,32 @@ impl Worker for AccountWorker {
 }
 
 impl AccountWorker {
-    pub fn new(repository: Arc<dyn Repository>) -> Self {
-        AccountWorker { repository }
+    pub fn new(account_queue: Arc<dyn AccountQueue>, repository: Arc<dyn Repository>) -> Self {
+        AccountWorker {
+            account_queue,
+            repository,
+        }
     }
 }
 
 pub struct TransactionWorker {
+    account_queue: Arc<dyn AccountQueue>,
+    tx_queue: Arc<dyn TransactionQueue>,
     repository: Arc<dyn Repository>,
+}
+
+impl TransactionWorker {
+    pub fn new(
+        account_queue: Arc<dyn AccountQueue>,
+        tx_queue: Arc<dyn TransactionQueue>,
+        repository: Arc<dyn Repository>,
+    ) -> Self {
+        TransactionWorker {
+            account_queue,
+            tx_queue,
+            repository,
+        }
+    }
 }
 
 impl Worker for TransactionWorker {
@@ -43,11 +64,5 @@ impl Worker for TransactionWorker {
                 return Err(String::from("transaction worker error"));
             }
         }
-    }
-}
-
-impl TransactionWorker {
-    pub fn new(repository: Arc<dyn Repository>) -> Self {
-        TransactionWorker { repository }
     }
 }
