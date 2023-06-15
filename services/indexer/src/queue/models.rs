@@ -3,8 +3,8 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use diesel::*;
 use super::schema::*;
+use diesel::*;
 
 use chrono::NaiveDateTime;
 #[derive(Queryable, Debug, Identifiable)]
@@ -35,4 +35,3 @@ pub struct TxQueueItem {
     pub time: NaiveDateTime,
     pub retry_time: Option<NaiveDateTime>,
 }
-
