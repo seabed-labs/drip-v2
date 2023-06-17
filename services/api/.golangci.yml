@@ -1,0 +1,12 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - gofmt
+    - bodyclose
+    - exhaustive
+    - misspell
+    - godot
+    - unparam
+    - exhaustruct
