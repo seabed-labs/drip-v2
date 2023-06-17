@@ -31,8 +31,4 @@ generate-sdk-anchor-client: program
 # Services
 #############################################################################
 
-backend: indexer
-
-indexer: program generate-indexer-database-models
-	cargo build -p indexer
 
