@@ -1,13 +1,13 @@
-import express, { json, urlencoded } from "express";
-import { RegisterRoutes } from "./generated/routes";
+import express, { json, urlencoded } from 'express'
+import { RegisterRoutes } from './generated/routes'
 
-export const app = express();
+export const app = express()
 
 app.use(
-  urlencoded({
-    extended: true,
-  })
-);
-app.use(json());
+    urlencoded({
+        extended: true,
+    })
+)
+app.use(json())
 
-RegisterRoutes(app);
+RegisterRoutes(app)

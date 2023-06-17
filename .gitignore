@@ -1,14 +1,5 @@
+**/.DS_Store
+.idea/
+node_modules/
 
-.anchor
-.DS_Store
-target
-**/*.rs.bk
-test-ledger
-.yarn
-
-**/.idea/
-*.env
-
-**/dist/
-**/node_modules/
-**/tsconfig.tsbuildinfo
+**/*.env

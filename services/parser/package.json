@@ -10,11 +10,14 @@
   "scripts": {
     "prepack": "yarn run build",
     "build": "yarn run build:api-codec && yarn run tsc",
-    "build:api-codec": "yarn run tsoa spec-and-routes --yaml && yarn run prettier:fix && yarn run lint:fix",
+    "build:api-codec": "yarn run tsoa spec-and-routes --yaml && yarn run lint:fix",
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
-    "lint": "eslint --ext .ts .",
-    "lint:fix": "eslint --fix --ext .ts .",
-    "prettier:fix": "prettier --write ./src swaggerApi.yaml"
+    "lint": "yarn run lint:eslint && yarn run lint:prettier",
+    "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
+    "lint:eslint": "eslint --ignore-path .gitignore --ext .ts . ",
+    "lint:prettier": "prettier \"*/**/*{.js,.ts,.yaml}\" --check --ignore-path .gitignore",
+    "lint:eslint:fix": "eslint --ignore-path .gitignore --fix --ext .ts . ",
+    "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
   },
   "devDependencies": {
     "@openapi-io-ts/cli": "^0.5.0",
