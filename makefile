@@ -15,12 +15,17 @@ program: root
 	cd solana-programs && anchor build
 	cp solana-programs/target/idl/drip_v2.json solana-programs/idl/drip_v2.json
 
-sdk: program generate-sdk-anchor-client
+sdk: program drip-types
+# TODO: Do we need drip_v2.ts in drip-sdk? (can use drip-types)
 	cp solana-programs/target/types/drip_v2.ts packages/sdk/src/idl/drip_v2.ts
-	yarn workspace @dcaf/drip install
-	yarn workspace @dcaf/drip build
+	cd packages/sdk && yarn install && yarn build
 
-generate-sdk-anchor-client: program
-	yarn run anchor-client-gen solana-programs/idl/drip_v2.json packages/sdk/src/generated --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
+drip-types: program
+	yarn run anchor-client-gen solana-programs/idl/drip_v2.json packages/drip-types/src --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
+	cp solana-programs/target/types/drip_v2.ts packages/drip-types/src/drip_v2.ts
+	cd packages/drip-types && yarn install && yarn build
+
+# generate-sdk-anchor-client: program
+# 	yarn run anchor-client-gen solana-programs/idl/drip_v2.json packages/sdk/src/generated --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
 
 
