@@ -10,7 +10,7 @@ clean:
 	cargo clean
 
 program:
-	# program needs sdk/dist to exist or else we can't yarn...
+# program needs sdk/dist to exist or else we can't yarn...
 	cd sdk && yarn && yarn build
 	yarn
 	anchor build
@@ -36,9 +36,3 @@ backend: indexer
 indexer: program generate-indexer-database-models
 	cargo build -p indexer
 
-# TODO(Mocha/Breve): This can be streamlined to be done in a docker container or something
-generate-indexer-database-models:
-	DATABASE_URL=postgres://dcaf:dcaf@localhost/indexer diesel print-schema > services/indexer/src/repository/schema.rs
-	DATABASE_URL=postgres://dcaf:dcaf@localhost/queue diesel print-schema > services/indexer/src/queue/schema.rs
-	DATABASE_URL=postgres://dcaf:dcaf@localhost/indexer diesel_ext --import-types "diesel::*" --import-types "super::schema::*" --schema-file services/indexer/src/repository/schema.rs --model > services/indexer/src/repository/models.rs
-	DATABASE_URL=postgres://dcaf:dcaf@localhost/queue diesel_ext --import-types "diesel::*" --import-types "super::schema::*" --schema-file services/indexer/src/queue/schema.rs --model > services/indexer/src/queue/models.rs
