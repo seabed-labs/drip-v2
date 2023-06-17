@@ -5,31 +5,41 @@ import * as types from "../types" // eslint-disable-line @typescript-eslint/no-u
 import { PROGRAM_ID } from "../programId"
 
 export interface DripPositionNftMappingFields {
+  version: number
   dripPositionNftMint: PublicKey
   dripPosition: PublicKey
+  bump: number
 }
 
 export interface DripPositionNftMappingJSON {
+  version: number
   dripPositionNftMint: string
   dripPosition: string
+  bump: number
 }
 
 export class DripPositionNftMapping {
+  readonly version: number
   readonly dripPositionNftMint: PublicKey
   readonly dripPosition: PublicKey
+  readonly bump: number
 
   static readonly discriminator = Buffer.from([
     169, 140, 220, 36, 255, 38, 150, 167,
   ])
 
   static readonly layout = borsh.struct([
+    borsh.u8("version"),
     borsh.publicKey("dripPositionNftMint"),
     borsh.publicKey("dripPosition"),
+    borsh.u8("bump"),
   ])
 
   constructor(fields: DripPositionNftMappingFields) {
+    this.version = fields.version
     this.dripPositionNftMint = fields.dripPositionNftMint
     this.dripPosition = fields.dripPosition
+    this.bump = fields.bump
   }
 
   static async fetch(
@@ -76,22 +86,28 @@ export class DripPositionNftMapping {
     const dec = DripPositionNftMapping.layout.decode(data.slice(8))
 
     return new DripPositionNftMapping({
+      version: dec.version,
       dripPositionNftMint: dec.dripPositionNftMint,
       dripPosition: dec.dripPosition,
+      bump: dec.bump,
     })
   }
 
   toJSON(): DripPositionNftMappingJSON {
     return {
+      version: this.version,
       dripPositionNftMint: this.dripPositionNftMint.toString(),
       dripPosition: this.dripPosition.toString(),
+      bump: this.bump,
     }
   }
 
   static fromJSON(obj: DripPositionNftMappingJSON): DripPositionNftMapping {
     return new DripPositionNftMapping({
+      version: obj.version,
       dripPositionNftMint: new PublicKey(obj.dripPositionNftMint),
       dripPosition: new PublicKey(obj.dripPosition),
+      bump: obj.bump,
     })
   }
 }

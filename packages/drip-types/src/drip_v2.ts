@@ -442,6 +442,83 @@ export type DripV2 = {
       ]
     },
     {
+      "name": "initDripPositionNft",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPositionNftMapping",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-nft-mapping"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "drip_position_nft_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "tokenizeDripPosition",
       "accounts": [
         {
@@ -488,32 +565,12 @@ export type DripV2 = {
         {
           "name": "dripPositionNftMint",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "dripPositionNftAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "dripPositionNftMapping",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "drip-v2-drip-position-nft-mapping"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "drip_position_nft_mint"
-              }
-            ]
-          }
         },
         {
           "name": "systemProgram",
@@ -524,9 +581,71 @@ export type DripV2 = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "detokenizeDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -605,6 +724,12 @@ export type DripV2 = {
           {
             "name": "totalOutputTokenReceived",
             "type": "u64"
+          },
+          {
+            "name": "dripPositionNftMint",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -614,6 +739,10 @@ export type DripV2 = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
           {
             "name": "dripPosition",
             "type": "publicKey"
@@ -631,12 +760,20 @@ export type DripV2 = {
         "kind": "struct",
         "fields": [
           {
+            "name": "version",
+            "type": "u8"
+          },
+          {
             "name": "dripPositionNftMint",
             "type": "publicKey"
           },
           {
             "name": "dripPosition",
             "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -854,13 +991,7 @@ export type DripV2 = {
             ]
           },
           {
-            "name": "Tokenized",
-            "fields": [
-              {
-                "name": "owner_nft_mint",
-                "type": "publicKey"
-              }
-            ]
+            "name": "Tokenized"
           }
         ]
       }
@@ -1030,6 +1161,36 @@ export type DripV2 = {
       "code": 6016,
       "name": "CannotEnableAutoCreditWithTokenizedPosition",
       "msg": "Cannot enable auto-credit with tokenized position"
+    },
+    {
+      "code": 6017,
+      "name": "DripPositionNftMintAlreadyCreated",
+      "msg": "Drip position NFT mint already created"
+    },
+    {
+      "code": 6018,
+      "name": "UnexpectedDripPositionNftAccountOwner",
+      "msg": "Drip position NFT account owner should be position owner"
+    },
+    {
+      "code": 6019,
+      "name": "UnexpectedDripPositionNftMint",
+      "msg": "Drip position NFT mint does not match drip position field"
+    },
+    {
+      "code": 6020,
+      "name": "UnexpectedDripPositionNftMapping",
+      "msg": "Drip position NFT mapping incorrect"
+    },
+    {
+      "code": 6021,
+      "name": "DripPositionNotTokenized",
+      "msg": "Drip position is not tokenized"
+    },
+    {
+      "code": 6022,
+      "name": "UnexpectedDripPositionNftAccount",
+      "msg": "Drip position NFT account does not match mint"
     }
   ]
 };
@@ -1478,6 +1639,83 @@ export const IDL: DripV2 = {
       ]
     },
     {
+      "name": "initDripPositionNft",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPositionNftMapping",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-nft-mapping"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "drip_position_nft_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "tokenizeDripPosition",
       "accounts": [
         {
@@ -1524,32 +1762,12 @@ export const IDL: DripV2 = {
         {
           "name": "dripPositionNftMint",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "dripPositionNftAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "dripPositionNftMapping",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "drip-v2-drip-position-nft-mapping"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "Mint",
-                "path": "drip_position_nft_mint"
-              }
-            ]
-          }
         },
         {
           "name": "systemProgram",
@@ -1560,9 +1778,71 @@ export const IDL: DripV2 = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "detokenizeDripPosition",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionNftAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1641,6 +1921,12 @@ export const IDL: DripV2 = {
           {
             "name": "totalOutputTokenReceived",
             "type": "u64"
+          },
+          {
+            "name": "dripPositionNftMint",
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -1650,6 +1936,10 @@ export const IDL: DripV2 = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
           {
             "name": "dripPosition",
             "type": "publicKey"
@@ -1667,12 +1957,20 @@ export const IDL: DripV2 = {
         "kind": "struct",
         "fields": [
           {
+            "name": "version",
+            "type": "u8"
+          },
+          {
             "name": "dripPositionNftMint",
             "type": "publicKey"
           },
           {
             "name": "dripPosition",
             "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -1890,13 +2188,7 @@ export const IDL: DripV2 = {
             ]
           },
           {
-            "name": "Tokenized",
-            "fields": [
-              {
-                "name": "owner_nft_mint",
-                "type": "publicKey"
-              }
-            ]
+            "name": "Tokenized"
           }
         ]
       }
@@ -2066,6 +2358,36 @@ export const IDL: DripV2 = {
       "code": 6016,
       "name": "CannotEnableAutoCreditWithTokenizedPosition",
       "msg": "Cannot enable auto-credit with tokenized position"
+    },
+    {
+      "code": 6017,
+      "name": "DripPositionNftMintAlreadyCreated",
+      "msg": "Drip position NFT mint already created"
+    },
+    {
+      "code": 6018,
+      "name": "UnexpectedDripPositionNftAccountOwner",
+      "msg": "Drip position NFT account owner should be position owner"
+    },
+    {
+      "code": 6019,
+      "name": "UnexpectedDripPositionNftMint",
+      "msg": "Drip position NFT mint does not match drip position field"
+    },
+    {
+      "code": 6020,
+      "name": "UnexpectedDripPositionNftMapping",
+      "msg": "Drip position NFT mapping incorrect"
+    },
+    {
+      "code": 6021,
+      "name": "DripPositionNotTokenized",
+      "msg": "Drip position is not tokenized"
+    },
+    {
+      "code": 6022,
+      "name": "UnexpectedDripPositionNftAccount",
+      "msg": "Drip position NFT account does not match mint"
     }
   ]
 };

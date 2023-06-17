@@ -34,7 +34,6 @@ pub fn handle_init_global_config(
     ctx: Context<InitGlobalConfig>,
     params: InitGlobalConfigParams,
 ) -> Result<()> {
-    ctx.accounts.global_config.version = 0;
     ctx.accounts.global_config.super_admin = params.super_admin;
     ctx.accounts.global_config.default_drip_fee_bps = params.default_drip_fee_bps;
     ctx.accounts.global_config.global_config_signer = ctx.accounts.global_config_signer.key();

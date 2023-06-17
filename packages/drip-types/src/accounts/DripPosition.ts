@@ -17,6 +17,7 @@ export interface DripPositionFields {
   frequencyInSeconds: BN
   totalInputTokenDripped: BN
   totalOutputTokenReceived: BN
+  dripPositionNftMint: PublicKey | null
 }
 
 export interface DripPositionJSON {
@@ -32,6 +33,7 @@ export interface DripPositionJSON {
   frequencyInSeconds: string
   totalInputTokenDripped: string
   totalOutputTokenReceived: string
+  dripPositionNftMint: string | null
 }
 
 export class DripPosition {
@@ -47,6 +49,7 @@ export class DripPosition {
   readonly frequencyInSeconds: BN
   readonly totalInputTokenDripped: BN
   readonly totalOutputTokenReceived: BN
+  readonly dripPositionNftMint: PublicKey | null
 
   static readonly discriminator = Buffer.from([
     4, 250, 161, 172, 41, 156, 53, 219,
@@ -65,6 +68,7 @@ export class DripPosition {
     borsh.u64("frequencyInSeconds"),
     borsh.u64("totalInputTokenDripped"),
     borsh.u64("totalOutputTokenReceived"),
+    borsh.option(borsh.publicKey(), "dripPositionNftMint"),
   ])
 
   constructor(fields: DripPositionFields) {
@@ -80,6 +84,7 @@ export class DripPosition {
     this.frequencyInSeconds = fields.frequencyInSeconds
     this.totalInputTokenDripped = fields.totalInputTokenDripped
     this.totalOutputTokenReceived = fields.totalOutputTokenReceived
+    this.dripPositionNftMint = fields.dripPositionNftMint
   }
 
   static async fetch(
@@ -138,6 +143,7 @@ export class DripPosition {
       frequencyInSeconds: dec.frequencyInSeconds,
       totalInputTokenDripped: dec.totalInputTokenDripped,
       totalOutputTokenReceived: dec.totalOutputTokenReceived,
+      dripPositionNftMint: dec.dripPositionNftMint,
     })
   }
 
@@ -155,6 +161,9 @@ export class DripPosition {
       frequencyInSeconds: this.frequencyInSeconds.toString(),
       totalInputTokenDripped: this.totalInputTokenDripped.toString(),
       totalOutputTokenReceived: this.totalOutputTokenReceived.toString(),
+      dripPositionNftMint:
+        (this.dripPositionNftMint && this.dripPositionNftMint.toString()) ||
+        null,
     }
   }
 
@@ -172,6 +181,9 @@ export class DripPosition {
       frequencyInSeconds: new BN(obj.frequencyInSeconds),
       totalInputTokenDripped: new BN(obj.totalInputTokenDripped),
       totalOutputTokenReceived: new BN(obj.totalOutputTokenReceived),
+      dripPositionNftMint:
+        (obj.dripPositionNftMint && new PublicKey(obj.dripPositionNftMint)) ||
+        null,
     })
   }
 }

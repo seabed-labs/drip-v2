@@ -28,7 +28,11 @@ export type {
   InitDripPositionArgs,
   InitDripPositionAccounts,
 } from "./initDripPosition"
+export { initDripPositionNft } from "./initDripPositionNft"
+export type { InitDripPositionNftAccounts } from "./initDripPositionNft"
 export { tokenizeDripPosition } from "./tokenizeDripPosition"
 export type { TokenizeDripPositionAccounts } from "./tokenizeDripPosition"
+export { detokenizeDripPosition } from "./detokenizeDripPosition"
+export type { DetokenizeDripPositionAccounts } from "./detokenizeDripPosition"
 export { toggleAutoCredit } from "./toggleAutoCredit"
 export type { ToggleAutoCreditAccounts } from "./toggleAutoCredit"

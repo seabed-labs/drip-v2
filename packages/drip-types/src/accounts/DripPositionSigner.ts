@@ -5,16 +5,19 @@ import * as types from "../types" // eslint-disable-line @typescript-eslint/no-u
 import { PROGRAM_ID } from "../programId"
 
 export interface DripPositionSignerFields {
+  version: number
   dripPosition: PublicKey
   bump: number
 }
 
 export interface DripPositionSignerJSON {
+  version: number
   dripPosition: string
   bump: number
 }
 
 export class DripPositionSigner {
+  readonly version: number
   readonly dripPosition: PublicKey
   readonly bump: number
 
@@ -23,11 +26,13 @@ export class DripPositionSigner {
   ])
 
   static readonly layout = borsh.struct([
+    borsh.u8("version"),
     borsh.publicKey("dripPosition"),
     borsh.u8("bump"),
   ])
 
   constructor(fields: DripPositionSignerFields) {
+    this.version = fields.version
     this.dripPosition = fields.dripPosition
     this.bump = fields.bump
   }
@@ -76,6 +81,7 @@ export class DripPositionSigner {
     const dec = DripPositionSigner.layout.decode(data.slice(8))
 
     return new DripPositionSigner({
+      version: dec.version,
       dripPosition: dec.dripPosition,
       bump: dec.bump,
     })
@@ -83,6 +89,7 @@ export class DripPositionSigner {
 
   toJSON(): DripPositionSignerJSON {
     return {
+      version: this.version,
       dripPosition: this.dripPosition.toString(),
       bump: this.bump,
     }
@@ -90,6 +97,7 @@ export class DripPositionSigner {
 
   static fromJSON(obj: DripPositionSignerJSON): DripPositionSigner {
     return new DripPositionSigner({
+      version: obj.version,
       dripPosition: new PublicKey(obj.dripPosition),
       bump: obj.bump,
     })

@@ -1,4 +1,6 @@
+mod detokenize_drip_position;
 mod init_drip_position;
+mod init_drip_position_nft;
 mod init_global_config;
 mod init_pair_config;
 mod toggle_auto_credit;
@@ -10,7 +12,9 @@ mod update_pyth_price_feed;
 mod update_super_admin;
 mod withdraw_fees;
 
+pub use detokenize_drip_position::*;
 pub use init_drip_position::*;
+pub use init_drip_position_nft::*;
 pub use init_global_config::*;
 pub use init_pair_config::*;
 pub use toggle_auto_credit::*;

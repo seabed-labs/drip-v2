@@ -16,6 +16,12 @@ export type CustomError =
   | CannotTokenizeAutoCreditEnabledDripPosition
   | DripPositionNftInvariantsFailed
   | CannotEnableAutoCreditWithTokenizedPosition
+  | DripPositionNftMintAlreadyCreated
+  | UnexpectedDripPositionNftAccountOwner
+  | UnexpectedDripPositionNftMint
+  | UnexpectedDripPositionNftMapping
+  | DripPositionNotTokenized
+  | UnexpectedDripPositionNftAccount
 
 export class SuperAdminSignatureRequired extends Error {
   static readonly code = 6000
@@ -207,6 +213,72 @@ export class CannotEnableAutoCreditWithTokenizedPosition extends Error {
   }
 }
 
+export class DripPositionNftMintAlreadyCreated extends Error {
+  static readonly code = 6017
+  readonly code = 6017
+  readonly name = "DripPositionNftMintAlreadyCreated"
+  readonly msg = "Drip position NFT mint already created"
+
+  constructor(readonly logs?: string[]) {
+    super("6017: Drip position NFT mint already created")
+  }
+}
+
+export class UnexpectedDripPositionNftAccountOwner extends Error {
+  static readonly code = 6018
+  readonly code = 6018
+  readonly name = "UnexpectedDripPositionNftAccountOwner"
+  readonly msg = "Drip position NFT account owner should be position owner"
+
+  constructor(readonly logs?: string[]) {
+    super("6018: Drip position NFT account owner should be position owner")
+  }
+}
+
+export class UnexpectedDripPositionNftMint extends Error {
+  static readonly code = 6019
+  readonly code = 6019
+  readonly name = "UnexpectedDripPositionNftMint"
+  readonly msg = "Drip position NFT mint does not match drip position field"
+
+  constructor(readonly logs?: string[]) {
+    super("6019: Drip position NFT mint does not match drip position field")
+  }
+}
+
+export class UnexpectedDripPositionNftMapping extends Error {
+  static readonly code = 6020
+  readonly code = 6020
+  readonly name = "UnexpectedDripPositionNftMapping"
+  readonly msg = "Drip position NFT mapping incorrect"
+
+  constructor(readonly logs?: string[]) {
+    super("6020: Drip position NFT mapping incorrect")
+  }
+}
+
+export class DripPositionNotTokenized extends Error {
+  static readonly code = 6021
+  readonly code = 6021
+  readonly name = "DripPositionNotTokenized"
+  readonly msg = "Drip position is not tokenized"
+
+  constructor(readonly logs?: string[]) {
+    super("6021: Drip position is not tokenized")
+  }
+}
+
+export class UnexpectedDripPositionNftAccount extends Error {
+  static readonly code = 6022
+  readonly code = 6022
+  readonly name = "UnexpectedDripPositionNftAccount"
+  readonly msg = "Drip position NFT account does not match mint"
+
+  constructor(readonly logs?: string[]) {
+    super("6022: Drip position NFT account does not match mint")
+  }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
   switch (code) {
     case 6000:
@@ -243,6 +315,18 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
       return new DripPositionNftInvariantsFailed(logs)
     case 6016:
       return new CannotEnableAutoCreditWithTokenizedPosition(logs)
+    case 6017:
+      return new DripPositionNftMintAlreadyCreated(logs)
+    case 6018:
+      return new UnexpectedDripPositionNftAccountOwner(logs)
+    case 6019:
+      return new UnexpectedDripPositionNftMint(logs)
+    case 6020:
+      return new UnexpectedDripPositionNftMapping(logs)
+    case 6021:
+      return new DripPositionNotTokenized(logs)
+    case 6022:
+      return new UnexpectedDripPositionNftAccount(logs)
   }
 
   return null

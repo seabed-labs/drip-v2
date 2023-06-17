@@ -69,8 +69,16 @@ pub mod drip_v2 {
         handle_init_drip_position(ctx, params)
     }
 
+    pub fn init_drip_position_nft(ctx: Context<InitDripPositionNft>) -> Result<()> {
+        handle_init_drip_position_nft(ctx)
+    }
+
     pub fn tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
         handle_tokenize_drip_position(ctx)
+    }
+
+    pub fn detokenize_drip_position(ctx: Context<DetokenizeDripPosition>) -> Result<()> {
+        handle_detokenize_drip_position(ctx)
     }
 
     pub fn toggle_auto_credit(ctx: Context<ToggleAutoCredit>) -> Result<()> {

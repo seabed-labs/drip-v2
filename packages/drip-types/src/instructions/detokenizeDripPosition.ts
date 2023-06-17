@@ -4,7 +4,7 @@ import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-esl
 import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface TokenizeDripPositionAccounts {
+export interface DetokenizeDripPositionAccounts {
   payer: PublicKey
   owner: PublicKey
   dripPosition: PublicKey
@@ -15,8 +15,8 @@ export interface TokenizeDripPositionAccounts {
   tokenProgram: PublicKey
 }
 
-export function tokenizeDripPosition(
-  accounts: TokenizeDripPositionAccounts,
+export function detokenizeDripPosition(
+  accounts: DetokenizeDripPositionAccounts,
   programId: PublicKey = PROGRAM_ID
 ) {
   const keys: Array<AccountMeta> = [
@@ -33,7 +33,7 @@ export function tokenizeDripPosition(
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([96, 214, 241, 27, 250, 106, 218, 233])
+  const identifier = Buffer.from([160, 58, 139, 72, 132, 220, 131, 18])
   const data = identifier
   const ix = new TransactionInstruction({ keys, programId, data })
   return ix

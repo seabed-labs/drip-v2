@@ -53,4 +53,23 @@ pub enum DripError {
 
     #[msg("Cannot enable auto-credit with tokenized position")]
     CannotEnableAutoCreditWithTokenizedPosition, // 6016 or 0x1780
+
+    #[msg("Drip position NFT mint already created")]
+    DripPositionNftMintAlreadyCreated, // 6017 or 0x1781
+
+    #[msg("Drip position NFT account owner should be position owner")]
+    UnexpectedDripPositionNftAccountOwner, // 6018 or 0x1782
+
+    #[msg("Drip position NFT mint does not match drip position field")]
+    UnexpectedDripPositionNftMint, // 6019 or 0x1783
+
+    // TODO: THIS ERROR IS UNUSED, can be reused for the next new error
+    #[msg("Drip position NFT mapping incorrect")]
+    UnexpectedDripPositionNftMapping, // 6020 or 0x1784
+
+    #[msg("Drip position is not tokenized")]
+    DripPositionNotTokenized, // 6021 or 0x1785
+
+    #[msg("Drip position NFT account does not match mint")]
+    UnexpectedDripPositionNftAccount, // 6022 or 0x1786
 }

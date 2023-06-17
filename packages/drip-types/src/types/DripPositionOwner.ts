@@ -48,18 +48,8 @@ export class Direct {
   }
 }
 
-export type TokenizedFields = {
-  ownerNftMint: PublicKey
-}
-export type TokenizedValue = {
-  ownerNftMint: PublicKey
-}
-
 export interface TokenizedJSON {
   kind: "Tokenized"
-  value: {
-    ownerNftMint: string
-  }
 }
 
 export class Tokenized {
@@ -67,28 +57,16 @@ export class Tokenized {
   static readonly kind = "Tokenized"
   readonly discriminator = 1
   readonly kind = "Tokenized"
-  readonly value: TokenizedValue
-
-  constructor(value: TokenizedFields) {
-    this.value = {
-      ownerNftMint: value.ownerNftMint,
-    }
-  }
 
   toJSON(): TokenizedJSON {
     return {
       kind: "Tokenized",
-      value: {
-        ownerNftMint: this.value.ownerNftMint.toString(),
-      },
     }
   }
 
   toEncodable() {
     return {
-      Tokenized: {
-        owner_nft_mint: this.value.ownerNftMint,
-      },
+      Tokenized: {},
     }
   }
 }
@@ -106,10 +84,7 @@ export function fromDecoded(obj: any): types.DripPositionOwnerKind {
     })
   }
   if ("Tokenized" in obj) {
-    const val = obj["Tokenized"]
-    return new Tokenized({
-      ownerNftMint: val["owner_nft_mint"],
-    })
+    return new Tokenized()
   }
 
   throw new Error("Invalid enum object")
@@ -125,9 +100,7 @@ export function fromJSON(
       })
     }
     case "Tokenized": {
-      return new Tokenized({
-        ownerNftMint: new PublicKey(obj.value.ownerNftMint),
-      })
+      return new Tokenized()
     }
   }
 }
@@ -135,7 +108,7 @@ export function fromJSON(
 export function layout(property?: string) {
   const ret = borsh.rustEnum([
     borsh.struct([borsh.publicKey("owner")], "Direct"),
-    borsh.struct([borsh.publicKey("owner_nft_mint")], "Tokenized"),
+    borsh.struct([], "Tokenized"),
   ])
   if (property !== undefined) {
     return ret.replicate(property)
