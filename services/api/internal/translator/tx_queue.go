@@ -9,7 +9,7 @@ import (
 )
 
 func (t *Translator) EnqueueTransaction(ctx context.Context, txSignature app.TransactionSignature) error {
-	return t.query.EnqueueTransaction(ctx, store.EnqueueTransactionParams{
+	return t.query.EnqueueTransaction(ctx, store.EnqueueTransactionParams{ // nolint: exhaustruct
 		TxSignature: string(txSignature),
 		Priority:    3,
 		Attempts:    0,
@@ -22,7 +22,6 @@ func (t *Translator) DequeueTransaction(ctx context.Context, id app.QueuedTransa
 	return t.query.DequeueTransaction(ctx, int64(id))
 }
 
-// TODO fix
 func (t *Translator) ListAllQueuedTransactions(ctx context.Context) ([]*app.QueuedTransaction, error) {
 	txs, err := t.query.ListAllQueuedTransactions(ctx)
 	if err != nil {
@@ -31,12 +30,7 @@ func (t *Translator) ListAllQueuedTransactions(ctx context.Context) ([]*app.Queu
 
 	var retTxs []*app.QueuedTransaction
 	for _, tx := range txs {
-		retTx, err := convStoreToAppQueuedTransaction(tx)
-		if err != nil {
-			return nil, err
-		}
-
-		retTxs = append(retTxs, retTx)
+		retTxs = append(retTxs, convStoreToAppQueuedTransaction(tx))
 	}
 
 	return retTxs, nil

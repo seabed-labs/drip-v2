@@ -23,4 +23,3 @@ CREATE TABLE dcaf."tx_queue" (
   CONSTRAINT tx_queue_items_pk PRIMARY KEY (id),
   CONSTRAINT unique_tx_signature UNIQUE (tx_signature)
 );
-

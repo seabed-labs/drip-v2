@@ -88,4 +88,17 @@ sqlc:
 		-f modeler/sqlc.Dockerfile ./
 
 
+.PHONY: build
+.PHONY: run
+.PHONY: create-migration
 .PHONY: migrate
+.PHONY: migrate-up
+.PHONY: migrate-down
+.PHONY: gen
+.PHONY: gen-sql
+.PHONY: lint
+.PHONY: lint-go
+.PHONY: lint-sql
+.PHONY: up
+.PHONY: down
+.PHONY: sqlc

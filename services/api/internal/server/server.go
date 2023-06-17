@@ -23,8 +23,8 @@ func NewHTTPServer(listenAddress int, handler http.Handler) *httpServer {
 	mux := http.NewServeMux()
 	mux.Handle("/", handler)
 
-	return &httpServer{ // nolint: exhaustruct
-		http: &http.Server{
+	return &httpServer{
+		http: &http.Server{ // nolint: exhaustruct
 			Addr: httpListenAddress,
 			Handler: http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {

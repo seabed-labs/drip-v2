@@ -9,7 +9,7 @@ import (
 )
 
 func (t *Translator) EnqueueAccount(ctx context.Context, pub app.PublicKey) error {
-	return t.query.EnqueueAccount(ctx, store.EnqueueAccountParams{
+	return t.query.EnqueueAccount(ctx, store.EnqueueAccountParams{ // nolint: exhaustruct
 		PublicKey:   string(pub),
 		Priority:    3,
 		Attempts:    0,
@@ -30,12 +30,7 @@ func (t *Translator) ListAllQueuedAccount(ctx context.Context) ([]*app.QueuedAcc
 
 	var retAccs []*app.QueuedAccount
 	for _, acc := range accs {
-		retAcc, err := convStoreToAppQueuedAccount(acc)
-		if err != nil {
-			return nil, err
-		}
-
-		retAccs = append(retAccs, retAcc)
+		retAccs = append(retAccs, convStoreToAppQueuedAccount(acc))
 	}
 
 	return retAccs, nil

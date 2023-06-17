@@ -8,7 +8,7 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 )
 
-func convStoreToAppQueuedAccount(sa store.DcafAccountQueue) (*app.QueuedAccount, error) {
+func convStoreToAppQueuedAccount(sa store.DcafAccountQueue) *app.QueuedAccount {
 	return &app.QueuedAccount{
 		ID:          app.QueuedAccountID(sa.ID),
 		PublicKey:   app.PublicKey(sa.PublicKey),
@@ -17,10 +17,10 @@ func convStoreToAppQueuedAccount(sa store.DcafAccountQueue) (*app.QueuedAccount,
 		MaxAttempts: sa.Attempts,
 		Time:        &sa.Time,
 		RetryTime:   filterNullTime(sa.RetryTime),
-	}, nil
+	}
 }
 
-func convStoreToAppQueuedTransaction(stx store.DcafTxQueue) (*app.QueuedTransaction, error) {
+func convStoreToAppQueuedTransaction(stx store.DcafTxQueue) *app.QueuedTransaction {
 	return &app.QueuedTransaction{
 		ID:                   app.QueuedTransactionID(stx.ID),
 		TransactionSignature: app.TransactionSignature(stx.TxSignature),
@@ -29,8 +29,7 @@ func convStoreToAppQueuedTransaction(stx store.DcafTxQueue) (*app.QueuedTransact
 		MaxAttempts:          stx.Attempts,
 		Time:                 &stx.Time,
 		RetryTime:            filterNullTime(stx.RetryTime),
-	}, nil
-
+	}
 }
 
 func filterNullTime(t sql.NullTime) *time.Time {

@@ -77,7 +77,7 @@ func main() {
 	)
 
 	rAddress := fmt.Sprintf("%s:%d", rHost, rPort)
-	rdb := redis.NewClient(&redis.Options{
+	rdb := redis.NewClient(&redis.Options{ // nolint: exhaustruct
 		Addr:     rAddress,
 		Password: rPassword,
 	})
