@@ -1031,8 +1031,5 @@
       "name": "CannotEnableAutoCreditWithTokenizedPosition",
       "msg": "Cannot enable auto-credit with tokenized position"
     }
-  ],
-  "metadata": {
-    "address": "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
-  }
+  ]
 }
