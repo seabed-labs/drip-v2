@@ -12,6 +12,7 @@ INSERT INTO dcaf.account_queue (
 
 -- name: ListAllQueuedAccount :many
 SELECT
+  "id",
   "public_key",
   "priority",
   "attempts",

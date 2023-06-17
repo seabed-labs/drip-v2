@@ -12,6 +12,7 @@ INSERT INTO dcaf.tx_queue (
 
 -- name: ListAllQueuedTransactions :many
 SELECT
+  "id",
   "tx_signature",
   "priority",
   "attempts",

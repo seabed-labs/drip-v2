@@ -8,11 +8,11 @@ import (
 
 	"database/sql"
 
+	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/handler"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/runnables"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/runner"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/translator"
@@ -92,8 +92,8 @@ func main() {
 		)
 	}
 
-	translator := translator.NewTranslator(pdb)
-	if err = translator.Migrate("./modeler/migrations"); err != nil {
+	t := translator.NewTranslator(pdb)
+	if err = t.Migrate("./modeler/migrations"); err != nil {
 		log.Fatal(
 			"failed to migrate",
 			zap.Error(err),
@@ -101,16 +101,14 @@ func main() {
 	}
 
 	rc := cache.NewRedisCache(rdb)
-	tokenCacheSyncer := runnables.NewTokenCacheSyncer(rc)
-	_ = jupiter.NewClient()
+	jupiter := jupiter.NewClient()
 
-	// TODO: add app
+	app := app.NewApp(t, jupiter, rc)
 
-	h := handler.NewHandler()
+	h := handler.NewHandler(app)
 	srv := server.NewHTTPServer(8080, h)
 
 	runner.NewRunner(
 		srv,
-		tokenCacheSyncer,
 	).Run().ThenStop()
 }

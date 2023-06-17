@@ -5,34 +5,23 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/go-redis/redis/v8"
 )
 
-type RedisInterface interface {
-	SetString(ctx context.Context, key string, value string) error
-	SetStringWithExpiration(ctx context.Context, key, value string, expiration time.Duration) error
-	GetString(ctx context.Context, key string) (string, error)
-	SetInt(ctx context.Context, key string, value int) error
-	SetIntWithExpiration(ctx context.Context, key string, value int, expiration time.Duration) error
-	GetInt(ctx context.Context, key string) (int, error)
-	SetStringSlice(ctx context.Context, key string, value []string) error
-	SetStringSliceWithExpiration(ctx context.Context, key string, value []string, expiration time.Duration) error
-	GetStringSlice(ctx context.Context, key string) ([]string, error)
-}
-
-type RedisCache struct {
+type redisCache struct {
 	rdb *redis.Client
 }
 
-func NewRedisCache(rdb *redis.Client) *RedisCache {
-	return &RedisCache{rdb: rdb}
+func NewRedisCache(rdb *redis.Client) *redisCache {
+	return &redisCache{rdb: rdb}
 }
 
-func (c *RedisCache) SetString(ctx context.Context, key string, value string) error {
+func (c *redisCache) SetString(ctx context.Context, key string, value string) error {
 	return c.rdb.Set(ctx, key, value, 0).Err()
 }
 
-func (c *RedisCache) SetStringWithExpiration(ctx context.Context, key, value string, expiration time.Duration) error {
+func (c *redisCache) SetStringWithExpiration(ctx context.Context, key, value string, expiration time.Duration) error {
 	err := c.rdb.Set(ctx, key, value, 0).Err()
 	if err != nil {
 		return err
@@ -41,15 +30,15 @@ func (c *RedisCache) SetStringWithExpiration(ctx context.Context, key, value str
 	return c.rdb.Expire(ctx, key, expiration).Err()
 }
 
-func (c *RedisCache) GetString(ctx context.Context, key string) (string, error) {
+func (c *redisCache) GetString(ctx context.Context, key string) (string, error) {
 	return c.rdb.Get(ctx, key).Result()
 }
 
-func (c *RedisCache) SetInt(ctx context.Context, key string, value int) error {
+func (c *redisCache) SetInt(ctx context.Context, key string, value int) error {
 	return c.rdb.Set(ctx, key, value, 0).Err()
 }
 
-func (c *RedisCache) SetIntWithExpiration(ctx context.Context, key string, value int, expiration time.Duration) error {
+func (c *redisCache) SetIntWithExpiration(ctx context.Context, key string, value int, expiration time.Duration) error {
 	err := c.rdb.Set(ctx, key, value, 0).Err()
 	if err != nil {
 		return err
@@ -58,7 +47,7 @@ func (c *RedisCache) SetIntWithExpiration(ctx context.Context, key string, value
 	return c.rdb.Expire(ctx, key, expiration).Err()
 }
 
-func (c *RedisCache) GetInt(ctx context.Context, key string) (int, error) {
+func (c *redisCache) GetInt(ctx context.Context, key string) (int, error) {
 	value, err := c.rdb.Get(ctx, key).Int()
 	if err != nil {
 		return 0, err
@@ -67,7 +56,7 @@ func (c *RedisCache) GetInt(ctx context.Context, key string) (int, error) {
 	return value, nil
 }
 
-func (c *RedisCache) SetStringSlice(ctx context.Context, key string, value []string) error {
+func (c *redisCache) SetStringSlice(ctx context.Context, key string, value []string) error {
 	b, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -76,7 +65,7 @@ func (c *RedisCache) SetStringSlice(ctx context.Context, key string, value []str
 	return c.SetString(ctx, key, string(b))
 }
 
-func (c *RedisCache) SetStringSliceWithExpiration(ctx context.Context, key string, value []string, expiration time.Duration) error {
+func (c *redisCache) SetStringSliceWithExpiration(ctx context.Context, key string, value []string, expiration time.Duration) error {
 	b, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -85,13 +74,33 @@ func (c *RedisCache) SetStringSliceWithExpiration(ctx context.Context, key strin
 	return c.SetStringWithExpiration(ctx, key, string(b), expiration)
 }
 
-func (c *RedisCache) GetStringSlice(ctx context.Context, key string) ([]string, error) {
+func (c *redisCache) GetStringSlice(ctx context.Context, key string) ([]string, error) {
 	value, err := c.GetString(ctx, key)
 	if err != nil {
 		return nil, err
 	}
 
-	s := []string{}
+	var s []string
 
 	return s, json.Unmarshal([]byte(value), &s)
+}
+
+func (c *redisCache) SetTokensWithExpiration(ctx context.Context, key string, value []*jupiter.Token, expiration time.Duration) error {
+	b, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return c.SetStringWithExpiration(ctx, key, string(b), expiration)
+}
+
+func (c *redisCache) GetTokens(ctx context.Context, key string) ([]*jupiter.Token, error) {
+	value, err := c.GetString(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	var ts []*jupiter.Token
+
+	return ts, json.Unmarshal([]byte(value), &ts)
 }

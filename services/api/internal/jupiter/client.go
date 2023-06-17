@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
@@ -12,7 +13,7 @@ import (
 )
 
 type ClientInterface interface {
-	GetTokens(ctx context.Context, strict bool)
+	GetTokens(ctx context.Context) ([]*Token, error)
 }
 
 type client struct {
@@ -29,23 +30,36 @@ func NewClient() *client {
 	}
 }
 
-func (c *client) GetTokens(ctx context.Context, strict bool) error {
-	urlSuffix := "all"
-	if strict {
-		urlSuffix = "strict"
-	}
-
-	url := fmt.Sprintf("%s/%s", c.address, urlSuffix)
+func (c *client) GetTokens(ctx context.Context) ([]*Token, error) {
+	url := fmt.Sprintf("%s/all", c.address)
 	resp, err := c.do(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	// TODO marshal data
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	if resp.StatusCode != http.StatusOK {
+		errMsg := "failed to get tokens"
+		c.log.Error(
+			errMsg,
+			zap.String("url", url),
+			zap.String("status", resp.Status),
+			zap.String("body", string(b)),
+			zap.Error(err),
+		)
+
+		return nil, fmt.Errorf(errMsg)
+	}
+
+	var ts []*Token
+
+	return ts, json.Unmarshal(b, &ts)
 }
 
 func (c *client) do(ctx context.Context, method, url string, payload interface{}) (*http.Response, error) {
