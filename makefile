@@ -25,7 +25,7 @@ sdk: program generate-sdk-anchor-client
 	cd packages/sdk && yarn build
 
 generate-sdk-anchor-client: program
-	yarn run anchor-client-gen idl/drip_v2.json ./packages/sdk/src/generated --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
+	# yarn run anchor-client-gen idl/drip_v2.json ./packages/sdk/src/generated --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
 
 #############################################################################
 # Services
