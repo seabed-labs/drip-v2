@@ -1,0 +1,65 @@
+components:
+  examples: {}
+  headers: {}
+  parameters: {}
+  requestBodies: {}
+  responses: {}
+  schemas:
+    Error:
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+        stack:
+          type: string
+      required:
+        - name
+        - message
+      type: object
+      additionalProperties: false
+    ResponseCommon__message-string--_.Error_:
+      properties:
+        error:
+          $ref: "#/components/schemas/Error"
+        data:
+          properties:
+            message:
+              type: string
+          required:
+            - message
+          type: object
+        serverTimestamp:
+          type: number
+          format: double
+      required:
+        - data
+        - serverTimestamp
+      type: object
+    PingResponse:
+      $ref: "#/components/schemas/ResponseCommon__message-string--_.Error_"
+  securitySchemes: {}
+info:
+  title: "@dcaf/drip-parser"
+  version: 0.1.0
+  description: "Worker to parse drip program accounts and instructions."
+  license:
+    name: MIT
+  contact:
+    name: "Dcaf Labs"
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: Ping
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PingResponse"
+      security: []
+      parameters: []
+servers:
+  - url: /
