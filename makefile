@@ -2,6 +2,11 @@
 root:
 	yarn
 
+format:
+	cd solana-programs && cargo fmt
+	yarn
+	yarn workspaces run lint:fix
+	
 test: program sdk
 	cd solana-programs && cargo test
 	cd solana-programs && anchor test

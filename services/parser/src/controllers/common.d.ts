@@ -1,4 +1,4 @@
 export declare function getServerResponseCommon(): {
-  serverTimestamp: number;
-};
+    serverTimestamp: number
+}
 //# sourceMappingURL=common.d.ts.map

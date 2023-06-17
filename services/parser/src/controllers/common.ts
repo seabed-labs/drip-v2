@@ -1,7 +1,7 @@
 export function getServerResponseCommon(): {
-  serverTimestamp: number;
+    serverTimestamp: number
 } {
-  return {
-    serverTimestamp: Math.floor(Date.now() / 1000),
-  };
+    return {
+        serverTimestamp: Math.floor(Date.now() / 1000),
+    }
 }

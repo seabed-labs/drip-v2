@@ -5,8 +5,12 @@
     "license": "UNLICENSED",
     "scripts": {
         "clean": "rm -rf target && rm -rf node_modules",
-        "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-        "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+        "lint": "yarn run lint:eslint && yarn run lint:prettier",
+        "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
+        "lint:eslint": "eslint --ignore-path .gitignore --ext .ts . ",
+        "lint:prettier": "prettier \"*/**/*{.js,.ts,.yaml}\" --check --ignore-path .gitignore",
+        "lint:eslint:fix": "eslint --ignore-path .gitignore --fix --ext .ts . ",
+        "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
     },
     "dependencies": {
         "@coral-xyz/anchor": "0.27.0",
