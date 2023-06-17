@@ -25,7 +25,4 @@ drip-types: program
 	cp solana-programs/target/types/drip_v2.ts packages/drip-types/src/drip_v2.ts
 	cd packages/drip-types && yarn install && yarn build
 
-# generate-sdk-anchor-client: program
-# 	yarn run anchor-client-gen solana-programs/idl/drip_v2.json packages/sdk/src/generated --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
-
 
