@@ -38,7 +38,7 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@dcaf/drip@file:./sdk/dist":
+"@dcaf/drip@file:./packages/sdk/dist":
   version "0.0.0"
 
 "@noble/curves@^1.0.0":

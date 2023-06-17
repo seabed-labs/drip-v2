@@ -6,7 +6,7 @@
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
     },
     "dependencies": {
-        "@dcaf/drip": "file:./sdk/dist",
+        "@dcaf/drip": "file:./packages/sdk/dist",
         "@coral-xyz/anchor": "0.27.0",
         "@types/chai-as-promised": "^7.1.5",
         "chai-as-promised": "^7.1.1"
