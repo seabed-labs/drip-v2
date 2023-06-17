@@ -1,19 +1,21 @@
 {
   "name": "@dcaf/drip",
-  "version": "2.0.0",
+  "version": "0.1.0",
   "main": "src/index.ts",
   "author": "Dcaf Labs",
   "license": "UNLICENSED",
   "scripts": {
     "build": "yarn run tsc",
-    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated"
+    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true"
   },
   "devDependencies": {
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "@types/bn.js": "5.1.1"
   },
   "dependencies": {
     "@solana/web3.js": "^1.77.3",
     "tiny-invariant": "^1.3.1",
-    "@coral-xyz/anchor": "0.27.0"
+    "@coral-xyz/anchor": "0.27.0",
+    "bn.js": "5.2.1"
   }
 }
