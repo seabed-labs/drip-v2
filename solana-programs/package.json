@@ -11,6 +11,7 @@
     "dependencies": {
         "@coral-xyz/anchor": "0.27.0",
         "@dcaf/drip": "0.1.0",
+        "@dcaf/drip-types": "0.1.0",
         "@types/chai-as-promised": "^7.1.5",
         "chai-as-promised": "^7.1.1"
     },

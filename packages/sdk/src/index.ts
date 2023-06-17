@@ -6,7 +6,7 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
-import { DripV2, IDL } from "./idl/drip_v2";
+import { DripV2, IDL } from "@dcaf/drip-types";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { AnchorProvider } from "@coral-xyz/anchor";
 
