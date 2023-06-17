@@ -11,18 +11,19 @@ clean:
 	cd packages/sdk && yarn clean
 	cd solana-programs && cargo clean
 
-program: root
+program:
 	cd solana-programs && anchor build
 	cp solana-programs/target/idl/drip_v2.json solana-programs/idl/drip_v2.json
 
+parser: drip-types sdk
+	cd services/parser && yarn install && yarn build
+
 sdk: program drip-types
-# TODO: Do we need drip_v2.ts in drip-sdk? (can use drip-types)
-	cp solana-programs/target/types/drip_v2.ts packages/sdk/src/idl/drip_v2.ts
 	cd packages/sdk && yarn install && yarn build
 
-drip-types: program
-	yarn run anchor-client-gen solana-programs/idl/drip_v2.json packages/drip-types/src --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
+drip-types: root program
 	cp solana-programs/target/types/drip_v2.ts packages/drip-types/src/drip_v2.ts
+	cd packages/drip-types && yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
 	cd packages/drip-types && yarn install && yarn build
 
 

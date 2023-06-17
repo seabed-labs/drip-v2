@@ -2,7 +2,7 @@
     "author": "Dcaf Labs",
     "license": "UNLICENSED",
     "private": true,
-    "workspaces": ["solana-programs", "packages/*", "ui/*"],
+    "workspaces": ["solana-programs", "packages/*", "services/*", "ui/*"],
     "scripts": {
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
@@ -10,6 +10,5 @@
     "dependencies": {
     },
     "devDependencies": {
-        "@dcaf/anchor-client-gen": "^0.28.1"
     }
 }
