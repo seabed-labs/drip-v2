@@ -1,12 +1,13 @@
 HDI := $(shell docker run --net=host --rm codenvy/che-ip:4.7.2)
 
-build:
+build: gen
 	@echo "==== RUNNING BUILD ===="
 	@docker build \
 		-t dcaf-api \
 		-f cmd/Dockerfile ./
 
 run: build up
+	sleep 2
 	go run ./...
 
 ### Migrate ###
@@ -21,7 +22,7 @@ migrate:
 	@$(MAKE) -s down
 
 
-migrate-up:
+migrate-up: gen
 	@echo "==== RUNNING DB MIGRATIONS (UP) ===="
 	@docker run \
 		--rm \
