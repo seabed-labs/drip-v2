@@ -30,5 +30,6 @@ drip-types: root program
 	cp solana-programs/target/types/drip_v2.ts packages/drip-types/src/drip_v2.ts
 	cd packages/drip-types && yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
 	cd packages/drip-types && yarn install && yarn build
+	cd packages/drip-types && yarn lint:fix
 
 
