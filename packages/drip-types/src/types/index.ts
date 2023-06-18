@@ -3,6 +3,8 @@ import * as AdminStateUpdate from './AdminStateUpdate'
 import * as AdminPermission from './AdminPermission'
 import * as PriceOracle from './PriceOracle'
 
+export { DepositParams } from './DepositParams'
+export type { DepositParamsFields, DepositParamsJSON } from './DepositParams'
 export { InitDripPositionParams } from './InitDripPositionParams'
 export type {
     InitDripPositionParamsFields,

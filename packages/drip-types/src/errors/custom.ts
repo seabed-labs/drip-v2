@@ -19,7 +19,7 @@ export type CustomError =
     | DripPositionNftMintAlreadyCreated
     | UnexpectedDripPositionNftAccountOwner
     | UnexpectedDripPositionNftMint
-    | UnexpectedDripPositionNftMapping
+    | UnexpectedDripPositionInputTokenAccount
     | DripPositionNotTokenized
     | UnexpectedDripPositionNftAccount
 
@@ -49,10 +49,10 @@ export class AdminPubkeyCannotBeDefault extends Error {
     static readonly code = 6002
     readonly code = 6002
     readonly name = 'AdminPubkeyCannotBeDefault'
-    readonly msg = 'SuperAdmin/Admin pubkey cannot be default'
+    readonly msg = 'Admin pubkey cannot be default'
 
     constructor(readonly logs?: string[]) {
-        super('6002: SuperAdmin/Admin pubkey cannot be default')
+        super('6002: Admin pubkey cannot be default')
     }
 }
 
@@ -246,14 +246,14 @@ export class UnexpectedDripPositionNftMint extends Error {
     }
 }
 
-export class UnexpectedDripPositionNftMapping extends Error {
+export class UnexpectedDripPositionInputTokenAccount extends Error {
     static readonly code = 6020
     readonly code = 6020
-    readonly name = 'UnexpectedDripPositionNftMapping'
-    readonly msg = 'Drip position NFT mapping incorrect'
+    readonly name = 'UnexpectedDripPositionInputTokenAccount'
+    readonly msg = 'Unexpected drip position input token account'
 
     constructor(readonly logs?: string[]) {
-        super('6020: Drip position NFT mapping incorrect')
+        super('6020: Unexpected drip position input token account')
     }
 }
 
@@ -322,7 +322,7 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
         case 6019:
             return new UnexpectedDripPositionNftMint(logs)
         case 6020:
-            return new UnexpectedDripPositionNftMapping(logs)
+            return new UnexpectedDripPositionInputTokenAccount(logs)
         case 6021:
             return new DripPositionNotTokenized(logs)
         case 6022:

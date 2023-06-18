@@ -655,6 +655,44 @@ export type DripV2 = {
                 }
             ]
             args: []
+        },
+        {
+            name: 'deposit'
+            accounts: [
+                {
+                    name: 'signer'
+                    isMut: false
+                    isSigner: true
+                },
+                {
+                    name: 'sourceInputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                },
+                {
+                    name: 'dripPositionInputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                },
+                {
+                    name: 'dripPosition'
+                    isMut: false
+                    isSigner: false
+                },
+                {
+                    name: 'tokenProgram'
+                    isMut: false
+                    isSigner: false
+                }
+            ]
+            args: [
+                {
+                    name: 'params'
+                    type: {
+                        defined: 'DepositParams'
+                    }
+                }
+            ]
         }
     ]
     accounts: [
@@ -873,6 +911,18 @@ export type DripV2 = {
     ]
     types: [
         {
+            name: 'DepositParams'
+            type: {
+                kind: 'struct'
+                fields: [
+                    {
+                        name: 'depositAmount'
+                        type: 'u64'
+                    }
+                ]
+            }
+        },
+        {
             name: 'InitDripPositionParams'
             type: {
                 kind: 'struct'
@@ -1070,7 +1120,7 @@ export type DripV2 = {
         {
             code: 6002
             name: 'AdminPubkeyCannotBeDefault'
-            msg: 'SuperAdmin/Admin pubkey cannot be default'
+            msg: 'Admin pubkey cannot be default'
         },
         {
             code: 6003
@@ -1159,8 +1209,8 @@ export type DripV2 = {
         },
         {
             code: 6020
-            name: 'UnexpectedDripPositionNftMapping'
-            msg: 'Drip position NFT mapping incorrect'
+            name: 'UnexpectedDripPositionInputTokenAccount'
+            msg: 'Unexpected drip position input token account'
         },
         {
             code: 6021
@@ -1833,6 +1883,44 @@ export const IDL: DripV2 = {
             ],
             args: [],
         },
+        {
+            name: 'deposit',
+            accounts: [
+                {
+                    name: 'signer',
+                    isMut: false,
+                    isSigner: true,
+                },
+                {
+                    name: 'sourceInputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                },
+                {
+                    name: 'dripPositionInputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                },
+                {
+                    name: 'dripPosition',
+                    isMut: false,
+                    isSigner: false,
+                },
+                {
+                    name: 'tokenProgram',
+                    isMut: false,
+                    isSigner: false,
+                },
+            ],
+            args: [
+                {
+                    name: 'params',
+                    type: {
+                        defined: 'DepositParams',
+                    },
+                },
+            ],
+        },
     ],
     accounts: [
         {
@@ -2050,6 +2138,18 @@ export const IDL: DripV2 = {
     ],
     types: [
         {
+            name: 'DepositParams',
+            type: {
+                kind: 'struct',
+                fields: [
+                    {
+                        name: 'depositAmount',
+                        type: 'u64',
+                    },
+                ],
+            },
+        },
+        {
             name: 'InitDripPositionParams',
             type: {
                 kind: 'struct',
@@ -2247,7 +2347,7 @@ export const IDL: DripV2 = {
         {
             code: 6002,
             name: 'AdminPubkeyCannotBeDefault',
-            msg: 'SuperAdmin/Admin pubkey cannot be default',
+            msg: 'Admin pubkey cannot be default',
         },
         {
             code: 6003,
@@ -2336,8 +2436,8 @@ export const IDL: DripV2 = {
         },
         {
             code: 6020,
-            name: 'UnexpectedDripPositionNftMapping',
-            msg: 'Drip position NFT mapping incorrect',
+            name: 'UnexpectedDripPositionInputTokenAccount',
+            msg: 'Unexpected drip position input token account',
         },
         {
             code: 6021,
