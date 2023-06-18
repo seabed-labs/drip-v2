@@ -8,8 +8,7 @@ pub enum DripError {
     #[msg("Admin index out of bounds")]
     AdminIndexOutOfBounds, // 6001 or 0x1771
 
-    // TODO: THIS ERROR IS UNUSED, can be reused for the next new error
-    #[msg("SuperAdmin/Admin pubkey cannot be default")]
+    #[msg("Admin pubkey cannot be default")]
     AdminPubkeyCannotBeDefault, // 6002 or 0x1772
 
     #[msg("Failed to convert u64 to usize")]
@@ -63,9 +62,8 @@ pub enum DripError {
     #[msg("Drip position NFT mint does not match drip position field")]
     UnexpectedDripPositionNftMint, // 6019 or 0x1783
 
-    // TODO: THIS ERROR IS UNUSED, can be reused for the next new error
-    #[msg("Drip position NFT mapping incorrect")]
-    UnexpectedDripPositionNftMapping, // 6020 or 0x1784
+    #[msg("Unexpected drip position input token account")]
+    UnexpectedDripPositionInputTokenAccount, // 6020 or 0x1784
 
     #[msg("Drip position is not tokenized")]
     DripPositionNotTokenized, // 6021 or 0x1785

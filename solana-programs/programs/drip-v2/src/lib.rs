@@ -84,4 +84,8 @@ pub mod drip_v2 {
     pub fn toggle_auto_credit(ctx: Context<ToggleAutoCredit>) -> Result<()> {
         handle_toggle_auto_credit(ctx)
     }
+
+    pub fn deposit(ctx: Context<Deposit>, params: DepositParams) -> Result<()> {
+        handle_deposit(ctx, params)
+    }
 }

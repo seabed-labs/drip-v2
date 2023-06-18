@@ -1,3 +1,4 @@
+mod deposit;
 mod detokenize_drip_position;
 mod init_drip_position;
 mod init_drip_position_nft;
@@ -12,6 +13,7 @@ mod update_pyth_price_feed;
 mod update_super_admin;
 mod withdraw_fees;
 
+pub use deposit::*;
 pub use detokenize_drip_position::*;
 pub use init_drip_position::*;
 pub use init_drip_position_nft::*;
