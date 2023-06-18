@@ -62,4 +62,8 @@ func (h *handler) registerRoutes() {
 	h.handler.POST("/transaction", func(c echo.Context) error {
 		return echo.ErrNotImplemented
 	})
+
+	h.handler.POST("/account", func(c echo.Context) error {
+		return echo.ErrNotImplemented
+	})
 }

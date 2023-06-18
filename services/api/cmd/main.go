@@ -10,6 +10,7 @@ import (
 
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
+	"github.com/dcaf-labs/drip-v2/services/api/internal/config"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/handler"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
@@ -18,24 +19,26 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/translator"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 )
 
 func main() {
+	config.Initialize()
 	log := logger.NewZapLogger("main")
 
 	var (
-		pHost     = "localhost"
-		pDatabase = "micro"
-		pPort     = 5432
-		pUser     = "docker"
-		pPassword = "docker"
+		pDatabase = viper.GetString("postgres.database")
+		pHost     = viper.GetString("postgres.host")
+		pPort     = viper.GetInt64("postgres.port")
+		pUser     = viper.GetString("postgres.user")
+		pPassword = viper.GetString("postgres.password")
 	)
 
 	log.Info(
 		"connecting to database",
-		zap.String("host", pHost),
 		zap.String("name", pDatabase),
-		zap.Int("port", pPort),
+		zap.String("host", pHost),
+		zap.Int64("port", pPort),
 	)
 
 	pAddress := fmt.Sprintf(
@@ -65,15 +68,15 @@ func main() {
 	}
 
 	var (
-		rHost     = "localhost"
-		rPort     = 6379
-		rPassword = "docker"
+		rHost     = viper.GetString("redis.host")
+		rPort     = viper.GetInt64("redis.port")
+		rPassword = viper.GetString("redis.password")
 	)
 
 	log.Info(
 		"connecting to redis",
 		zap.String("host", rHost),
-		zap.Int("port", rPort),
+		zap.Int64("port", rPort),
 	)
 
 	rAddress := fmt.Sprintf("%s:%d", rHost, rPort)

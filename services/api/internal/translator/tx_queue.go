@@ -10,7 +10,7 @@ import (
 
 func (t *Translator) EnqueueTransaction(ctx context.Context, txSignature app.TransactionSignature) error {
 	return t.query.EnqueueTransaction(ctx, store.EnqueueTransactionParams{ // nolint: exhaustruct
-		TxSignature: string(txSignature),
+		Signature:   string(txSignature),
 		Priority:    3,
 		Attempts:    0,
 		MaxAttempts: 10,

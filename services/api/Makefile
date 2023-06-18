@@ -7,12 +7,12 @@ build: gen
 		-f cmd/Dockerfile ./
 
 run: build up
-	sleep 2
-	go run ./...
+	@sleep 2
+	@go run ./...
 
 ### Migrate ###
 create-migration:
-	./scripts/create_migration_files.sh
+	@./scripts/create_migration_files.sh
 
 migrate:
 	@$(MAKE) -s up

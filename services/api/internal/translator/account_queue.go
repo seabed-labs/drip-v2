@@ -8,7 +8,7 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 )
 
-func (t *Translator) EnqueueAccount(ctx context.Context, pub app.PublicKey) error {
+func (t *Translator) EnqueueAccount(ctx context.Context, pub app.AccountPublicKey) error {
 	return t.query.EnqueueAccount(ctx, store.EnqueueAccountParams{ // nolint: exhaustruct
 		PublicKey:   string(pub),
 		Priority:    3,

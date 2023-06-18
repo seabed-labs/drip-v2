@@ -11,7 +11,7 @@ import (
 func convStoreToAppQueuedAccount(sa store.DcafAccountQueue) *app.QueuedAccount {
 	return &app.QueuedAccount{
 		ID:          app.QueuedAccountID(sa.ID),
-		PublicKey:   app.PublicKey(sa.PublicKey),
+		PublicKey:   app.AccountPublicKey(sa.PublicKey),
 		Priority:    sa.Priority,
 		Attempts:    sa.Attempts,
 		MaxAttempts: sa.Attempts,
@@ -22,13 +22,13 @@ func convStoreToAppQueuedAccount(sa store.DcafAccountQueue) *app.QueuedAccount {
 
 func convStoreToAppQueuedTransaction(stx store.DcafTxQueue) *app.QueuedTransaction {
 	return &app.QueuedTransaction{
-		ID:                   app.QueuedTransactionID(stx.ID),
-		TransactionSignature: app.TransactionSignature(stx.TxSignature),
-		Priority:             stx.Priority,
-		Attempts:             stx.Attempts,
-		MaxAttempts:          stx.Attempts,
-		Time:                 &stx.Time,
-		RetryTime:            filterNullTime(stx.RetryTime),
+		ID:          app.QueuedTransactionID(stx.ID),
+		Signature:   app.TransactionSignature(stx.Signature),
+		Priority:    stx.Priority,
+		Attempts:    stx.Attempts,
+		MaxAttempts: stx.Attempts,
+		Time:        &stx.Time,
+		RetryTime:   filterNullTime(stx.RetryTime),
 	}
 }
 

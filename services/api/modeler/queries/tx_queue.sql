@@ -1,6 +1,6 @@
 -- name: EnqueueTransaction :exec
 INSERT INTO dcaf.tx_queue (
-  "tx_signature",
+  "signature",
   "priority",
   "attempts",
   "max_attempts",
@@ -13,7 +13,7 @@ INSERT INTO dcaf.tx_queue (
 -- name: ListAllQueuedTransactions :many
 SELECT
   "id",
-  "tx_signature",
+  "signature",
   "priority",
   "attempts",
   "max_attempts",
