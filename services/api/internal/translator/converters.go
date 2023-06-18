@@ -33,10 +33,9 @@ func convStoreToAppQueuedTransaction(stx store.DcafTxQueue) *app.QueuedTransacti
 }
 
 func filterNullTime(t sql.NullTime) *time.Time {
-	var tt *time.Time
 	if t.Valid {
-		tt = &t.Time
+		return &t.Time
 	}
 
-	return tt
+	return nil
 }

@@ -36,6 +36,10 @@ func (t *Translator) CommitTransactor(fn func(tx *sql.Tx) error) (err error) {
 			panic(p)
 		} else if err != nil {
 			opErr = tx.Rollback()
+			t.log.Error(
+				"error occurred! rolling back.",
+				zap.Error(opErr),
+			)
 		} else {
 			opErr = tx.Commit()
 		}
@@ -45,6 +49,8 @@ func (t *Translator) CommitTransactor(fn func(tx *sql.Tx) error) (err error) {
 		}
 	}()
 
+	// DO NOT REMOVE
 	err = fn(tx)
+
 	return err
 }

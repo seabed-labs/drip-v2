@@ -9,6 +9,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"go.uber.org/zap"
 )
 
 type (
@@ -60,13 +61,21 @@ func (t *Translator) Migrate(dirpath string, opts ...Option) error {
 	}
 
 	t.log.Info("migrating database up")
-	err = m.Up()
-	if errors.Is(err, migrate.ErrNoChange) {
+	if err := m.Up(); errors.Is(err, migrate.ErrNoChange) {
 		t.log.Info("migration resulted in no change")
 	} else if err != nil {
 		return fmt.Errorf("migration failed: %w", err)
 	} else {
-		t.log.Info("successful migration")
+		v, d, err := m.Version()
+		if err != nil {
+			return err
+		}
+
+		t.log.Info(
+			"successful migration",
+			zap.Uint("version", v),
+			zap.Bool("dirty", d),
+		)
 	}
 
 	return nil

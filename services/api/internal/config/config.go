@@ -21,6 +21,9 @@ func Initialize() {
 		viper.SetConfigName(os.Getenv("ENV"))
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath("./config")
-		viper.MergeInConfig()
+		err := viper.MergeInConfig()
+		if err != nil {
+			panic(fmt.Errorf("failed to read config file: %w", err))
+		}
 	}
 }
