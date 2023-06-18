@@ -35,6 +35,8 @@ export type {
     WithdrawFeesParamsFields,
     WithdrawFeesParamsJSON,
 } from './WithdrawFeesParams'
+export { WithdrawParams } from './WithdrawParams'
+export type { WithdrawParamsFields, WithdrawParamsJSON } from './WithdrawParams'
 export { DripPositionOwner }
 
 export type DripPositionOwnerKind =

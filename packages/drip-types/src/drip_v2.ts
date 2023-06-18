@@ -693,6 +693,80 @@ export type DripV2 = {
                     }
                 }
             ]
+        },
+        {
+            name: 'withdraw'
+            accounts: [
+                {
+                    name: 'signer'
+                    isMut: false
+                    isSigner: true
+                },
+                {
+                    name: 'destinationInputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                    isOptional: true
+                },
+                {
+                    name: 'destinationOutputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                    isOptional: true
+                },
+                {
+                    name: 'dripPositionInputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                    isOptional: true
+                },
+                {
+                    name: 'dripPositionOutputTokenAccount'
+                    isMut: true
+                    isSigner: false
+                    isOptional: true
+                },
+                {
+                    name: 'dripPosition'
+                    isMut: false
+                    isSigner: false
+                    relations: ['drip_position_signer']
+                },
+                {
+                    name: 'dripPositionSigner'
+                    isMut: false
+                    isSigner: false
+                    pda: {
+                        seeds: [
+                            {
+                                kind: 'const'
+                                type: 'string'
+                                value: 'drip-v2-drip-position-signer'
+                            },
+                            {
+                                kind: 'account'
+                                type: 'publicKey'
+                                account: 'DripPosition'
+                                path: 'drip_position'
+                            }
+                        ]
+                    }
+                    relations: ['drip_position']
+                },
+                {
+                    name: 'tokenProgram'
+                    isMut: false
+                    isSigner: false
+                }
+            ]
+            args: [
+                {
+                    name: 'params'
+                    type: {
+                        defined: 'WithdrawParams'
+                    }
+                }
+            ]
         }
     ]
     accounts: [
@@ -1009,6 +1083,22 @@ export type DripV2 = {
             }
         },
         {
+            name: 'WithdrawParams'
+            type: {
+                kind: 'struct'
+                fields: [
+                    {
+                        name: 'withdrawInputAmount'
+                        type: 'u64'
+                    },
+                    {
+                        name: 'withdrawOutputAmount'
+                        type: 'u64'
+                    }
+                ]
+            }
+        },
+        {
             name: 'DripPositionOwner'
             type: {
                 kind: 'enum'
@@ -1221,6 +1311,11 @@ export type DripV2 = {
             code: 6022
             name: 'UnexpectedDripPositionNftAccount'
             msg: 'Drip position NFT account does not match mint'
+        },
+        {
+            code: 6023
+            name: 'InsufficientInfoForWithdrawal'
+            msg: 'Insufficient information for withdrawal'
         }
     ]
 }
@@ -1921,6 +2016,80 @@ export const IDL: DripV2 = {
                 },
             ],
         },
+        {
+            name: 'withdraw',
+            accounts: [
+                {
+                    name: 'signer',
+                    isMut: false,
+                    isSigner: true,
+                },
+                {
+                    name: 'destinationInputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                    isOptional: true,
+                },
+                {
+                    name: 'destinationOutputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                    isOptional: true,
+                },
+                {
+                    name: 'dripPositionInputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                    isOptional: true,
+                },
+                {
+                    name: 'dripPositionOutputTokenAccount',
+                    isMut: true,
+                    isSigner: false,
+                    isOptional: true,
+                },
+                {
+                    name: 'dripPosition',
+                    isMut: false,
+                    isSigner: false,
+                    relations: ['drip_position_signer'],
+                },
+                {
+                    name: 'dripPositionSigner',
+                    isMut: false,
+                    isSigner: false,
+                    pda: {
+                        seeds: [
+                            {
+                                kind: 'const',
+                                type: 'string',
+                                value: 'drip-v2-drip-position-signer',
+                            },
+                            {
+                                kind: 'account',
+                                type: 'publicKey',
+                                account: 'DripPosition',
+                                path: 'drip_position',
+                            },
+                        ],
+                    },
+                    relations: ['drip_position'],
+                },
+                {
+                    name: 'tokenProgram',
+                    isMut: false,
+                    isSigner: false,
+                },
+            ],
+            args: [
+                {
+                    name: 'params',
+                    type: {
+                        defined: 'WithdrawParams',
+                    },
+                },
+            ],
+        },
     ],
     accounts: [
         {
@@ -2236,6 +2405,22 @@ export const IDL: DripV2 = {
             },
         },
         {
+            name: 'WithdrawParams',
+            type: {
+                kind: 'struct',
+                fields: [
+                    {
+                        name: 'withdrawInputAmount',
+                        type: 'u64',
+                    },
+                    {
+                        name: 'withdrawOutputAmount',
+                        type: 'u64',
+                    },
+                ],
+            },
+        },
+        {
             name: 'DripPositionOwner',
             type: {
                 kind: 'enum',
@@ -2448,6 +2633,11 @@ export const IDL: DripV2 = {
             code: 6022,
             name: 'UnexpectedDripPositionNftAccount',
             msg: 'Drip position NFT account does not match mint',
+        },
+        {
+            code: 6023,
+            name: 'InsufficientInfoForWithdrawal',
+            msg: 'Insufficient information for withdrawal',
         },
     ],
 }

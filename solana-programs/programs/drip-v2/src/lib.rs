@@ -88,4 +88,8 @@ pub mod drip_v2 {
     pub fn deposit(ctx: Context<Deposit>, params: DepositParams) -> Result<()> {
         handle_deposit(ctx, params)
     }
+
+    pub fn withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
+        handle_withdraw(ctx, params)
+    }
 }

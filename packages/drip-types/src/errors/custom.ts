@@ -22,6 +22,7 @@ export type CustomError =
     | UnexpectedDripPositionInputTokenAccount
     | DripPositionNotTokenized
     | UnexpectedDripPositionNftAccount
+    | InsufficientInfoForWithdrawal
 
 export class SuperAdminSignatureRequired extends Error {
     static readonly code = 6000
@@ -279,6 +280,17 @@ export class UnexpectedDripPositionNftAccount extends Error {
     }
 }
 
+export class InsufficientInfoForWithdrawal extends Error {
+    static readonly code = 6023
+    readonly code = 6023
+    readonly name = 'InsufficientInfoForWithdrawal'
+    readonly msg = 'Insufficient information for withdrawal'
+
+    constructor(readonly logs?: string[]) {
+        super('6023: Insufficient information for withdrawal')
+    }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
     switch (code) {
         case 6000:
@@ -327,6 +339,8 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
             return new DripPositionNotTokenized(logs)
         case 6022:
             return new UnexpectedDripPositionNftAccount(logs)
+        case 6023:
+            return new InsufficientInfoForWithdrawal(logs)
     }
 
     return null
