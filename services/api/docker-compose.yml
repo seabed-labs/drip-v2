@@ -26,6 +26,20 @@ services:
       timeout: 5s
       retries: 3
 
+  rabbitmq:
+    image: rabbitmq:3.9
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: docker
+      RABBITMQ_DEFAULT_PASS: docker
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "node_health_check"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
 networks:
   default:
     name: local

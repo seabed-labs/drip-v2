@@ -2,6 +2,7 @@ package translator
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/dcaf-labs/drip-v2/services/api/gen/store"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
@@ -9,17 +10,89 @@ import (
 )
 
 type Translator struct {
-	log   *zap.Logger
-	db    *sql.DB
-	query *store.Queries
+	log     *zap.Logger
+	address string
+	db      *sql.DB
+	query   *store.Queries
 }
 
-func NewTranslator(db *sql.DB) *Translator {
-	return &Translator{
-		log:   logger.NewZapLogger("translator"),
-		db:    db,
-		query: store.New(db),
+type translatorOption struct {
+	user     string
+	password string
+	sslMode  bool
+}
+
+type translatorOptionFunc func(*translatorOption)
+
+func WithDatabaseUser(user string) translatorOptionFunc {
+	return func(o *translatorOption) {
+		o.user = user
 	}
+}
+
+func WithDatabasePassword(password string) translatorOptionFunc {
+	return func(o *translatorOption) {
+		o.password = password
+	}
+}
+
+func WithDatabaseSSLMode(sslMode bool) translatorOptionFunc {
+	return func(o *translatorOption) {
+		o.sslMode = sslMode
+	}
+}
+
+func NewTranslator(driverName, name, host string, port int64, opts ...translatorOptionFunc) *Translator {
+	o := &translatorOption{}
+
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	log := logger.NewZapLogger("translator")
+	log.Info(
+		"connecting to database",
+		zap.String("name", name),
+		zap.String("host", host),
+		zap.Int64("port", port),
+	)
+
+	address := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%t",
+		o.user,
+		o.password,
+		host,
+		port,
+		name,
+		o.sslMode,
+	)
+	db, err := sql.Open(driverName, address)
+	if err != nil {
+		log.Fatal(
+			"failed to connect to the database",
+			zap.String("address", address),
+			zap.Error(err),
+		)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(
+			"failed to ping the database",
+			zap.String("address", address),
+			zap.Error(err),
+		)
+	}
+
+	return &Translator{
+		log:     log,
+		address: address,
+		db:      db,
+		query:   store.New(db),
+	}
+}
+
+func (t *Translator) Close() {
+	t.db.Close()
 }
 
 func (t *Translator) CommitTransactor(fn func(tx *sql.Tx) error) (err error) {
