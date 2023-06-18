@@ -14,6 +14,8 @@ export interface WithdrawAccounts {
     destinationOutputTokenAccount: PublicKey
     dripPositionInputTokenAccount: PublicKey
     dripPositionOutputTokenAccount: PublicKey
+    dripPositionNftMint: PublicKey
+    dripPositionNftAccount: PublicKey
     dripPosition: PublicKey
     dripPositionSigner: PublicKey
     tokenProgram: PublicKey
@@ -47,6 +49,16 @@ export function withdraw(
             pubkey: accounts.dripPositionOutputTokenAccount,
             isSigner: false,
             isWritable: true,
+        },
+        {
+            pubkey: accounts.dripPositionNftMint,
+            isSigner: false,
+            isWritable: false,
+        },
+        {
+            pubkey: accounts.dripPositionNftAccount,
+            isSigner: false,
+            isWritable: false,
         },
         { pubkey: accounts.dripPosition, isSigner: false, isWritable: false },
         {

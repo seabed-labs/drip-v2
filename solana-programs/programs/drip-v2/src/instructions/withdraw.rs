@@ -1,9 +1,10 @@
+use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
+
 use crate::{
     errors::DripError,
     state::{DripPosition, DripPositionSigner},
 };
-use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {
@@ -16,15 +17,19 @@ pub struct Withdraw<'info> {
     pub destination_output_token_account: Option<Account<'info, TokenAccount>>,
 
     #[account(mut)]
-    pub drip_position_input_token_account: Option<Account<'info, TokenAccount>>,
+    pub drip_position_input_token_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
-    pub drip_position_output_token_account: Option<Account<'info, TokenAccount>>,
+    pub drip_position_output_token_account: Box<Account<'info, TokenAccount>>,
+
+    pub drip_position_nft_mint: Option<Account<'info, Mint>>,
+
+    pub drip_position_nft_account: Option<Account<'info, TokenAccount>>,
 
     #[account(
         has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
     )]
-    pub drip_position: Account<'info, DripPosition>,
+    pub drip_position: Box<Account<'info, DripPosition>>,
 
     #[account(
         seeds = [
@@ -34,7 +39,7 @@ pub struct Withdraw<'info> {
         bump = drip_position_signer.bump,
         has_one = drip_position @ DripError::DripPositionSignerMismatch
     )]
-    pub drip_position_signer: Account<'info, DripPositionSigner>,
+    pub drip_position_signer: Box<Account<'info, DripPositionSigner>>,
 
     pub token_program: Program<'info, Token>,
 }
@@ -46,6 +51,15 @@ pub struct WithdrawParams {
 }
 
 pub fn handle_withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
+    require!(
+        ctx.accounts.drip_position.is_owned_by_signer(
+            &ctx.accounts.signer,
+            &ctx.accounts.drip_position_nft_mint,
+            &ctx.accounts.drip_position_nft_account,
+        )?,
+        DripError::DripPositionOwnerNotSigner
+    );
+
     withdraw_tokens(
         &ctx.accounts.token_program,
         &ctx.accounts.drip_position,
@@ -71,12 +85,12 @@ fn withdraw_tokens<'a, 'info>(
     token_program: &'a Program<'info, Token>,
     drip_position: &'a Account<'info, DripPosition>,
     drip_position_signer: &'a Account<'info, DripPositionSigner>,
-    source: &'a mut Option<Account<'info, TokenAccount>>,
+    source: &'a mut Account<'info, TokenAccount>,
     destination: &'a mut Option<Account<'info, TokenAccount>>,
     amount: u64,
 ) -> Result<()> {
-    match (source, destination, amount) {
-        (Some(source), Some(destination), amount) if amount > 0 => {
+    match (destination, amount) {
+        (Some(destination), amount) if amount > 0 => {
             token::transfer(
                 CpiContext::new_with_signer(
                     token_program.to_account_info(),
@@ -96,7 +110,7 @@ fn withdraw_tokens<'a, 'info>(
 
             Ok(())
         }
-        (_, _, amount) if amount > 0 => {
+        (_, amount) if amount > 0 => {
             return err!(DripError::InsufficientInfoForWithdrawal);
         }
         _ => Ok(()),

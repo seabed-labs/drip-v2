@@ -21,8 +21,8 @@ export type {
     UpdateDefaultPairDripFeesArgs,
     UpdateDefaultPairDripFeesAccounts,
 } from './updateDefaultPairDripFees'
-export { withdrawFees } from './withdrawFees'
-export type { WithdrawFeesArgs, WithdrawFeesAccounts } from './withdrawFees'
+export { collectFees } from './collectFees'
+export type { CollectFeesArgs, CollectFeesAccounts } from './collectFees'
 export { initDripPosition } from './initDripPosition'
 export type {
     InitDripPositionArgs,

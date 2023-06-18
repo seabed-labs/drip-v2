@@ -1,3 +1,5 @@
+mod close_position;
+mod collect_fees;
 mod deposit;
 mod detokenize_drip_position;
 mod init_drip_position;
@@ -12,8 +14,9 @@ mod update_default_pair_drip_fees;
 mod update_pyth_price_feed;
 mod update_super_admin;
 mod withdraw;
-mod withdraw_fees;
 
+pub use close_position::*;
+pub use collect_fees::*;
 pub use deposit::*;
 pub use detokenize_drip_position::*;
 pub use init_drip_position::*;
@@ -28,4 +31,3 @@ pub use update_default_pair_drip_fees::*;
 pub use update_pyth_price_feed::*;
 pub use update_super_admin::*;
 pub use withdraw::*;
-pub use withdraw_fees::*;

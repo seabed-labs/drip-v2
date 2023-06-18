@@ -23,6 +23,9 @@ export type CustomError =
     | DripPositionNotTokenized
     | UnexpectedDripPositionNftAccount
     | InsufficientInfoForWithdrawal
+    | InsufficientInfoForTokenizedOwnerCheck
+    | IncorrectAccountsForClosePosition
+    | CannotCloseDripPositionWithTokens
 
 export class SuperAdminSignatureRequired extends Error {
     static readonly code = 6000
@@ -291,6 +294,45 @@ export class InsufficientInfoForWithdrawal extends Error {
     }
 }
 
+export class InsufficientInfoForTokenizedOwnerCheck extends Error {
+    static readonly code = 6024
+    readonly code = 6024
+    readonly name = 'InsufficientInfoForTokenizedOwnerCheck'
+    readonly msg =
+        'Insufficient information for tokenized drip position owner check'
+
+    constructor(readonly logs?: string[]) {
+        super(
+            '6024: Insufficient information for tokenized drip position owner check'
+        )
+    }
+}
+
+export class IncorrectAccountsForClosePosition extends Error {
+    static readonly code = 6025
+    readonly code = 6025
+    readonly name = 'IncorrectAccountsForClosePosition'
+    readonly msg = 'Incorrect accounts for close_position'
+
+    constructor(readonly logs?: string[]) {
+        super('6025: Incorrect accounts for close_position')
+    }
+}
+
+export class CannotCloseDripPositionWithTokens extends Error {
+    static readonly code = 6026
+    readonly code = 6026
+    readonly name = 'CannotCloseDripPositionWithTokens'
+    readonly msg =
+        'Cannot close position with non-zero input/output token balance'
+
+    constructor(readonly logs?: string[]) {
+        super(
+            '6026: Cannot close position with non-zero input/output token balance'
+        )
+    }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
     switch (code) {
         case 6000:
@@ -341,6 +383,12 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
             return new UnexpectedDripPositionNftAccount(logs)
         case 6023:
             return new InsufficientInfoForWithdrawal(logs)
+        case 6024:
+            return new InsufficientInfoForTokenizedOwnerCheck(logs)
+        case 6025:
+            return new IncorrectAccountsForClosePosition(logs)
+        case 6026:
+            return new CannotCloseDripPositionWithTokens(logs)
     }
 
     return null

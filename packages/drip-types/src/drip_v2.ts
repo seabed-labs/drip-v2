@@ -296,7 +296,7 @@ export type DripV2 = {
             ]
         },
         {
-            name: 'withdrawFees'
+            name: 'collectFees'
             accounts: [
                 {
                     name: 'signer'
@@ -348,7 +348,7 @@ export type DripV2 = {
                 {
                     name: 'params'
                     type: {
-                        defined: 'WithdrawFeesParams'
+                        defined: 'CollectFeesParams'
                     }
                 }
             ]
@@ -718,11 +718,21 @@ export type DripV2 = {
                     name: 'dripPositionInputTokenAccount'
                     isMut: true
                     isSigner: false
-                    isOptional: true
                 },
                 {
                     name: 'dripPositionOutputTokenAccount'
                     isMut: true
+                    isSigner: false
+                },
+                {
+                    name: 'dripPositionNftMint'
+                    isMut: false
+                    isSigner: false
+                    isOptional: true
+                },
+                {
+                    name: 'dripPositionNftAccount'
+                    isMut: false
                     isSigner: false
                     isOptional: true
                 },
@@ -985,6 +995,18 @@ export type DripV2 = {
     ]
     types: [
         {
+            name: 'CollectFeesParams'
+            type: {
+                kind: 'struct'
+                fields: [
+                    {
+                        name: 'recipient'
+                        type: 'publicKey'
+                    }
+                ]
+            }
+        },
+        {
             name: 'DepositParams'
             type: {
                 kind: 'struct'
@@ -1066,18 +1088,6 @@ export type DripV2 = {
                     {
                         name: 'newDefaultPairDripFeesBps'
                         type: 'u64'
-                    }
-                ]
-            }
-        },
-        {
-            name: 'WithdrawFeesParams'
-            type: {
-                kind: 'struct'
-                fields: [
-                    {
-                        name: 'recipient'
-                        type: 'publicKey'
                     }
                 ]
             }
@@ -1170,7 +1180,7 @@ export type DripV2 = {
                         name: 'UpdateDefaultPairDripFees'
                     },
                     {
-                        name: 'WithdrawFees'
+                        name: 'CollectFees'
                     }
                 ]
             }
@@ -1316,6 +1326,21 @@ export type DripV2 = {
             code: 6023
             name: 'InsufficientInfoForWithdrawal'
             msg: 'Insufficient information for withdrawal'
+        },
+        {
+            code: 6024
+            name: 'InsufficientInfoForTokenizedOwnerCheck'
+            msg: 'Insufficient information for tokenized drip position owner check'
+        },
+        {
+            code: 6025
+            name: 'IncorrectAccountsForClosePosition'
+            msg: 'Incorrect accounts for close_position'
+        },
+        {
+            code: 6026
+            name: 'CannotCloseDripPositionWithTokens'
+            msg: 'Cannot close position with non-zero input/output token balance'
         }
     ]
 }
@@ -1618,7 +1643,7 @@ export const IDL: DripV2 = {
             ],
         },
         {
-            name: 'withdrawFees',
+            name: 'collectFees',
             accounts: [
                 {
                     name: 'signer',
@@ -1670,7 +1695,7 @@ export const IDL: DripV2 = {
                 {
                     name: 'params',
                     type: {
-                        defined: 'WithdrawFeesParams',
+                        defined: 'CollectFeesParams',
                     },
                 },
             ],
@@ -2040,11 +2065,21 @@ export const IDL: DripV2 = {
                     name: 'dripPositionInputTokenAccount',
                     isMut: true,
                     isSigner: false,
-                    isOptional: true,
                 },
                 {
                     name: 'dripPositionOutputTokenAccount',
                     isMut: true,
+                    isSigner: false,
+                },
+                {
+                    name: 'dripPositionNftMint',
+                    isMut: false,
+                    isSigner: false,
+                    isOptional: true,
+                },
+                {
+                    name: 'dripPositionNftAccount',
+                    isMut: false,
                     isSigner: false,
                     isOptional: true,
                 },
@@ -2307,6 +2342,18 @@ export const IDL: DripV2 = {
     ],
     types: [
         {
+            name: 'CollectFeesParams',
+            type: {
+                kind: 'struct',
+                fields: [
+                    {
+                        name: 'recipient',
+                        type: 'publicKey',
+                    },
+                ],
+            },
+        },
+        {
             name: 'DepositParams',
             type: {
                 kind: 'struct',
@@ -2388,18 +2435,6 @@ export const IDL: DripV2 = {
                     {
                         name: 'newDefaultPairDripFeesBps',
                         type: 'u64',
-                    },
-                ],
-            },
-        },
-        {
-            name: 'WithdrawFeesParams',
-            type: {
-                kind: 'struct',
-                fields: [
-                    {
-                        name: 'recipient',
-                        type: 'publicKey',
                     },
                 ],
             },
@@ -2492,7 +2527,7 @@ export const IDL: DripV2 = {
                         name: 'UpdateDefaultPairDripFees',
                     },
                     {
-                        name: 'WithdrawFees',
+                        name: 'CollectFees',
                     },
                 ],
             },
@@ -2638,6 +2673,21 @@ export const IDL: DripV2 = {
             code: 6023,
             name: 'InsufficientInfoForWithdrawal',
             msg: 'Insufficient information for withdrawal',
+        },
+        {
+            code: 6024,
+            name: 'InsufficientInfoForTokenizedOwnerCheck',
+            msg: 'Insufficient information for tokenized drip position owner check',
+        },
+        {
+            code: 6025,
+            name: 'IncorrectAccountsForClosePosition',
+            msg: 'Incorrect accounts for close_position',
+        },
+        {
+            code: 6026,
+            name: 'CannotCloseDripPositionWithTokens',
+            msg: 'Cannot close position with non-zero input/output token balance',
         },
     ],
 }
