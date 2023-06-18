@@ -1,4 +1,7 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::{Mint, TokenAccount};
+
+use crate::errors::DripError;
 
 #[account]
 #[derive(Default, InitSpace)]
@@ -15,6 +18,8 @@ pub struct DripPosition {
     pub frequency_in_seconds: u64,
     pub total_input_token_dripped: u64,
     pub total_output_token_received: u64,
+    // We store this separately and not inside the owner enum
+    // because we want to preserve it between tokenizations
     pub drip_position_nft_mint: Option<Pubkey>,
 }
 
@@ -37,6 +42,32 @@ impl DripPosition {
         match self.drip_position_nft_mint {
             Some(key) => key.eq(nft_mint),
             _ => false,
+        }
+    }
+
+    pub fn is_owned_by_signer<'info>(
+        &self,
+        signer: &Signer<'info>,
+        drip_position_nft_mint: &Option<Account<'info, Mint>>,
+        drip_position_nft_account: &Option<Account<'info, TokenAccount>>,
+    ) -> Result<bool> {
+        match self.owner {
+            DripPositionOwner::Tokenized => {
+                match (
+                    self.drip_position_nft_mint,
+                    drip_position_nft_mint,
+                    drip_position_nft_account,
+                ) {
+                    (Some(expected_nft_mint), Some(actual_nft_mint), Some(nft_account)) => {
+                        Ok(expected_nft_mint.eq(&actual_nft_mint.key())
+                            && actual_nft_mint.key().eq(&nft_account.mint)
+                            && signer.key().eq(&nft_account.owner)
+                            && nft_account.amount.eq(&1))
+                    }
+                    _ => return err!(DripError::InsufficientInfoForTokenizedOwnerCheck),
+                }
+            }
+            DripPositionOwner::Direct { owner } => Ok(owner.eq(signer.key)),
         }
     }
 }

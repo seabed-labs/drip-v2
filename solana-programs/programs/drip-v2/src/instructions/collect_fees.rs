@@ -6,7 +6,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 #[derive(Accounts)]
-pub struct WithdrawFees<'info> {
+pub struct CollectFees<'info> {
     pub signer: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
@@ -28,15 +28,15 @@ pub struct WithdrawFees<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct WithdrawFeesParams {
+pub struct CollectFeesParams {
     pub recipient: Pubkey,
 }
 
-pub fn handle_withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesParams) -> Result<()> {
+pub fn handle_collect_fees(ctx: Context<CollectFees>, params: CollectFeesParams) -> Result<()> {
     require!(
         ctx.accounts
             .signer
-            .is_authorized(&ctx.accounts.global_config, AdminPermission::WithdrawFees),
+            .is_authorized(&ctx.accounts.global_config, AdminPermission::CollectFees),
         DripError::OperationUnauthorized
     );
 

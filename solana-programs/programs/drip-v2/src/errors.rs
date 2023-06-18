@@ -73,4 +73,13 @@ pub enum DripError {
 
     #[msg("Insufficient information for withdrawal")]
     InsufficientInfoForWithdrawal, // 6023 or 0x1787
+
+    #[msg("Insufficient information for tokenized drip position owner check")]
+    InsufficientInfoForTokenizedOwnerCheck, // 6024 or 0x1788
+
+    #[msg("Incorrect accounts for close_position")]
+    IncorrectAccountsForClosePosition, // 6025 or 0x1789
+
+    #[msg("Cannot close position with non-zero input/output token balance")]
+    CannotCloseDripPositionWithTokens, // 6026 or 0x1790
 }

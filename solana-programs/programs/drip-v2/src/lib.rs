@@ -4,7 +4,6 @@ pub mod state;
 
 use anchor_lang::prelude::*;
 use instructions::*;
-
 declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 
 // TODO: Check and ensure exhaustive validations for each IX in its handler
@@ -58,8 +57,8 @@ pub mod drip_v2 {
         handle_update_default_pair_drip_fees(ctx, params)
     }
 
-    pub fn withdraw_fees(ctx: Context<WithdrawFees>, params: WithdrawFeesParams) -> Result<()> {
-        handle_withdraw_fees(ctx, params)
+    pub fn collect_fees(ctx: Context<CollectFees>, params: CollectFeesParams) -> Result<()> {
+        handle_collect_fees(ctx, params)
     }
 
     pub fn init_drip_position(

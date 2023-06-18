@@ -102,7 +102,7 @@ pub enum AdminPermission {
     UpdateDefaultDripFees,
     UpdatePythPriceFeed,
     UpdateDefaultPairDripFees,
-    WithdrawFees,
+    CollectFees,
 }
 
 impl AdminPermission {

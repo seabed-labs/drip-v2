@@ -4,11 +4,11 @@ import * as borsh from '@coral-xyz/borsh' // eslint-disable-line @typescript-esl
 import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from '../programId'
 
-export interface WithdrawFeesArgs {
-    params: types.WithdrawFeesParamsFields
+export interface CollectFeesArgs {
+    params: types.CollectFeesParamsFields
 }
 
-export interface WithdrawFeesAccounts {
+export interface CollectFeesAccounts {
     signer: PublicKey
     globalConfig: PublicKey
     globalConfigSigner: PublicKey
@@ -17,11 +17,11 @@ export interface WithdrawFeesAccounts {
     tokenProgram: PublicKey
 }
 
-export const layout = borsh.struct([types.WithdrawFeesParams.layout('params')])
+export const layout = borsh.struct([types.CollectFeesParams.layout('params')])
 
-export function withdrawFees(
-    args: WithdrawFeesArgs,
-    accounts: WithdrawFeesAccounts,
+export function collectFees(
+    args: CollectFeesArgs,
+    accounts: CollectFeesAccounts,
     programId: PublicKey = PROGRAM_ID
 ) {
     const keys: Array<AccountMeta> = [
@@ -44,11 +44,11 @@ export function withdrawFees(
         },
         { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     ]
-    const identifier = Buffer.from([198, 212, 171, 109, 144, 215, 174, 89])
+    const identifier = Buffer.from([164, 152, 207, 99, 30, 186, 19, 182])
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
         {
-            params: types.WithdrawFeesParams.toEncodable(args.params),
+            params: types.CollectFeesParams.toEncodable(args.params),
         },
         buffer
     )
