@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "Generated types for drip-v2",
   "author": "Dcaf Labs",
-  "license": "MIT",
-  "main": "src/index.ts",
-  "types": "src/index.d.ts",
+  "license": "UNLICENSED",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "yarn run build",
     "build": "yarn run tsc",
