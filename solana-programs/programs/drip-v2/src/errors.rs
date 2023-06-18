@@ -70,4 +70,7 @@ pub enum DripError {
 
     #[msg("Drip position NFT account does not match mint")]
     UnexpectedDripPositionNftAccount, // 6022 or 0x1786
+
+    #[msg("Insufficient information for withdrawal")]
+    InsufficientInfoForWithdrawal, // 6023 or 0x1787
 }
