@@ -28,7 +28,7 @@ const models: TsoaRoute.Models = {
         additionalProperties: false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    'ResponseCommon__message-string--_.Error_': {
+    'ResponseCommon__message-string_.Error_': {
         dataType: 'refAlias',
         type: {
             dataType: 'nestedObjectLiteral',
@@ -49,10 +49,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     PingResponse: {
         dataType: 'refAlias',
-        type: {
-            ref: 'ResponseCommon__message-string--_.Error_',
-            validators: {},
-        },
+        type: { ref: 'ResponseCommon__message-string_.Error_', validators: {} },
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 }
