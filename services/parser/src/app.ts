@@ -1,5 +1,5 @@
 import express, { json, urlencoded } from 'express'
-import { RegisterRoutes } from './generated/routes'
+import { RegisterRoutes } from './generated/api'
 
 export const app = express()
 
