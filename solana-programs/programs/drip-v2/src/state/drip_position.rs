@@ -15,12 +15,13 @@ pub struct DripPosition {
     pub frequency_in_seconds: u64,
     pub total_input_token_dripped: u64,
     pub total_output_token_received: u64,
+    pub drip_position_nft_mint: Option<Pubkey>,
 }
 
 impl DripPosition {
     pub fn is_tokenized(&self) -> bool {
         match self.owner {
-            DripPositionOwner::Tokenized { .. } => true,
+            DripPositionOwner::Tokenized => true,
             _ => false,
         }
     }
@@ -28,7 +29,14 @@ impl DripPosition {
     pub fn is_directly_owned_by(&self, signer: Pubkey) -> bool {
         match self.owner {
             DripPositionOwner::Direct { owner } => signer.eq(&owner),
-            DripPositionOwner::Tokenized { .. } => false,
+            _ => false,
+        }
+    }
+
+    pub fn has_associated_nft_mint(&self, nft_mint: &Pubkey) -> bool {
+        match self.drip_position_nft_mint {
+            Some(key) => key.eq(nft_mint),
+            _ => false,
         }
     }
 }
@@ -36,13 +44,13 @@ impl DripPosition {
 #[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
 pub enum DripPositionOwner {
     Direct { owner: Pubkey },
-    Tokenized { owner_nft_mint: Pubkey },
+    Tokenized,
 }
 
 impl Default for DripPositionOwner {
     fn default() -> Self {
-        Self::Tokenized {
-            owner_nft_mint: Pubkey::default(),
+        Self::Direct {
+            owner: Pubkey::default(),
         }
     }
 }
@@ -50,6 +58,7 @@ impl Default for DripPositionOwner {
 #[account]
 #[derive(Default, InitSpace)]
 pub struct DripPositionSigner {
+    pub version: u8,
     pub drip_position: Pubkey,
     pub bump: u8,
 }
@@ -58,6 +67,8 @@ pub struct DripPositionSigner {
 #[derive(Default, InitSpace)]
 // The goal of this account is to be able to get from the tokenized position NFT pubkey to the position pubkey by walking through an intermediary PDA
 pub struct DripPositionNftMapping {
+    pub version: u8,
     pub drip_position_nft_mint: Pubkey,
     pub drip_position: Pubkey,
+    pub bump: u8,
 }
