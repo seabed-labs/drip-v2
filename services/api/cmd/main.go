@@ -10,7 +10,7 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/queue"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/runner"
+	"github.com/dcaf-labs/drip-v2/services/api/internal/runnable"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/translator"
 	_ "github.com/lib/pq"
@@ -46,23 +46,23 @@ func main() {
 	)
 	defer rc.Close()
 
-	rmq := queue.NewRabbitMQ(
+	rq := queue.NewRabbitMQ(
 		viper.GetString("rabbitmq.host"),
 		viper.GetInt64("rabbitmq.port"),
 		queue.WithRabbitMQUser(viper.GetString("rabbitmq.user")),
 		queue.WithRabbitMQPassword(viper.GetString("rabbitmq.password")),
 	)
-	defer rmq.Close()
+	defer rq.Close()
 
-	rmq.DeclareQueue(app.QueueAccount, app.QueueTransaction)
+	rq.DeclareQueue(app.QueueAccount, app.QueueTransaction)
 
-	jupiter := jupiter.NewClient()
-	app := app.NewApp(t, jupiter, rc, rmq)
+	jup := jupiter.NewClient()
+	app := app.NewApp(t, jup, rc, rq)
 
 	h := handler.NewHandler(app)
-	srv := server.NewHTTPServer(20000, h)
 
-	runner.NewRunner(
-		srv,
+	runnable.NewRunner(
+		server.NewHTTPServer(20000, h),
+		runnable.NewTokenCacheSyncer(rc, jup),
 	).Run().ThenStop()
 }

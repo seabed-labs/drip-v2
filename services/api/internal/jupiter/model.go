@@ -1,7 +1,10 @@
 package jupiter
 
+import "time"
+
 const (
-	RedisJupiterTokensKey = "jupiter_tokens"
+	TokensCacheKey             = "jupiter_tokens"
+	TokensCacheRetentionPeriod = time.Minute * 10
 )
 
 type (

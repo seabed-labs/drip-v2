@@ -11,9 +11,10 @@ import (
 )
 
 type handlerAppInterface interface {
+	GetToken(ctx echo.Context) error
 	GetTokens(ctx echo.Context) error
-	PublishTransaction(ctx echo.Context, payload []byte) error
 	PublishAccount(ctx echo.Context, payload []byte) error
+	PublishTransaction(ctx echo.Context, payload []byte) error
 }
 
 type handler struct {
@@ -57,33 +58,20 @@ func (h *handler) registerRoutes() {
 		return err
 	})
 
-	h.handler.GET("/token/:token_address", func(c echo.Context) error {
-		return echo.ErrNotImplemented
-	})
-
-	h.handler.GET("/wallet/:wallet_address/positions", func(c echo.Context) error {
-		return echo.ErrNotImplemented
-	})
-
-	h.handler.POST("/transaction", func(c echo.Context) error {
-		r := c.Request()
-		defer r.Body.Close()
-
-		payload, err := io.ReadAll(r.Body)
-		if err != nil {
-			h.log.Error(ErrReadingPayload.Error())
-			return c.String(http.StatusBadRequest, ErrReadingPayload.Error())
-		}
-
-		err = h.app.PublishTransaction(c, payload)
+	h.handler.GET("/tokens/:token_address", func(c echo.Context) error {
+		err := h.app.GetToken(c)
 		if err != nil {
 			h.log.Error(
-				"failed to handle app.PublishTransaction POST request",
+				"failed to handle app.GetToken GET request",
 				zap.Error(err),
 			)
 		}
 
 		return err
+	})
+
+	h.handler.GET("/wallet/:wallet_address/positions", func(c echo.Context) error {
+		return echo.ErrNotImplemented
 	})
 
 	h.handler.POST("/account", func(c echo.Context) error {
@@ -100,6 +88,27 @@ func (h *handler) registerRoutes() {
 		if err != nil {
 			h.log.Error(
 				"failed to handle app.PublishAccount POST request",
+				zap.Error(err),
+			)
+		}
+
+		return err
+	})
+
+	h.handler.POST("/transaction", func(c echo.Context) error {
+		r := c.Request()
+		defer r.Body.Close()
+
+		payload, err := io.ReadAll(r.Body)
+		if err != nil {
+			h.log.Error(ErrReadingPayload.Error())
+			return c.String(http.StatusBadRequest, ErrReadingPayload.Error())
+		}
+
+		err = h.app.PublishTransaction(c, payload)
+		if err != nil {
+			h.log.Error(
+				"failed to handle app.PublishTransaction POST request",
 				zap.Error(err),
 			)
 		}

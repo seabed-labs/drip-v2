@@ -14,8 +14,9 @@ import (
 type appTranslatorInterface interface{}
 
 type appCacheInterface interface {
-	SetTokensWithExpiration(ctx context.Context, key string, value []*jupiter.Token, expiration time.Duration) error
+	GetToken(ctx context.Context, key string) (*jupiter.Token, error)
 	GetTokens(ctx context.Context, key string) ([]*jupiter.Token, error)
+	SetTokensWithExpiration(ctx context.Context, key string, value []*jupiter.Token, expiration time.Duration) error
 }
 
 type appQueueInterface interface {
@@ -40,10 +41,33 @@ func NewApp(translator appTranslatorInterface, jupiter jupiter.ClientInterface, 
 	}
 }
 
+func (a *app) GetToken(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	address := c.Param("token_address")
+	if address == jupiter.TokensCacheKey {
+		return c.String(http.StatusBadRequest, "invalid token address")
+	}
+
+	ts, err := a.cache.GetToken(ctx, address)
+	if err != nil {
+		a.log.Warn(
+			"failed to get token from cache",
+			zap.String("address", address),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusNotFound, "token not found")
+	}
+
+	return c.JSON(http.StatusOK, ts)
+
+}
+
 func (a *app) GetTokens(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	ts, err := a.cache.GetTokens(ctx, jupiter.RedisJupiterTokensKey)
+	ts, err := a.cache.GetTokens(ctx, jupiter.TokensCacheKey)
 	if err != nil {
 		a.log.Warn(
 			"failed to get tokens from cache",
@@ -64,43 +88,7 @@ func (a *app) GetTokens(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, errMsg)
 	}
 
-	if err := a.cache.SetTokensWithExpiration(ctx, jupiter.RedisJupiterTokensKey, ts, time.Minute*10); err != nil {
-		a.log.Error(
-			"failed to update the cache",
-			zap.String("key", jupiter.RedisJupiterTokensKey),
-			zap.Error(err),
-		)
-	}
-
 	return c.JSON(http.StatusOK, ts)
-}
-
-func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
-	tx, err := decodeTransactionPayload(payload)
-	if err != nil {
-		errMsg := "failed to decode transaction"
-		a.log.Error(
-			errMsg,
-			zap.Error(err),
-		)
-
-		return c.String(http.StatusInternalServerError, errMsg)
-	}
-
-	err = a.queue.Publish(QueueTransaction, "text/plain", string(tx.Signature))
-	if err != nil {
-		errMsg := "failed to publish transaction"
-		a.log.Error(
-			errMsg,
-			zap.String("queue", QueueTransaction),
-			zap.String("transaction_signature", string(tx.Signature)),
-			zap.Error(err),
-		)
-
-		return c.String(http.StatusInternalServerError, errMsg)
-	}
-
-	return c.JSON(http.StatusAccepted, "published transaction")
 }
 
 func (a *app) PublishAccount(c echo.Context, payload []byte) error {
@@ -129,4 +117,32 @@ func (a *app) PublishAccount(c echo.Context, payload []byte) error {
 	}
 
 	return c.JSON(http.StatusAccepted, "published account")
+}
+
+func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
+	tx, err := decodeTransactionPayload(payload)
+	if err != nil {
+		errMsg := "failed to decode transaction"
+		a.log.Error(
+			errMsg,
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	err = a.queue.Publish(QueueTransaction, "text/plain", string(tx.Signature))
+	if err != nil {
+		errMsg := "failed to publish transaction"
+		a.log.Error(
+			errMsg,
+			zap.String("queue", QueueTransaction),
+			zap.String("transaction_signature", string(tx.Signature)),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	return c.JSON(http.StatusAccepted, "published transaction")
 }
