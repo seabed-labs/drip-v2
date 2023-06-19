@@ -28,7 +28,7 @@ func main() {
 		viper.GetInt64("postgres.port"),
 		translator.WithDatabaseUser(viper.GetString("postgres.user")),
 		translator.WithDatabasePassword(viper.GetString("postgres.password")),
-		translator.WithDatabaseSSLMode(viper.GetBool("postgres.sslmode")),
+		translator.WithDatabaseSSLMode(viper.GetString("postgres.sslmode")),
 	)
 	defer t.Close()
 
@@ -54,8 +54,10 @@ func main() {
 	)
 	defer rmq.Close()
 
+	rmq.DeclareQueue(app.QueueAccount, app.QueueTransaction)
+
 	jupiter := jupiter.NewClient()
-	app := app.NewApp(t, jupiter, rc)
+	app := app.NewApp(t, jupiter, rc, rmq)
 
 	h := handler.NewHandler(app)
 	srv := server.NewHTTPServer(20000, h)

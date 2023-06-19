@@ -4,7 +4,7 @@ postgres:
   port: 5432
   user: "docker"
   password: "docker"
-  sslmode: false
+  sslmode: disable
 
 redis:
   host: "localhost"
@@ -13,7 +13,7 @@ redis:
 
 rabbitmq:
   host: "localhost"
-  port: 6379
+  port: 5672
   user: "docker"
   password: "docker"
 

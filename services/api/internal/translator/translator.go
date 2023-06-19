@@ -19,7 +19,7 @@ type Translator struct {
 type translatorOption struct {
 	user     string
 	password string
-	sslMode  bool
+	sslMode  string
 }
 
 type translatorOptionFunc func(*translatorOption)
@@ -36,7 +36,7 @@ func WithDatabasePassword(password string) translatorOptionFunc {
 	}
 }
 
-func WithDatabaseSSLMode(sslMode bool) translatorOptionFunc {
+func WithDatabaseSSLMode(sslMode string) translatorOptionFunc {
 	return func(o *translatorOption) {
 		o.sslMode = sslMode
 	}
@@ -58,7 +58,7 @@ func NewTranslator(driverName, name, host string, port int64, opts ...translator
 	)
 
 	address := fmt.Sprintf(
-		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%t",
+		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s",
 		o.user,
 		o.password,
 		host,

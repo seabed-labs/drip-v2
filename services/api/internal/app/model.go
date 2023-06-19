@@ -1,33 +1,19 @@
 package app
 
-import "time"
+const (
+	QueueTransaction = "transaction"
+	QueueAccount     = "account"
+)
 
 type (
-	QueuedTransactionID  int64
 	TransactionSignature string
+	AccountPublicKey     string
 )
 
-type (
-	QueuedAccountID  int64
-	AccountPublicKey string
-)
-
-type QueuedTransaction struct {
-	ID          QueuedTransactionID
-	Signature   TransactionSignature
-	Priority    int64
-	Attempts    int64
-	MaxAttempts int64
-	Time        *time.Time
-	RetryTime   *time.Time
+type Transaction struct {
+	Signature TransactionSignature `json:"tx_signature"`
 }
 
-type QueuedAccount struct {
-	ID          QueuedAccountID
-	PublicKey   AccountPublicKey
-	Priority    int64
-	Attempts    int64
-	MaxAttempts int64
-	Time        *time.Time
-	RetryTime   *time.Time
+type Account struct {
+	PublicKey AccountPublicKey `json:"acc_publicKey"`
 }

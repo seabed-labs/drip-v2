@@ -42,7 +42,10 @@ func (s *httpServer) Run() error {
 		return err
 	}
 
-	s.log.Info(fmt.Sprintf("http server listening on %v", s.httpListenAddress))
+	s.log.Info(
+		"http server listening",
+		zap.String("address", s.httpListenAddress),
+	)
 
 	go func() {
 		if err := s.http.Serve(httpListener); err != nil {

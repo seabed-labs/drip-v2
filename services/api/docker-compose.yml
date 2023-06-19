@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=micro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -d micro -U docker"]
       interval: 5s
       timeout: 5s
       retries: 3
@@ -27,7 +27,7 @@ services:
       retries: 3
 
   rabbitmq:
-    image: rabbitmq:3.9
+    image: rabbitmq:3.9-management
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -35,7 +35,7 @@ services:
       RABBITMQ_DEFAULT_USER: docker
       RABBITMQ_DEFAULT_PASS: docker
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "node_health_check"]
+      test: ["CMD", "rabbitmq-diagnostics -q ping"]
       interval: 5s
       timeout: 5s
       retries: 3

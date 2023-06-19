@@ -1,22 +1,28 @@
 package handler
 
 import (
+	"io"
 	"net/http"
 
-	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
 )
 
+type handlerAppInterface interface {
+	GetTokens(ctx echo.Context) error
+	PublishTransaction(ctx echo.Context, payload []byte) error
+	PublishAccount(ctx echo.Context, payload []byte) error
+}
+
 type handler struct {
 	log     *zap.Logger
 	handler *echo.Echo
-	app     app.AppInterface
+	app     handlerAppInterface
 }
 
-func NewHandler(app app.AppInterface) *handler {
+func NewHandler(app handlerAppInterface) *handler {
 	h := &handler{
 		log:     logger.NewZapLogger("server"),
 		handler: echo.New(),
@@ -60,10 +66,44 @@ func (h *handler) registerRoutes() {
 	})
 
 	h.handler.POST("/transaction", func(c echo.Context) error {
-		return echo.ErrNotImplemented
+		r := c.Request()
+		defer r.Body.Close()
+
+		payload, err := io.ReadAll(r.Body)
+		if err != nil {
+			h.log.Error(ErrReadingPayload.Error())
+			return c.String(http.StatusBadRequest, ErrReadingPayload.Error())
+		}
+
+		err = h.app.PublishTransaction(c, payload)
+		if err != nil {
+			h.log.Error(
+				"failed to handle app.PublishTransaction POST request",
+				zap.Error(err),
+			)
+		}
+
+		return err
 	})
 
 	h.handler.POST("/account", func(c echo.Context) error {
-		return echo.ErrNotImplemented
+		r := c.Request()
+		defer r.Body.Close()
+
+		payload, err := io.ReadAll(r.Body)
+		if err != nil {
+			h.log.Error(ErrReadingPayload.Error())
+			return c.String(http.StatusBadRequest, ErrReadingPayload.Error())
+		}
+
+		err = h.app.PublishAccount(c, payload)
+		if err != nil {
+			h.log.Error(
+				"failed to handle app.PublishAccount POST request",
+				zap.Error(err),
+			)
+		}
+
+		return err
 	})
 }

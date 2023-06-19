@@ -18,8 +18,8 @@ type appCacheInterface interface {
 	GetTokens(ctx context.Context, key string) ([]*jupiter.Token, error)
 }
 
-type AppInterface interface {
-	GetTokens(ctx echo.Context) error
+type appQueueInterface interface {
+	Publish(queueName, contentType string, body string) error
 }
 
 type app struct {
@@ -27,14 +27,16 @@ type app struct {
 	translator appTranslatorInterface
 	jupiter    jupiter.ClientInterface
 	cache      appCacheInterface
+	queue      appQueueInterface
 }
 
-func NewApp(translator appTranslatorInterface, jupiter jupiter.ClientInterface, cache appCacheInterface) *app {
+func NewApp(translator appTranslatorInterface, jupiter jupiter.ClientInterface, cache appCacheInterface, queue appQueueInterface) *app {
 	return &app{
 		log:        logger.NewZapLogger("app"),
 		translator: translator,
 		jupiter:    jupiter,
 		cache:      cache,
+		queue:      queue,
 	}
 }
 
@@ -71,4 +73,60 @@ func (a *app) GetTokens(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, ts)
+}
+
+func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
+	tx, err := decodeTransactionPayload(payload)
+	if err != nil {
+		errMsg := "failed to decode transaction"
+		a.log.Error(
+			errMsg,
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	err = a.queue.Publish(QueueTransaction, "text/plain", string(tx.Signature))
+	if err != nil {
+		errMsg := "failed to publish transaction"
+		a.log.Error(
+			errMsg,
+			zap.String("queue", QueueTransaction),
+			zap.String("transaction_signature", string(tx.Signature)),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	return c.JSON(http.StatusAccepted, "published transaction")
+}
+
+func (a *app) PublishAccount(c echo.Context, payload []byte) error {
+	acc, err := decodeAccountPayload(payload)
+	if err != nil {
+		errMsg := "failed to decode account"
+		a.log.Error(
+			errMsg,
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	err = a.queue.Publish(QueueAccount, "text/plain", string(acc.PublicKey))
+	if err != nil {
+		errMsg := "failed to publish account"
+		a.log.Error(
+			errMsg,
+			zap.String("queue", QueueTransaction),
+			zap.String("account_publickey", string(acc.PublicKey)),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusInternalServerError, errMsg)
+	}
+
+	return c.JSON(http.StatusAccepted, "published account")
 }
