@@ -12,7 +12,7 @@ import {
     fetchMiddlewares,
 } from '@tsoa/runtime'
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { ParseController } from './../../controllers/parseController'
+import { FetchController } from './../../controllers/fetchController'
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PingController } from './../../controllers/pingController'
 import type { RequestHandler, Router } from 'express'
@@ -407,11 +407,11 @@ export function RegisterRoutes(app: Router) {
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
     app.get(
-        '/parse/tx/:txSignature',
-        ...fetchMiddlewares<RequestHandler>(ParseController),
-        ...fetchMiddlewares<RequestHandler>(ParseController.prototype.parseTx),
+        '/fetch/tx/:txSignature',
+        ...fetchMiddlewares<RequestHandler>(FetchController),
+        ...fetchMiddlewares<RequestHandler>(FetchController.prototype.parseTx),
 
-        function ParseController_parseTx(
+        function FetchController_parseTx(
             request: any,
             response: any,
             next: any
@@ -431,7 +431,7 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = getValidatedArgs(args, request, response)
 
-                const controller = new ParseController()
+                const controller = new FetchController()
 
                 const promise = controller.parseTx.apply(
                     controller,
@@ -445,13 +445,13 @@ export function RegisterRoutes(app: Router) {
     )
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get(
-        '/parse/account/:accountPublicKey',
-        ...fetchMiddlewares<RequestHandler>(ParseController),
+        '/fetch/account/:accountPublicKey',
+        ...fetchMiddlewares<RequestHandler>(FetchController),
         ...fetchMiddlewares<RequestHandler>(
-            ParseController.prototype.parseAccount
+            FetchController.prototype.parseAccount
         ),
 
-        function ParseController_parseAccount(
+        function FetchController_parseAccount(
             request: any,
             response: any,
             next: any
@@ -471,7 +471,7 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = getValidatedArgs(args, request, response)
 
-                const controller = new ParseController()
+                const controller = new FetchController()
 
                 const promise = controller.parseAccount.apply(
                     controller,

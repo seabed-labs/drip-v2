@@ -20,10 +20,10 @@ program:
 	cd solana-programs && anchor build
 	cp solana-programs/target/idl/drip_v2.json solana-programs/idl/drip_v2.json
 
-parser: drip-types sdk
+fetcher: drip-types sdk
 # tsoa can't use external types, but we want to directly pipe parsed accounts to api server
-	cd services/parser && yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src/generated/anchor --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
-	cd services/parser && yarn install && yarn build && yarn lint:fix
+	cd services/fetcher && yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src/generated/anchor --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk" 
+	cd services/fetcher && yarn install && yarn build && yarn lint:fix
 
 sdk: program drip-types
 	cd packages/sdk && yarn install && yarn build && yarn lint:fix

@@ -344,7 +344,7 @@ components:
             $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_'
     securitySchemes: {}
 info:
-    title: '@dcaf/drip-parser'
+    title: '@dcaf/drip-fetcher'
     version: 0.1.0
     description: 'Worker to parse drip program accounts and instructions.'
     license:
@@ -353,7 +353,7 @@ info:
         name: 'Dcaf Labs'
 openapi: 3.0.0
 paths:
-    '/parse/tx/{txSignature}':
+    '/fetch/tx/{txSignature}':
         get:
             operationId: ParseTx
             responses:
@@ -371,7 +371,7 @@ paths:
                     required: true
                     schema:
                         type: string
-    '/parse/account/{accountPublicKey}':
+    '/fetch/account/{accountPublicKey}':
         get:
             operationId: ParseAccount
             responses:

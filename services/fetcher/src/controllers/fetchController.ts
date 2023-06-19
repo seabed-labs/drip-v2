@@ -10,8 +10,8 @@ import {
 import { programId } from '../service/programId'
 import { PublicKey } from '@solana/web3.js'
 
-@Route('parse')
-export class ParseController extends Controller {
+@Route('fetch')
+export class FetchController extends Controller {
     private readonly connection: Connection
     constructor() {
         super()
