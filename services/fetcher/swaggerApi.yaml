@@ -40,7 +40,7 @@ components:
             $ref: '#/components/schemas/ResponseCommon__message-string_.Error_'
     securitySchemes: {}
 info:
-    title: '@dcaf/drip-parser'
+    title: '@dcaf/drip-fetcher'
     version: 0.1.0
     description: 'Worker to parse drip program accounts and instructions.'
     license:

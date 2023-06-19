@@ -1,5 +1,5 @@
 {
-  "name": "@dcaf/drip-parser",
+  "name": "@dcaf/drip-fetcher",
   "version": "0.1.0",
   "description": "Worker to parse drip program accounts and instructions.",
   "author": "Dcaf Labs",

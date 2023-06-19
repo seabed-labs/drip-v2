@@ -20,8 +20,8 @@ program:
 	cd solana-programs && anchor build
 	cp solana-programs/target/idl/drip_v2.json solana-programs/idl/drip_v2.json
 
-parser: drip-types sdk
-	cd services/parser && yarn install && yarn build
+fetcher: drip-types sdk
+	cd services/fetcher && yarn install && yarn build
 
 sdk: program drip-types
 	cd packages/sdk && yarn install && yarn build
