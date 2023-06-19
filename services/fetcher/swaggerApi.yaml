@@ -1,0 +1,406 @@
+components:
+    examples: {}
+    headers: {}
+    parameters: {}
+    requestBodies: {}
+    responses: {}
+    schemas:
+        Error:
+            properties:
+                name:
+                    type: string
+                message:
+                    type: string
+                stack:
+                    type: string
+            required:
+                - name
+                - message
+            type: object
+            additionalProperties: false
+        ResponseCommon__message-string_.Error_:
+            anyOf:
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                message:
+                                    type: string
+                            required:
+                                - message
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - data
+                        - serverTimestamp
+                    type: object
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                message:
+                                    type: string
+                            required:
+                                - message
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - error
+                        - serverTimestamp
+                    type: object
+        PingResponse:
+            $ref: '#/components/schemas/ResponseCommon__message-string_.Error_'
+        DripPositionOwner.DirectJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Direct
+                    nullable: false
+                value:
+                    properties:
+                        owner:
+                            type: string
+                    required:
+                        - owner
+                    type: object
+            required:
+                - kind
+                - value
+            type: object
+            additionalProperties: false
+        DripPositionOwner.TokenizedJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Tokenized
+                    nullable: false
+            required:
+                - kind
+            type: object
+            additionalProperties: false
+        types.DripPositionOwnerJSON:
+            anyOf:
+                -
+                    $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
+                -
+                    $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
+        DripPositionJSON:
+            properties:
+                globalConfig:
+                    type: string
+                owner:
+                    $ref: '#/components/schemas/types.DripPositionOwnerJSON'
+                dripPositionSigner:
+                    type: string
+                autoCreditEnabled:
+                    type: boolean
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                inputTokenAccount:
+                    type: string
+                outputTokenAccount:
+                    type: string
+                dripAmount:
+                    type: string
+                frequencyInSeconds:
+                    type: string
+                totalInputTokenDripped:
+                    type: string
+                totalOutputTokenReceived:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                    nullable: true
+            required:
+                - globalConfig
+                - owner
+                - dripPositionSigner
+                - autoCreditEnabled
+                - inputTokenMint
+                - outputTokenMint
+                - inputTokenAccount
+                - outputTokenAccount
+                - dripAmount
+                - frequencyInSeconds
+                - totalInputTokenDripped
+                - totalOutputTokenReceived
+                - dripPositionNftMint
+            type: object
+            additionalProperties: false
+        DripPositionNftMappingJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                dripPositionNftMint:
+                    type: string
+                dripPosition:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - dripPositionNftMint
+                - dripPosition
+                - bump
+            type: object
+            additionalProperties: false
+        DripPositionSignerJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                dripPosition:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - dripPosition
+                - bump
+            type: object
+            additionalProperties: false
+        GlobalConfigJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                superAdmin:
+                    type: string
+                admins:
+                    items:
+                        type: string
+                    type: array
+                adminPermissions:
+                    items:
+                        type: string
+                    type: array
+                defaultDripFeeBps:
+                    type: string
+                globalConfigSigner:
+                    type: string
+            required:
+                - version
+                - superAdmin
+                - admins
+                - adminPermissions
+                - defaultDripFeeBps
+                - globalConfigSigner
+            type: object
+            additionalProperties: false
+        GlobalConfigSignerJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                globalConfig:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - globalConfig
+                - bump
+            type: object
+            additionalProperties: false
+        PriceOracle.UnavailableJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Unavailable
+                    nullable: false
+            required:
+                - kind
+            type: object
+            additionalProperties: false
+        PriceOracle.PythJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Pyth
+                    nullable: false
+                value:
+                    properties:
+                        pythPriceFeedAccount:
+                            type: string
+                    required:
+                        - pythPriceFeedAccount
+                    type: object
+            required:
+                - kind
+                - value
+            type: object
+            additionalProperties: false
+        types.PriceOracleJSON:
+            anyOf:
+                -
+                    $ref: '#/components/schemas/PriceOracle.UnavailableJSON'
+                -
+                    $ref: '#/components/schemas/PriceOracle.PythJSON'
+        PairConfigJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                globalConfig:
+                    type: string
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+                defaultPairDripFeeBps:
+                    type: string
+                inputTokenDripFeePortionBps:
+                    type: string
+                inputTokenPriceOracle:
+                    $ref: '#/components/schemas/types.PriceOracleJSON'
+                outputTokenPriceOracle:
+                    $ref: '#/components/schemas/types.PriceOracleJSON'
+            required:
+                - version
+                - globalConfig
+                - inputTokenMint
+                - outputTokenMint
+                - bump
+                - defaultPairDripFeeBps
+                - inputTokenDripFeePortionBps
+                - inputTokenPriceOracle
+                - outputTokenPriceOracle
+            type: object
+            additionalProperties: false
+        ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_:
+            anyOf:
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                account:
+                                    anyOf: [{$ref: '#/components/schemas/DripPositionJSON'}, {$ref: '#/components/schemas/DripPositionNftMappingJSON'}, {$ref: '#/components/schemas/DripPositionSignerJSON'}, {$ref: '#/components/schemas/GlobalConfigJSON'}, {$ref: '#/components/schemas/GlobalConfigSignerJSON'}, {$ref: '#/components/schemas/PairConfigJSON'}]
+                                name:
+                                    type: string
+                                    enum: [DripPosition, DripPositionNftMapping, DripPositionSigner, GlobalConfig, GlobalConfigSigner, PairConfig]
+                                publicKey:
+                                    type: string
+                            required:
+                                - account
+                                - name
+                                - publicKey
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - data
+                        - serverTimestamp
+                    type: object
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                account:
+                                    anyOf: [{$ref: '#/components/schemas/DripPositionJSON'}, {$ref: '#/components/schemas/DripPositionNftMappingJSON'}, {$ref: '#/components/schemas/DripPositionSignerJSON'}, {$ref: '#/components/schemas/GlobalConfigJSON'}, {$ref: '#/components/schemas/GlobalConfigSignerJSON'}, {$ref: '#/components/schemas/PairConfigJSON'}]
+                                name:
+                                    type: string
+                                    enum: [DripPosition, DripPositionNftMapping, DripPositionSigner, GlobalConfig, GlobalConfigSigner, PairConfig]
+                                publicKey:
+                                    type: string
+                            required:
+                                - account
+                                - name
+                                - publicKey
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - error
+                        - serverTimestamp
+                    type: object
+        ParsedAccountResponse:
+            $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_'
+    securitySchemes: {}
+info:
+    title: '@dcaf/drip-fetcher'
+    version: 0.1.0
+    description: 'Worker to parse drip program accounts and instructions.'
+    license:
+        name: MIT
+    contact:
+        name: 'Dcaf Labs'
+openapi: 3.0.0
+paths:
+    '/fetch/tx/{txSignature}':
+        get:
+            operationId: ParseTx
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PingResponse'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: txSignature
+                    required: true
+                    schema:
+                        type: string
+    '/fetch/account/{accountPublicKey}':
+        get:
+            operationId: ParseAccount
+            responses:
+                '200':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ParsedAccountResponse'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: accountPublicKey
+                    required: true
+                    schema:
+                        type: string
+    /:
+        get:
+            operationId: Ping
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PingResponse'
+            security: []
+            parameters: []
+servers:
+    -
+        url: /

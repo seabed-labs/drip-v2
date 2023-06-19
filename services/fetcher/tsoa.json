@@ -12,7 +12,8 @@
     "email": "hello@dcaflabs.com"
   },
   "routes": {
-      "routesDir": "src/generated"
+      "routesDir": "src/generated/api",
+      "routesFileName": "index.ts"
   },
   "yaml": true
 }

@@ -1,16 +1,18 @@
 {
-  "name": "@dcaf/drip-parser",
+  "name": "@dcaf/drip-fetcher",
   "version": "0.1.0",
   "description": "Worker to parse drip program accounts and instructions.",
   "author": "Dcaf Labs",
   "license": "MIT",
   "private": true,
-  "main": "src/index.ts",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "yarn run build",
-    "build": "yarn run build:api-codec && yarn run tsc",
-    "build:api-codec": "yarn run tsoa spec-and-routes --yaml && yarn run lint:fix",
+    "start": "node dist/index.js",
+    "start:dev": "yarn run ts-node src/index.ts",
+    "build": "yarn run build:api-spec && yarn run tsc",
+    "build:api-spec": "yarn run tsoa spec-and-routes --yaml && yarn run lint:fix",
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
@@ -20,7 +22,6 @@
     "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@openapi-io-ts/cli": "^0.5.0",
     "@types/express": "^4.17.17",
     "@types/node": "^20.3.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
@@ -32,10 +33,14 @@
   },
   "dependencies": {
     "@dcaf/drip-types": "0.1.0",
+    "@dcaf/drip": "0.1.0",
     "@types/express": "^4.17.17",
     "@types/node": "^20.3.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "tsoa": "^5.1.1"
+    "nodemon": "^2.0.22",
+    "tsoa": "^5.1.1",
+    "@solana/web3.js": "1.77.3",
+    "@coral-xyz/anchor": "0.27.0"
   }
 }
