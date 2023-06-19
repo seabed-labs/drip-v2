@@ -1,3 +1,4 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { TransactionInstruction, PublicKey, AccountMeta } from '@solana/web3.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -15,34 +16,98 @@ export interface DetokenizeDripPositionAccounts {
     tokenProgram: PublicKey
 }
 
-export function detokenizeDripPosition(
-    accounts: DetokenizeDripPositionAccounts,
-    programId: PublicKey = PROGRAM_ID
-) {
-    const keys: Array<AccountMeta> = [
-        { pubkey: accounts.payer, isSigner: true, isWritable: true },
-        { pubkey: accounts.owner, isSigner: true, isWritable: false },
-        { pubkey: accounts.dripPosition, isSigner: false, isWritable: true },
-        {
-            pubkey: accounts.dripPositionSigner,
-            isSigner: false,
-            isWritable: false,
-        },
-        {
-            pubkey: accounts.dripPositionNftMint,
-            isSigner: false,
-            isWritable: true,
-        },
-        {
-            pubkey: accounts.dripPositionNftAccount,
-            isSigner: false,
-            isWritable: true,
-        },
-        { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-        { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-    ]
-    const identifier = Buffer.from([160, 58, 139, 72, 132, 220, 131, 18])
-    const data = identifier
-    const ix = new TransactionInstruction({ keys, programId, data })
-    return ix
+export interface DetokenizeDripPositionAccountsJSON {
+    payer: string
+    owner: string
+    dripPosition: string
+    dripPositionSigner: string
+    dripPositionNftMint: string
+    dripPositionNftAccount: string
+    systemProgram: string
+    tokenProgram: string
+}
+
+export class DetokenizeDripPosition {
+    static readonly ixName = 'detokenizeDripPosition'
+    readonly identifier: Buffer
+    readonly keys: Array<AccountMeta>
+
+    constructor(
+        readonly accounts: DetokenizeDripPositionAccounts,
+        readonly programId: PublicKey = PROGRAM_ID
+    ) {
+        this.identifier = Buffer.from([160, 58, 139, 72, 132, 220, 131, 18])
+        this.keys = [
+            { pubkey: this.accounts.payer, isSigner: true, isWritable: true },
+            { pubkey: this.accounts.owner, isSigner: true, isWritable: false },
+            {
+                pubkey: this.accounts.dripPosition,
+                isSigner: false,
+                isWritable: true,
+            },
+            {
+                pubkey: this.accounts.dripPositionSigner,
+                isSigner: false,
+                isWritable: false,
+            },
+            {
+                pubkey: this.accounts.dripPositionNftMint,
+                isSigner: false,
+                isWritable: true,
+            },
+            {
+                pubkey: this.accounts.dripPositionNftAccount,
+                isSigner: false,
+                isWritable: true,
+            },
+            {
+                pubkey: this.accounts.systemProgram,
+                isSigner: false,
+                isWritable: false,
+            },
+            {
+                pubkey: this.accounts.tokenProgram,
+                isSigner: false,
+                isWritable: false,
+            },
+        ]
+    }
+
+    static fromDecoded(flattenedAccounts: PublicKey[]) {
+        const accounts = {
+            payer: flattenedAccounts[0],
+            owner: flattenedAccounts[1],
+            dripPosition: flattenedAccounts[2],
+            dripPositionSigner: flattenedAccounts[3],
+            dripPositionNftMint: flattenedAccounts[4],
+            dripPositionNftAccount: flattenedAccounts[5],
+            systemProgram: flattenedAccounts[6],
+            tokenProgram: flattenedAccounts[7],
+        }
+        return new DetokenizeDripPosition(accounts)
+    }
+
+    build() {
+        const data = this.identifier
+        const ix = new TransactionInstruction({
+            keys: this.keys,
+            programId: this.programId,
+            data,
+        })
+        return ix
+    }
+
+    toAccountsJSON(): DetokenizeDripPositionAccountsJSON {
+        return {
+            payer: this.accounts.payer.toString(),
+            owner: this.accounts.owner.toString(),
+            dripPosition: this.accounts.dripPosition.toString(),
+            dripPositionSigner: this.accounts.dripPositionSigner.toString(),
+            dripPositionNftMint: this.accounts.dripPositionNftMint.toString(),
+            dripPositionNftAccount:
+                this.accounts.dripPositionNftAccount.toString(),
+            systemProgram: this.accounts.systemProgram.toString(),
+            tokenProgram: this.accounts.tokenProgram.toString(),
+        }
+    }
 }

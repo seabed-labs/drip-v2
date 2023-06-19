@@ -1,5 +1,5 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey, Connection } from '@solana/web3.js'
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from '../programId'
@@ -10,8 +10,8 @@ export interface PairConfigFields {
     inputTokenMint: PublicKey
     outputTokenMint: PublicKey
     bump: number
-    defaultPairDripFeeBps: BN
-    inputTokenDripFeePortionBps: BN
+    defaultPairDripFeeBps: bigint
+    inputTokenDripFeePortionBps: bigint
     inputTokenPriceOracle: types.PriceOracleKind
     outputTokenPriceOracle: types.PriceOracleKind
 }
@@ -34,8 +34,8 @@ export class PairConfig {
     readonly inputTokenMint: PublicKey
     readonly outputTokenMint: PublicKey
     readonly bump: number
-    readonly defaultPairDripFeeBps: BN
-    readonly inputTokenDripFeePortionBps: BN
+    readonly defaultPairDripFeeBps: bigint
+    readonly inputTokenDripFeePortionBps: bigint
     readonly inputTokenPriceOracle: types.PriceOracleKind
     readonly outputTokenPriceOracle: types.PriceOracleKind
 
@@ -149,8 +149,8 @@ export class PairConfig {
             inputTokenMint: new PublicKey(obj.inputTokenMint),
             outputTokenMint: new PublicKey(obj.outputTokenMint),
             bump: obj.bump,
-            defaultPairDripFeeBps: new BN(obj.defaultPairDripFeeBps),
-            inputTokenDripFeePortionBps: new BN(
+            defaultPairDripFeeBps: BigInt(obj.defaultPairDripFeeBps),
+            inputTokenDripFeePortionBps: BigInt(
                 obj.inputTokenDripFeePortionBps
             ),
             inputTokenPriceOracle: types.PriceOracle.fromJSON(

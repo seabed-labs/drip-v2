@@ -1,11 +1,11 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface InitDripPositionParamsFields {
-    dripAmount: BN
-    frequencyInSeconds: BN
+    dripAmount: bigint
+    frequencyInSeconds: bigint
 }
 
 export interface InitDripPositionParamsJSON {
@@ -14,8 +14,8 @@ export interface InitDripPositionParamsJSON {
 }
 
 export class InitDripPositionParams {
-    readonly dripAmount: BN
-    readonly frequencyInSeconds: BN
+    readonly dripAmount: bigint
+    readonly frequencyInSeconds: bigint
 
     constructor(fields: InitDripPositionParamsFields) {
         this.dripAmount = fields.dripAmount
@@ -39,8 +39,8 @@ export class InitDripPositionParams {
 
     static toEncodable(fields: InitDripPositionParamsFields) {
         return {
-            dripAmount: fields.dripAmount,
-            frequencyInSeconds: fields.frequencyInSeconds,
+            dripAmount: new BN(fields.dripAmount.toString()),
+            frequencyInSeconds: new BN(fields.frequencyInSeconds.toString()),
         }
     }
 
@@ -53,8 +53,8 @@ export class InitDripPositionParams {
 
     static fromJSON(obj: InitDripPositionParamsJSON): InitDripPositionParams {
         return new InitDripPositionParams({
-            dripAmount: new BN(obj.dripAmount),
-            frequencyInSeconds: new BN(obj.frequencyInSeconds),
+            dripAmount: BigInt(obj.dripAmount),
+            frequencyInSeconds: BigInt(obj.frequencyInSeconds),
         })
     }
 

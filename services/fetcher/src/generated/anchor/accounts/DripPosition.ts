@@ -1,5 +1,5 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey, Connection } from '@solana/web3.js'
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from '../programId'
@@ -13,10 +13,10 @@ export interface DripPositionFields {
     outputTokenMint: PublicKey
     inputTokenAccount: PublicKey
     outputTokenAccount: PublicKey
-    dripAmount: BN
-    frequencyInSeconds: BN
-    totalInputTokenDripped: BN
-    totalOutputTokenReceived: BN
+    dripAmount: bigint
+    frequencyInSeconds: bigint
+    totalInputTokenDripped: bigint
+    totalOutputTokenReceived: bigint
     dripPositionNftMint: PublicKey | null
 }
 
@@ -45,10 +45,10 @@ export class DripPosition {
     readonly outputTokenMint: PublicKey
     readonly inputTokenAccount: PublicKey
     readonly outputTokenAccount: PublicKey
-    readonly dripAmount: BN
-    readonly frequencyInSeconds: BN
-    readonly totalInputTokenDripped: BN
-    readonly totalOutputTokenReceived: BN
+    readonly dripAmount: bigint
+    readonly frequencyInSeconds: bigint
+    readonly totalInputTokenDripped: bigint
+    readonly totalOutputTokenReceived: bigint
     readonly dripPositionNftMint: PublicKey | null
 
     static readonly discriminator = Buffer.from([
@@ -178,10 +178,10 @@ export class DripPosition {
             outputTokenMint: new PublicKey(obj.outputTokenMint),
             inputTokenAccount: new PublicKey(obj.inputTokenAccount),
             outputTokenAccount: new PublicKey(obj.outputTokenAccount),
-            dripAmount: new BN(obj.dripAmount),
-            frequencyInSeconds: new BN(obj.frequencyInSeconds),
-            totalInputTokenDripped: new BN(obj.totalInputTokenDripped),
-            totalOutputTokenReceived: new BN(obj.totalOutputTokenReceived),
+            dripAmount: BigInt(obj.dripAmount),
+            frequencyInSeconds: BigInt(obj.frequencyInSeconds),
+            totalInputTokenDripped: BigInt(obj.totalInputTokenDripped),
+            totalOutputTokenReceived: BigInt(obj.totalOutputTokenReceived),
             dripPositionNftMint:
                 (obj.dripPositionNftMint &&
                     new PublicKey(obj.dripPositionNftMint)) ||

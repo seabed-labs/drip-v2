@@ -1,11 +1,11 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey } from '@solana/web3.js' // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface InitGlobalConfigParamsFields {
     superAdmin: PublicKey
-    defaultDripFeeBps: BN
+    defaultDripFeeBps: bigint
 }
 
 export interface InitGlobalConfigParamsJSON {
@@ -15,7 +15,7 @@ export interface InitGlobalConfigParamsJSON {
 
 export class InitGlobalConfigParams {
     readonly superAdmin: PublicKey
-    readonly defaultDripFeeBps: BN
+    readonly defaultDripFeeBps: bigint
 
     constructor(fields: InitGlobalConfigParamsFields) {
         this.superAdmin = fields.superAdmin
@@ -40,7 +40,7 @@ export class InitGlobalConfigParams {
     static toEncodable(fields: InitGlobalConfigParamsFields) {
         return {
             superAdmin: fields.superAdmin,
-            defaultDripFeeBps: fields.defaultDripFeeBps,
+            defaultDripFeeBps: new BN(fields.defaultDripFeeBps.toString()),
         }
     }
 
@@ -54,7 +54,7 @@ export class InitGlobalConfigParams {
     static fromJSON(obj: InitGlobalConfigParamsJSON): InitGlobalConfigParams {
         return new InitGlobalConfigParams({
             superAdmin: new PublicKey(obj.superAdmin),
-            defaultDripFeeBps: new BN(obj.defaultDripFeeBps),
+            defaultDripFeeBps: BigInt(obj.defaultDripFeeBps),
         })
     }
 

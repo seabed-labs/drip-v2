@@ -1,10 +1,10 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface DepositParamsFields {
-    depositAmount: BN
+    depositAmount: bigint
 }
 
 export interface DepositParamsJSON {
@@ -12,7 +12,7 @@ export interface DepositParamsJSON {
 }
 
 export class DepositParams {
-    readonly depositAmount: BN
+    readonly depositAmount: bigint
 
     constructor(fields: DepositParamsFields) {
         this.depositAmount = fields.depositAmount
@@ -31,7 +31,7 @@ export class DepositParams {
 
     static toEncodable(fields: DepositParamsFields) {
         return {
-            depositAmount: fields.depositAmount,
+            depositAmount: new BN(fields.depositAmount.toString()),
         }
     }
 
@@ -43,7 +43,7 @@ export class DepositParams {
 
     static fromJSON(obj: DepositParamsJSON): DepositParams {
         return new DepositParams({
-            depositAmount: new BN(obj.depositAmount),
+            depositAmount: BigInt(obj.depositAmount),
         })
     }
 

@@ -3,6 +3,12 @@ import * as AdminStateUpdate from './AdminStateUpdate'
 import * as AdminPermission from './AdminPermission'
 import * as PriceOracle from './PriceOracle'
 
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
+export { CollectFeesParams } from './CollectFeesParams'
+export type {
+    CollectFeesParamsFields,
+    CollectFeesParamsJSON,
+} from './CollectFeesParams'
 export { DepositParams } from './DepositParams'
 export type { DepositParamsFields, DepositParamsJSON } from './DepositParams'
 export { InitDripPositionParams } from './InitDripPositionParams'
@@ -30,11 +36,8 @@ export type {
     UpdateDefaultPairDripFeesParamsFields,
     UpdateDefaultPairDripFeesParamsJSON,
 } from './UpdateDefaultPairDripFeesParams'
-export { WithdrawFeesParams } from './WithdrawFeesParams'
-export type {
-    WithdrawFeesParamsFields,
-    WithdrawFeesParamsJSON,
-} from './WithdrawFeesParams'
+export { WithdrawParams } from './WithdrawParams'
+export type { WithdrawParamsFields, WithdrawParamsJSON } from './WithdrawParams'
 export { DripPositionOwner }
 
 export type DripPositionOwnerKind =
@@ -66,13 +69,13 @@ export type AdminPermissionKind =
     | AdminPermission.UpdateDefaultDripFees
     | AdminPermission.UpdatePythPriceFeed
     | AdminPermission.UpdateDefaultPairDripFees
-    | AdminPermission.WithdrawFees
+    | AdminPermission.CollectFees
 export type AdminPermissionJSON =
     | AdminPermission.DripJSON
     | AdminPermission.UpdateDefaultDripFeesJSON
     | AdminPermission.UpdatePythPriceFeedJSON
     | AdminPermission.UpdateDefaultPairDripFeesJSON
-    | AdminPermission.WithdrawFeesJSON
+    | AdminPermission.CollectFeesJSON
 
 export { PriceOracle }
 

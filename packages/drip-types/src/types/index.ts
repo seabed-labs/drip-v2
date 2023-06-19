@@ -3,6 +3,7 @@ import * as AdminStateUpdate from './AdminStateUpdate'
 import * as AdminPermission from './AdminPermission'
 import * as PriceOracle from './PriceOracle'
 
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 export { CollectFeesParams } from './CollectFeesParams'
 export type {
     CollectFeesParamsFields,

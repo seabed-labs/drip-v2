@@ -1,10 +1,10 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface UpdateAdminParamsFields {
-    adminIndex: BN
+    adminIndex: bigint
     adminChange: types.AdminStateUpdateKind
 }
 
@@ -14,7 +14,7 @@ export interface UpdateAdminParamsJSON {
 }
 
 export class UpdateAdminParams {
-    readonly adminIndex: BN
+    readonly adminIndex: bigint
     readonly adminChange: types.AdminStateUpdateKind
 
     constructor(fields: UpdateAdminParamsFields) {
@@ -42,7 +42,7 @@ export class UpdateAdminParams {
 
     static toEncodable(fields: UpdateAdminParamsFields) {
         return {
-            adminIndex: fields.adminIndex,
+            adminIndex: new BN(fields.adminIndex.toString()),
             adminChange: fields.adminChange.toEncodable(),
         }
     }
@@ -56,7 +56,7 @@ export class UpdateAdminParams {
 
     static fromJSON(obj: UpdateAdminParamsJSON): UpdateAdminParams {
         return new UpdateAdminParams({
-            adminIndex: new BN(obj.adminIndex),
+            adminIndex: BigInt(obj.adminIndex),
             adminChange: types.AdminStateUpdate.fromJSON(obj.adminChange),
         })
     }
