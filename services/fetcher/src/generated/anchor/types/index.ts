@@ -21,6 +21,10 @@ export type {
     InitGlobalConfigParamsFields,
     InitGlobalConfigParamsJSON,
 } from './InitGlobalConfigParams'
+export { PostDripParams } from './PostDripParams'
+export type { PostDripParamsFields, PostDripParamsJSON } from './PostDripParams'
+export { PreDripParams } from './PreDripParams'
+export type { PreDripParamsFields, PreDripParamsJSON } from './PreDripParams'
 export { UpdateAdminParams } from './UpdateAdminParams'
 export type {
     UpdateAdminParamsFields,

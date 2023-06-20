@@ -41,6 +41,10 @@ export * from './deposit'
 export type { DepositFields, DepositAccounts } from './deposit'
 export * from './withdraw'
 export type { WithdrawFields, WithdrawAccounts } from './withdraw'
+export * from './preDrip'
+export type { PreDripFields, PreDripAccounts } from './preDrip'
+export * from './postDrip'
+export type { PostDripFields, PostDripAccounts } from './postDrip'
 
 export enum DripV2InstructionNames {
     initGlobalConfig = 'initGlobalConfig',
@@ -58,4 +62,6 @@ export enum DripV2InstructionNames {
     toggleAutoCredit = 'toggleAutoCredit',
     deposit = 'deposit',
     withdraw = 'withdraw',
+    preDrip = 'preDrip',
+    postDrip = 'postDrip',
 }

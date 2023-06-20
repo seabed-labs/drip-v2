@@ -78,7 +78,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.deposit',
                                 required: true,
@@ -145,7 +144,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.detokenizeDripPosition',
                                 required: true,
@@ -233,7 +231,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.initDripPosition',
                                 required: true,
@@ -299,7 +296,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.initDripPositionNft',
                                 required: true,
@@ -379,7 +375,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.initGlobalConfig',
                                 required: true,
@@ -439,7 +434,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.initPairConfig',
                                 required: true,
@@ -498,7 +492,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.toggleAutoCredit',
                                 required: true,
@@ -565,7 +558,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.tokenizeDripPosition',
                                 required: true,
@@ -632,7 +624,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.updateAdmin',
                                 required: true,
@@ -716,7 +707,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.updateDefaultDripFees',
                                 required: true,
@@ -801,7 +791,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.updateDefaultPairDripFees',
                                 required: true,
@@ -865,7 +854,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.updatePythPriceFeed',
                                 required: true,
@@ -925,7 +913,6 @@ const models: TsoaRoute.Models = {
                     {
                         dataType: 'nestedObjectLiteral',
                         nestedProperties: {
-                            index: { dataType: 'double', required: true },
                             name: {
                                 ref: 'DripV2InstructionNames.updateSuperAdmin',
                                 required: true,
@@ -978,7 +965,7 @@ const models: TsoaRoute.Models = {
         additionalProperties: false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    'ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_':
+    'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_':
         {
             dataType: 'refAlias',
             type: {
@@ -991,19 +978,13 @@ const models: TsoaRoute.Models = {
                             data: {
                                 dataType: 'nestedObjectLiteral',
                                 nestedProperties: {
-                                    unparsedInstructions: {
-                                        dataType: 'array',
-                                        array: { dataType: 'double' },
-                                        required: true,
-                                    },
-                                    parsedInstructions: {
+                                    instructions: {
                                         dataType: 'array',
                                         array: {
                                             dataType: 'nestedObjectLiteral',
                                             nestedProperties: {
                                                 parsedIx: {
                                                     ref: 'ParsedDripIx',
-                                                    required: true,
                                                 },
                                                 index: {
                                                     dataType: 'double',
@@ -1033,19 +1014,13 @@ const models: TsoaRoute.Models = {
                             data: {
                                 dataType: 'nestedObjectLiteral',
                                 nestedProperties: {
-                                    unparsedInstructions: {
-                                        dataType: 'array',
-                                        array: { dataType: 'double' },
-                                        required: true,
-                                    },
-                                    parsedInstructions: {
+                                    instructions: {
                                         dataType: 'array',
                                         array: {
                                             dataType: 'nestedObjectLiteral',
                                             nestedProperties: {
                                                 parsedIx: {
                                                     ref: 'ParsedDripIx',
-                                                    required: true,
                                                 },
                                                 index: {
                                                     dataType: 'double',
@@ -1075,7 +1050,7 @@ const models: TsoaRoute.Models = {
     ParsedTxResponse: {
         dataType: 'refAlias',
         type: {
-            ref: 'ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_',
+            ref: 'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_',
             validators: {},
         },
     },
