@@ -61,13 +61,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_DepositAccountsJSON.DepositFieldsJSON_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.deposit'
                     required:
-                        - index
                         - name
                     type: object
         ParsedDeposit:
@@ -119,13 +115,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_DetokenizeDripPositionAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.detokenizeDripPosition'
                     required:
-                        - index
                         - name
                     type: object
         ParsedDetokenizeDripPosition:
@@ -210,13 +202,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_InitDripPositionAccountsJSON.InitDripPositionFieldsJSON_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.initDripPosition'
                     required:
-                        - index
                         - name
                     type: object
         ParsedInitDripPosition:
@@ -265,13 +253,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_InitDripPositionNftAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.initDripPositionNft'
                     required:
-                        - index
                         - name
                     type: object
         ParsedInitDripPositionNft:
@@ -332,13 +316,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_InitGlobalConfigAccountsJSON.InitGlobalConfigFieldsJSON_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.initGlobalConfig'
                     required:
-                        - index
                         - name
                     type: object
         ParsedInitGlobalConfig:
@@ -384,13 +364,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_InitPairConfigAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.initPairConfig'
                     required:
-                        - index
                         - name
                     type: object
         ParsedInitPairConfig:
@@ -424,13 +400,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_ToggleAutoCreditAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.toggleAutoCredit'
                     required:
-                        - index
                         - name
                     type: object
         ParsedToggleAutoCredit:
@@ -482,13 +454,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_TokenizeDripPositionAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.tokenizeDripPosition'
                     required:
-                        - index
                         - name
                     type: object
         ParsedTokenizeDripPosition:
@@ -528,13 +496,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_UpdateAdminAccountsJSON.Record_string.unknown__'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.updateAdmin'
                     required:
-                        - index
                         - name
                     type: object
         ParsedUpdateAdmin:
@@ -586,13 +550,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_UpdateDefaultDripFeesAccountsJSON.UpdateDefaultDripFeesFieldsJSON_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultDripFees'
                     required:
-                        - index
                         - name
                     type: object
         ParsedUpdateDefaultDripFees:
@@ -647,13 +607,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_UpdateDefaultPairDripFeesAccountsJSON.UpdateDefaultPairDripFeesFieldsJSON_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultPairDripFees'
                     required:
-                        - index
                         - name
                     type: object
         ParsedUpdateDefaultPairDripFees:
@@ -696,13 +652,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_UpdatePythPriceFeedAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.updatePythPriceFeed'
                     required:
-                        - index
                         - name
                     type: object
         ParsedUpdatePythPriceFeed:
@@ -739,13 +691,9 @@ components:
                     $ref: '#/components/schemas/ParsedIx_UpdateSuperAdminAccountsJSON.undefined_'
                 -
                     properties:
-                        index:
-                            type: number
-                            format: double
                         name:
                             $ref: '#/components/schemas/DripV2InstructionNames.updateSuperAdmin'
                     required:
-                        - index
                         - name
                     type: object
         ParsedUpdateSuperAdmin:
@@ -791,7 +739,7 @@ components:
                 - message
             type: object
             additionalProperties: false
-        ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_:
+        'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_':
             anyOf:
                 -
                     properties:
@@ -799,17 +747,13 @@ components:
                             $ref: '#/components/schemas/Error'
                         data:
                             properties:
-                                unparsedInstructions:
-                                    items: {type: number, format: double}
-                                    type: array
-                                parsedInstructions:
-                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [parsedIx, index], type: object}
+                                instructions:
+                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [index], type: object}
                                     type: array
                                 signature:
                                     type: string
                             required:
-                                - unparsedInstructions
-                                - parsedInstructions
+                                - instructions
                                 - signature
                             type: object
                         serverTimestamp:
@@ -825,17 +769,13 @@ components:
                             $ref: '#/components/schemas/Error'
                         data:
                             properties:
-                                unparsedInstructions:
-                                    items: {type: number, format: double}
-                                    type: array
-                                parsedInstructions:
-                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [parsedIx, index], type: object}
+                                instructions:
+                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [index], type: object}
                                     type: array
                                 signature:
                                     type: string
                             required:
-                                - unparsedInstructions
-                                - parsedInstructions
+                                - instructions
                                 - signature
                             type: object
                         serverTimestamp:
@@ -846,7 +786,7 @@ components:
                         - serverTimestamp
                     type: object
         ParsedTxResponse:
-            $ref: '#/components/schemas/ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_'
+            $ref: '#/components/schemas/ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_'
         Commitment:
             type: string
             enum:
