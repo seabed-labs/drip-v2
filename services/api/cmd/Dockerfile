@@ -1,0 +1,20 @@
+FROM golang:1.20.4-bullseye as builder
+
+WORKDIR /api
+
+COPY . .
+RUN go mod download
+RUN go install ./...
+RUN go build -o ./api ./cmd/main.go
+
+
+FROM debian:bullseye-slim
+
+WORKDIR /
+
+COPY --from=builder ./api ./api
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+EXPOSE 20000
+
+ENTRYPOINT ["./api"]
