@@ -24,6 +24,6 @@
         "prettier": "^2.5.1"
     },
     "dependencies": {
-        "@dcaf/anchor-client-gen": "0.28.1-beta.1"
+        "@dcaf/anchor-client-gen": "0.28.1-beta.2"
     }
 }

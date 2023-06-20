@@ -5,6 +5,779 @@ components:
     requestBodies: {}
     responses: {}
     schemas:
+        DepositAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                sourceInputTokenAccount:
+                    type: string
+                dripPositionInputTokenAccount:
+                    type: string
+                dripPosition:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - signer
+                - sourceInputTokenAccount
+                - dripPositionInputTokenAccount
+                - dripPosition
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        types.DepositParamsJSON:
+            properties:
+                depositAmount:
+                    type: string
+            required:
+                - depositAmount
+            type: object
+            additionalProperties: false
+        DepositFieldsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.DepositParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedIx_DepositAccountsJSON.DepositFieldsJSON_:
+            properties:
+                data:
+                    $ref: '#/components/schemas/DepositFieldsJSON'
+                accounts:
+                    $ref: '#/components/schemas/DepositAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.deposit:
+            enum:
+                - deposit
+            type: string
+        ParsedIxWithMetadata_DepositAccountsJSON.DripV2InstructionNames.deposit.DepositFieldsJSON_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_DepositAccountsJSON.DepositFieldsJSON_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.deposit'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedDeposit:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_DepositAccountsJSON.DripV2InstructionNames.deposit.DepositFieldsJSON_'
+        DetokenizeDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                owner:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftAccount:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - owner
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftAccount
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedIx_DetokenizeDripPositionAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/DetokenizeDripPositionAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.detokenizeDripPosition:
+            enum:
+                - detokenizeDripPosition
+            type: string
+        ParsedIxWithMetadata_DetokenizeDripPositionAccountsJSON.DripV2InstructionNames.detokenizeDripPosition_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_DetokenizeDripPositionAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.detokenizeDripPosition'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedDetokenizeDripPosition:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_DetokenizeDripPositionAccountsJSON.DripV2InstructionNames.detokenizeDripPosition_'
+        InitDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                owner:
+                    type: string
+                globalConfig:
+                    type: string
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                inputTokenAccount:
+                    type: string
+                outputTokenAccount:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+                associatedTokenProgram:
+                    type: string
+            required:
+                - payer
+                - owner
+                - globalConfig
+                - inputTokenMint
+                - outputTokenMint
+                - inputTokenAccount
+                - outputTokenAccount
+                - dripPosition
+                - dripPositionSigner
+                - systemProgram
+                - tokenProgram
+                - associatedTokenProgram
+            type: object
+            additionalProperties: false
+        types.InitDripPositionParamsJSON:
+            properties:
+                dripAmount:
+                    type: string
+                frequencyInSeconds:
+                    type: string
+            required:
+                - dripAmount
+                - frequencyInSeconds
+            type: object
+            additionalProperties: false
+        InitDripPositionFieldsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.InitDripPositionParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedIx_InitDripPositionAccountsJSON.InitDripPositionFieldsJSON_:
+            properties:
+                data:
+                    $ref: '#/components/schemas/InitDripPositionFieldsJSON'
+                accounts:
+                    $ref: '#/components/schemas/InitDripPositionAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.initDripPosition:
+            enum:
+                - initDripPosition
+            type: string
+        ParsedIxWithMetadata_InitDripPositionAccountsJSON.DripV2InstructionNames.initDripPosition.InitDripPositionFieldsJSON_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_InitDripPositionAccountsJSON.InitDripPositionFieldsJSON_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.initDripPosition'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedInitDripPosition:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_InitDripPositionAccountsJSON.DripV2InstructionNames.initDripPosition.InitDripPositionFieldsJSON_'
+        InitDripPositionNftAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftMapping:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftMapping
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedIx_InitDripPositionNftAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/InitDripPositionNftAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.initDripPositionNft:
+            enum:
+                - initDripPositionNft
+            type: string
+        ParsedIxWithMetadata_InitDripPositionNftAccountsJSON.DripV2InstructionNames.initDripPositionNft_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_InitDripPositionNftAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.initDripPositionNft'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedInitDripPositionNft:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_InitDripPositionNftAccountsJSON.DripV2InstructionNames.initDripPositionNft_'
+        InitGlobalConfigAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                globalConfig:
+                    type: string
+                globalConfigSigner:
+                    type: string
+                systemProgram:
+                    type: string
+            required:
+                - payer
+                - globalConfig
+                - globalConfigSigner
+                - systemProgram
+            type: object
+            additionalProperties: false
+        types.InitGlobalConfigParamsJSON:
+            properties:
+                superAdmin:
+                    type: string
+                defaultDripFeeBps:
+                    type: string
+            required:
+                - superAdmin
+                - defaultDripFeeBps
+            type: object
+            additionalProperties: false
+        InitGlobalConfigFieldsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.InitGlobalConfigParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedIx_InitGlobalConfigAccountsJSON.InitGlobalConfigFieldsJSON_:
+            properties:
+                data:
+                    $ref: '#/components/schemas/InitGlobalConfigFieldsJSON'
+                accounts:
+                    $ref: '#/components/schemas/InitGlobalConfigAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.initGlobalConfig:
+            enum:
+                - initGlobalConfig
+            type: string
+        ParsedIxWithMetadata_InitGlobalConfigAccountsJSON.DripV2InstructionNames.initGlobalConfig.InitGlobalConfigFieldsJSON_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_InitGlobalConfigAccountsJSON.InitGlobalConfigFieldsJSON_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.initGlobalConfig'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedInitGlobalConfig:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_InitGlobalConfigAccountsJSON.DripV2InstructionNames.initGlobalConfig.InitGlobalConfigFieldsJSON_'
+        InitPairConfigAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                globalConfig:
+                    type: string
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                pairConfig:
+                    type: string
+                systemProgram:
+                    type: string
+            required:
+                - payer
+                - globalConfig
+                - inputTokenMint
+                - outputTokenMint
+                - pairConfig
+                - systemProgram
+            type: object
+            additionalProperties: false
+        ParsedIx_InitPairConfigAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/InitPairConfigAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.initPairConfig:
+            enum:
+                - initPairConfig
+            type: string
+        ParsedIxWithMetadata_InitPairConfigAccountsJSON.DripV2InstructionNames.initPairConfig_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_InitPairConfigAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.initPairConfig'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedInitPairConfig:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_InitPairConfigAccountsJSON.DripV2InstructionNames.initPairConfig_'
+        ToggleAutoCreditAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                dripPosition:
+                    type: string
+            required:
+                - signer
+                - dripPosition
+            type: object
+            additionalProperties: false
+        ParsedIx_ToggleAutoCreditAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/ToggleAutoCreditAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.toggleAutoCredit:
+            enum:
+                - toggleAutoCredit
+            type: string
+        ParsedIxWithMetadata_ToggleAutoCreditAccountsJSON.DripV2InstructionNames.toggleAutoCredit_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_ToggleAutoCreditAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.toggleAutoCredit'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedToggleAutoCredit:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_ToggleAutoCreditAccountsJSON.DripV2InstructionNames.toggleAutoCredit_'
+        TokenizeDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                owner:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftAccount:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - owner
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftAccount
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedIx_TokenizeDripPositionAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/TokenizeDripPositionAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.tokenizeDripPosition:
+            enum:
+                - tokenizeDripPosition
+            type: string
+        ParsedIxWithMetadata_TokenizeDripPositionAccountsJSON.DripV2InstructionNames.tokenizeDripPosition_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_TokenizeDripPositionAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.tokenizeDripPosition'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedTokenizeDripPosition:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_TokenizeDripPositionAccountsJSON.DripV2InstructionNames.tokenizeDripPosition_'
+        UpdateAdminAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+            type: object
+            additionalProperties: false
+        Record_string.unknown_:
+            properties: {}
+            type: object
+            description: 'Construct a type with a set of properties K of type T'
+        ParsedIx_UpdateAdminAccountsJSON.Record_string.unknown__:
+            properties:
+                data:
+                    $ref: '#/components/schemas/Record_string.unknown_'
+                accounts:
+                    $ref: '#/components/schemas/UpdateAdminAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.updateAdmin:
+            enum:
+                - updateAdmin
+            type: string
+        ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!Record_string.unknown__:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_UpdateAdminAccountsJSON.Record_string.unknown__'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.updateAdmin'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedUpdateAdmin:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!Record_string.unknown__'
+        UpdateDefaultDripFeesAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+            type: object
+            additionalProperties: false
+        types.UpdateDefaultDripFeesParamsJSON:
+            properties:
+                newDefaultDripFeesBps:
+                    type: string
+            required:
+                - newDefaultDripFeesBps
+            type: object
+            additionalProperties: false
+        UpdateDefaultDripFeesFieldsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.UpdateDefaultDripFeesParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedIx_UpdateDefaultDripFeesAccountsJSON.UpdateDefaultDripFeesFieldsJSON_:
+            properties:
+                data:
+                    $ref: '#/components/schemas/UpdateDefaultDripFeesFieldsJSON'
+                accounts:
+                    $ref: '#/components/schemas/UpdateDefaultDripFeesAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.updateDefaultDripFees:
+            enum:
+                - updateDefaultDripFees
+            type: string
+        ParsedIxWithMetadata_UpdateDefaultDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultDripFees.UpdateDefaultDripFeesFieldsJSON_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_UpdateDefaultDripFeesAccountsJSON.UpdateDefaultDripFeesFieldsJSON_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultDripFees'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedUpdateDefaultDripFees:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateDefaultDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultDripFees.UpdateDefaultDripFeesFieldsJSON_'
+        UpdateDefaultPairDripFeesAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                pairConfig:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - pairConfig
+                - globalConfig
+            type: object
+            additionalProperties: false
+        types.UpdateDefaultPairDripFeesParamsJSON:
+            properties:
+                newDefaultPairDripFeesBps:
+                    type: string
+            required:
+                - newDefaultPairDripFeesBps
+            type: object
+            additionalProperties: false
+        UpdateDefaultPairDripFeesFieldsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.UpdateDefaultPairDripFeesParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedIx_UpdateDefaultPairDripFeesAccountsJSON.UpdateDefaultPairDripFeesFieldsJSON_:
+            properties:
+                data:
+                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesFieldsJSON'
+                accounts:
+                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesAccountsJSON'
+            required:
+                - data
+                - accounts
+            type: object
+        DripV2InstructionNames.updateDefaultPairDripFees:
+            enum:
+                - updateDefaultPairDripFees
+            type: string
+        ParsedIxWithMetadata_UpdateDefaultPairDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultPairDripFees.UpdateDefaultPairDripFeesFieldsJSON_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_UpdateDefaultPairDripFeesAccountsJSON.UpdateDefaultPairDripFeesFieldsJSON_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultPairDripFees'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedUpdateDefaultPairDripFees:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateDefaultPairDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultPairDripFees.UpdateDefaultPairDripFeesFieldsJSON_'
+        UpdatePythPriceFeedAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+                pairConfig:
+                    type: string
+                inputTokenPythPriceFeed:
+                    type: string
+                outputTokenPythPriceFeed:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+                - pairConfig
+                - inputTokenPythPriceFeed
+                - outputTokenPythPriceFeed
+            type: object
+            additionalProperties: false
+        ParsedIx_UpdatePythPriceFeedAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/UpdatePythPriceFeedAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.updatePythPriceFeed:
+            enum:
+                - updatePythPriceFeed
+            type: string
+        ParsedIxWithMetadata_UpdatePythPriceFeedAccountsJSON.DripV2InstructionNames.updatePythPriceFeed_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_UpdatePythPriceFeedAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.updatePythPriceFeed'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedUpdatePythPriceFeed:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdatePythPriceFeedAccountsJSON.DripV2InstructionNames.updatePythPriceFeed_'
+        UpdateSuperAdminAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                newSuperAdmin:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - newSuperAdmin
+                - globalConfig
+            type: object
+            additionalProperties: false
+        ParsedIx_UpdateSuperAdminAccountsJSON.undefined_:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/UpdateSuperAdminAccountsJSON'
+            required:
+                - accounts
+            type: object
+        DripV2InstructionNames.updateSuperAdmin:
+            enum:
+                - updateSuperAdmin
+            type: string
+        ParsedIxWithMetadata_UpdateSuperAdminAccountsJSON.DripV2InstructionNames.updateSuperAdmin_:
+            allOf:
+                -
+                    $ref: '#/components/schemas/ParsedIx_UpdateSuperAdminAccountsJSON.undefined_'
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                        name:
+                            $ref: '#/components/schemas/DripV2InstructionNames.updateSuperAdmin'
+                    required:
+                        - index
+                        - name
+                    type: object
+        ParsedUpdateSuperAdmin:
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateSuperAdminAccountsJSON.DripV2InstructionNames.updateSuperAdmin_'
+        ParsedDripIx:
+            anyOf:
+                -
+                    $ref: '#/components/schemas/ParsedDeposit'
+                -
+                    $ref: '#/components/schemas/ParsedDetokenizeDripPosition'
+                -
+                    $ref: '#/components/schemas/ParsedInitDripPosition'
+                -
+                    $ref: '#/components/schemas/ParsedInitDripPositionNft'
+                -
+                    $ref: '#/components/schemas/ParsedInitGlobalConfig'
+                -
+                    $ref: '#/components/schemas/ParsedInitPairConfig'
+                -
+                    $ref: '#/components/schemas/ParsedToggleAutoCredit'
+                -
+                    $ref: '#/components/schemas/ParsedTokenizeDripPosition'
+                -
+                    $ref: '#/components/schemas/ParsedUpdateAdmin'
+                -
+                    $ref: '#/components/schemas/ParsedUpdateDefaultDripFees'
+                -
+                    $ref: '#/components/schemas/ParsedUpdateDefaultPairDripFees'
+                -
+                    $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
+                -
+                    $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
         Error:
             properties:
                 name:
@@ -18,7 +791,7 @@ components:
                 - message
             type: object
             additionalProperties: false
-        ResponseCommon__message-string_.Error_:
+        ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_:
             anyOf:
                 -
                     properties:
@@ -26,10 +799,18 @@ components:
                             $ref: '#/components/schemas/Error'
                         data:
                             properties:
-                                message:
+                                unparsedInstructions:
+                                    items: {type: number, format: double}
+                                    type: array
+                                parsedInstructions:
+                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [parsedIx, index], type: object}
+                                    type: array
+                                signature:
                                     type: string
                             required:
-                                - message
+                                - unparsedInstructions
+                                - parsedInstructions
+                                - signature
                             type: object
                         serverTimestamp:
                             type: number
@@ -44,10 +825,18 @@ components:
                             $ref: '#/components/schemas/Error'
                         data:
                             properties:
-                                message:
+                                unparsedInstructions:
+                                    items: {type: number, format: double}
+                                    type: array
+                                parsedInstructions:
+                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [parsedIx, index], type: object}
+                                    type: array
+                                signature:
                                     type: string
                             required:
-                                - message
+                                - unparsedInstructions
+                                - parsedInstructions
+                                - signature
                             type: object
                         serverTimestamp:
                             type: number
@@ -56,8 +845,13 @@ components:
                         - error
                         - serverTimestamp
                     type: object
-        PingResponse:
-            $ref: '#/components/schemas/ResponseCommon__message-string_.Error_'
+        ParsedTxResponse:
+            $ref: '#/components/schemas/ResponseCommon__signature-stringparsedInstructions%3A_index-numberparsedIx%3AParsedDripIx_-ArrayunparsedInstructions-number-Array_.Error_'
+        Commitment:
+            type: string
+            enum:
+                - confirmed
+                - finalized
         DripPositionOwner.DirectJSON:
             properties:
                 kind:
@@ -342,6 +1136,46 @@ components:
                     type: object
         ParsedAccountResponse:
             $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_'
+        ResponseCommon__message-string_.Error_:
+            anyOf:
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                message:
+                                    type: string
+                            required:
+                                - message
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - data
+                        - serverTimestamp
+                    type: object
+                -
+                    properties:
+                        error:
+                            $ref: '#/components/schemas/Error'
+                        data:
+                            properties:
+                                message:
+                                    type: string
+                            required:
+                                - message
+                            type: object
+                        serverTimestamp:
+                            type: number
+                            format: double
+                    required:
+                        - error
+                        - serverTimestamp
+                    type: object
+        PingResponse:
+            $ref: '#/components/schemas/ResponseCommon__message-string_.Error_'
     securitySchemes: {}
 info:
     title: '@dcaf/drip-fetcher'
@@ -353,24 +1187,30 @@ info:
         name: 'Dcaf Labs'
 openapi: 3.0.0
 paths:
-    '/fetch/tx/{txSignature}':
+    '/fetch/tx/{signature}':
         get:
             operationId: ParseTx
             responses:
                 '200':
-                    description: Ok
+                    description: ""
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PingResponse'
+                                $ref: '#/components/schemas/ParsedTxResponse'
             security: []
             parameters:
                 -
                     in: path
-                    name: txSignature
+                    name: signature
                     required: true
                     schema:
                         type: string
+                -
+                    in: query
+                    name: commitment
+                    required: false
+                    schema:
+                        $ref: '#/components/schemas/Commitment'
     '/fetch/account/{accountPublicKey}':
         get:
             operationId: ParseAccount
@@ -389,6 +1229,12 @@ paths:
                     required: true
                     schema:
                         type: string
+                -
+                    in: query
+                    name: commitment
+                    required: false
+                    schema:
+                        $ref: '#/components/schemas/Commitment'
     /:
         get:
             operationId: Ping
