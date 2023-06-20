@@ -44,16 +44,16 @@ func NewApp(translator appTranslatorInterface, jupiter jupiter.ClientInterface, 
 func (a *app) GetToken(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	address := c.Param("token_address")
-	if address == jupiter.TokensCacheKey {
+	t := c.Param("token_address")
+	if t == jupiter.TokensCacheKey {
 		return c.String(http.StatusBadRequest, "invalid token address")
 	}
 
-	ts, err := a.cache.GetToken(ctx, address)
+	ts, err := a.cache.GetToken(ctx, t)
 	if err != nil {
 		a.log.Warn(
 			"failed to get token from cache",
-			zap.String("address", address),
+			zap.String("token_address", t),
 			zap.Error(err),
 		)
 
@@ -146,3 +146,5 @@ func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
 
 	return c.JSON(http.StatusAccepted, "published transaction")
 }
+
+func (a *app) GetPositions(ctx echo.Context) error { return nil }

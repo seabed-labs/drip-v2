@@ -33,7 +33,7 @@ func WithRedisPassword(password string) redisOptionFunc {
 }
 
 func NewRedisCache(host string, port int64, opts ...redisOptionFunc) *redis {
-	o := &redisOption{}
+	o := &redisOption{} // nolint: exhaustruct
 
 	for _, opt := range opts {
 		opt(o)
@@ -66,6 +66,7 @@ func NewRedisCache(host string, port int64, opts ...redisOptionFunc) *redis {
 		log:     log,
 		address: address,
 		cache:   rdb,
+		mutex:   sync.RWMutex{},
 	}
 }
 

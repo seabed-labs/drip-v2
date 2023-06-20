@@ -64,5 +64,7 @@ func main() {
 	runnable.NewRunner(
 		server.NewHTTPServer(20000, h),
 		runnable.NewTokenCacheSyncer(rc, jup),
+		runnable.NewTransactionFetcher(rq, t),
+		runnable.NewAccountFetcher(rq, t),
 	).Run().ThenStop()
 }

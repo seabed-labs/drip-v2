@@ -52,13 +52,13 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 		zap.Int64("port", port),
 	)
 
-	rabbitMQAddress := fmt.Sprintf("amqp://%s:%s@%s:%d", o.user, o.password, host, port)
+	address := fmt.Sprintf("amqp://%s:%s@%s:%d", o.user, o.password, host, port)
 
-	conn, err := amqp.Dial(rabbitMQAddress)
+	conn, err := amqp.Dial(address)
 	if err != nil {
 		log.Fatal(
 			"failed to connect to rabbitMQ",
-			zap.String("address", rabbitMQAddress),
+			zap.String("address", address),
 			zap.Error(err),
 		)
 	}
@@ -67,55 +67,58 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 	if err != nil {
 		log.Fatal(
 			"failed to open rabbitMQ channel",
-			zap.String("address", rabbitMQAddress),
+			zap.String("address", address),
 			zap.Error(err),
 		)
 	}
 
 	return &rabbitMQ{
 		log:        log,
+		address:    address,
 		connection: conn,
 		channel:    ch,
 	}
 }
 
-func (r *rabbitMQ) Close() {
-	if err := r.channel.Close(); err != nil {
-		r.log.Error(
+func (q *rabbitMQ) Close() {
+	if err := q.channel.Close(); err != nil {
+		q.log.Error(
 			"failed to gracefully close rabbitMQ channel",
-			zap.String("address", r.address),
+			zap.String("address", q.address),
 			zap.Error(err),
 		)
 	}
 
-	if err := r.connection.Close(); err != nil {
-		r.log.Error(
+	if err := q.connection.Close(); err != nil {
+		q.log.Error(
 			"failed to gracefully close rabbitMQ connection",
-			zap.String("address", r.address),
+			zap.String("address", q.address),
 			zap.Error(err),
 		)
 	}
 }
 
-func (r *rabbitMQ) DeclareQueue(names ...string) error {
+func (q *rabbitMQ) DeclareQueue(names ...string) {
 	for _, name := range names {
-		if _, err := r.channel.QueueDeclare(name, true, false, false, false, nil); err != nil {
-			r.log.Fatal(
+		if _, err := q.channel.QueueDeclare(name, true, false, false, false, nil); err != nil {
+			q.log.Fatal(
 				"failed to create queue",
 				zap.String("name", name),
 				zap.Error(err),
 			)
 		}
 	}
-
-	return nil
 }
 
-func (r *rabbitMQ) Publish(queueName, contentType, body string) error {
-	return r.channel.Publish("", queueName, false, false,
-		amqp.Publishing{
+func (q *rabbitMQ) Publish(queueName, contentType, body string) error {
+	return q.channel.Publish("", queueName, false, false,
+		amqp.Publishing{ // nolint: exhaustruct
 			ContentType: contentType,
 			Body:        []byte(body),
 		},
 	)
+}
+
+func (q *rabbitMQ) Consume(name, consumer string) (<-chan amqp.Delivery, error) {
+	return q.channel.Consume(name, consumer, true, false, false, false, nil)
 }

@@ -43,7 +43,7 @@ func WithDatabaseSSLMode(sslMode string) translatorOptionFunc {
 }
 
 func NewTranslator(driverName, name, host string, port int64, opts ...translatorOptionFunc) *Translator {
-	o := &translatorOption{}
+	o := &translatorOption{} // nolint: exhaustruct
 
 	for _, opt := range opts {
 		opt(o)

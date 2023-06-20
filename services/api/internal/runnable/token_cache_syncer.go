@@ -78,5 +78,5 @@ func (c *tokenCacheSyncer) Stop(ctx context.Context) error {
 }
 
 func (c *tokenCacheSyncer) Name() string {
-	return "tokenCacheSyncer"
+	return "token_cache_syncer"
 }

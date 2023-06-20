@@ -1,9 +1,9 @@
 HDI := $(shell docker run --net=host --rm codenvy/che-ip:4.7.2)
 
-build: gen
+build:
 	@echo "==== RUNNING BUILD ===="
 	@docker build \
-		--tag dcaf-api \
+		--tag dcaf-api:latest \
 		--file cmd/Dockerfile ./
 
 run: build up
@@ -73,15 +73,7 @@ lint-sql:
 			lint model.sql queries migrations
 
 #### Code Fix ####
-fix: fix-go fix-sql
-
-fix-go:
-	@echo "==== FIXING GO FILES ===="
-	@docker run --rm \
-		--volume $(CURDIR):/src \
-		--workdir /src \
-		golangci/golangci-lint:v1.53.2 \
-			golangci-lint run --config .golangci.yml --verbose --fix
+lint-fix: fix-sql
 
 fix-sql:
 	@echo "==== FIXING SQL FILES ===="
