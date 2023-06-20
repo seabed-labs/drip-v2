@@ -777,6 +777,47 @@ export type DripV2 = {
                     }
                 }
             ]
+        },
+        {
+            name: 'preDrip'
+            accounts: [
+                {
+                    name: 'signer'
+                    isMut: false
+                    isSigner: true
+                },
+                {
+                    name: 'instructions'
+                    isMut: false
+                    isSigner: false
+                }
+            ]
+            args: [
+                {
+                    name: 'params'
+                    type: {
+                        defined: 'PreDripParams'
+                    }
+                }
+            ]
+        },
+        {
+            name: 'postDrip'
+            accounts: [
+                {
+                    name: 'signer'
+                    isMut: false
+                    isSigner: true
+                }
+            ]
+            args: [
+                {
+                    name: 'params'
+                    type: {
+                        defined: 'PostDripParams'
+                    }
+                }
+            ]
         }
     ]
     accounts: [
@@ -1045,6 +1086,25 @@ export type DripV2 = {
                     },
                     {
                         name: 'defaultDripFeeBps'
+                        type: 'u64'
+                    }
+                ]
+            }
+        },
+        {
+            name: 'PostDripParams'
+            type: {
+                kind: 'struct'
+                fields: []
+            }
+        },
+        {
+            name: 'PreDripParams'
+            type: {
+                kind: 'struct'
+                fields: [
+                    {
+                        name: 'x'
                         type: 'u64'
                     }
                 ]
@@ -1341,6 +1401,11 @@ export type DripV2 = {
             code: 6026
             name: 'CannotCloseDripPositionWithTokens'
             msg: 'Cannot close position with non-zero input/output token balance'
+        },
+        {
+            code: 6027
+            name: 'CannotFindPostDripIx'
+            msg: 'Cannot find post-drip IX'
         }
     ]
 }
@@ -2125,6 +2190,47 @@ export const IDL: DripV2 = {
                 },
             ],
         },
+        {
+            name: 'preDrip',
+            accounts: [
+                {
+                    name: 'signer',
+                    isMut: false,
+                    isSigner: true,
+                },
+                {
+                    name: 'instructions',
+                    isMut: false,
+                    isSigner: false,
+                },
+            ],
+            args: [
+                {
+                    name: 'params',
+                    type: {
+                        defined: 'PreDripParams',
+                    },
+                },
+            ],
+        },
+        {
+            name: 'postDrip',
+            accounts: [
+                {
+                    name: 'signer',
+                    isMut: false,
+                    isSigner: true,
+                },
+            ],
+            args: [
+                {
+                    name: 'params',
+                    type: {
+                        defined: 'PostDripParams',
+                    },
+                },
+            ],
+        },
     ],
     accounts: [
         {
@@ -2392,6 +2498,25 @@ export const IDL: DripV2 = {
                     },
                     {
                         name: 'defaultDripFeeBps',
+                        type: 'u64',
+                    },
+                ],
+            },
+        },
+        {
+            name: 'PostDripParams',
+            type: {
+                kind: 'struct',
+                fields: [],
+            },
+        },
+        {
+            name: 'PreDripParams',
+            type: {
+                kind: 'struct',
+                fields: [
+                    {
+                        name: 'x',
                         type: 'u64',
                     },
                 ],
@@ -2688,6 +2813,11 @@ export const IDL: DripV2 = {
             code: 6026,
             name: 'CannotCloseDripPositionWithTokens',
             msg: 'Cannot close position with non-zero input/output token balance',
+        },
+        {
+            code: 6027,
+            name: 'CannotFindPostDripIx',
+            msg: 'Cannot find post-drip IX',
         },
     ],
 }

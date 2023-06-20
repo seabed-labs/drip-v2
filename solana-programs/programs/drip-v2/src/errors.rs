@@ -82,4 +82,7 @@ pub enum DripError {
 
     #[msg("Cannot close position with non-zero input/output token balance")]
     CannotCloseDripPositionWithTokens, // 6026 or 0x1790
+
+    #[msg("Cannot find post-drip IX")]
+    CannotFindPostDripIx, // 6027 or 0x1791
 }

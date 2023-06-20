@@ -26,6 +26,7 @@ export type CustomError =
     | InsufficientInfoForTokenizedOwnerCheck
     | IncorrectAccountsForClosePosition
     | CannotCloseDripPositionWithTokens
+    | CannotFindPostDripIx
 
 export class SuperAdminSignatureRequired extends Error {
     static readonly code = 6000
@@ -333,6 +334,17 @@ export class CannotCloseDripPositionWithTokens extends Error {
     }
 }
 
+export class CannotFindPostDripIx extends Error {
+    static readonly code = 6027
+    readonly code = 6027
+    readonly name = 'CannotFindPostDripIx'
+    readonly msg = 'Cannot find post-drip IX'
+
+    constructor(readonly logs?: string[]) {
+        super('6027: Cannot find post-drip IX')
+    }
+}
+
 export function fromCode(code: number, logs?: string[]): CustomError | null {
     switch (code) {
         case 6000:
@@ -389,6 +401,8 @@ export function fromCode(code: number, logs?: string[]): CustomError | null {
             return new IncorrectAccountsForClosePosition(logs)
         case 6026:
             return new CannotCloseDripPositionWithTokens(logs)
+        case 6027:
+            return new CannotFindPostDripIx(logs)
     }
 
     return null
