@@ -1,4 +1,4 @@
-// eslint-disable-line @typescript-eslint/no-unused-vars
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'

@@ -1,3 +1,4 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey } from '@solana/web3.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars

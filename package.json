@@ -2,7 +2,12 @@
     "author": "Dcaf Labs",
     "license": "UNLICENSED",
     "private": true,
-    "workspaces": ["solana-programs", "packages/*", "services/*", "ui/*"],
+    "workspaces": [
+        "solana-programs",
+        "packages/*",
+        "services/*",
+        "ui/*"
+    ],
     "scripts": {
         "lint": "yarn run lint:eslint && yarn run lint:prettier",
         "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
@@ -17,5 +22,8 @@
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-unused-imports": "^2.0.0",
         "prettier": "^2.5.1"
+    },
+    "dependencies": {
+        "@dcaf/anchor-client-gen": "0.28.1-beta.2"
     }
 }

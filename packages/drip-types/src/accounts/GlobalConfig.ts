@@ -1,5 +1,5 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 import { PublicKey, Connection } from '@solana/web3.js'
-import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from '../programId'
@@ -8,8 +8,8 @@ export interface GlobalConfigFields {
     version: number
     superAdmin: PublicKey
     admins: Array<PublicKey>
-    adminPermissions: Array<BN>
-    defaultDripFeeBps: BN
+    adminPermissions: Array<bigint>
+    defaultDripFeeBps: bigint
     globalConfigSigner: PublicKey
 }
 
@@ -26,8 +26,8 @@ export class GlobalConfig {
     readonly version: number
     readonly superAdmin: PublicKey
     readonly admins: Array<PublicKey>
-    readonly adminPermissions: Array<BN>
-    readonly defaultDripFeeBps: BN
+    readonly adminPermissions: Array<bigint>
+    readonly defaultDripFeeBps: bigint
     readonly globalConfigSigner: PublicKey
 
     static readonly discriminator = Buffer.from([
@@ -123,8 +123,8 @@ export class GlobalConfig {
             version: obj.version,
             superAdmin: new PublicKey(obj.superAdmin),
             admins: obj.admins.map((item) => new PublicKey(item)),
-            adminPermissions: obj.adminPermissions.map((item) => new BN(item)),
-            defaultDripFeeBps: new BN(obj.defaultDripFeeBps),
+            adminPermissions: obj.adminPermissions.map((item) => BigInt(item)),
+            defaultDripFeeBps: BigInt(obj.defaultDripFeeBps),
             globalConfigSigner: new PublicKey(obj.globalConfigSigner),
         })
     }

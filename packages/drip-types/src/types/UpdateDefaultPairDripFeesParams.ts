@@ -1,10 +1,11 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface UpdateDefaultPairDripFeesParamsFields {
-    newDefaultPairDripFeesBps: BN
+    newDefaultPairDripFeesBps: bigint
 }
 
 export interface UpdateDefaultPairDripFeesParamsJSON {
@@ -12,7 +13,7 @@ export interface UpdateDefaultPairDripFeesParamsJSON {
 }
 
 export class UpdateDefaultPairDripFeesParams {
-    readonly newDefaultPairDripFeesBps: BN
+    readonly newDefaultPairDripFeesBps: bigint
 
     constructor(fields: UpdateDefaultPairDripFeesParamsFields) {
         this.newDefaultPairDripFeesBps = fields.newDefaultPairDripFeesBps
@@ -31,7 +32,9 @@ export class UpdateDefaultPairDripFeesParams {
 
     static toEncodable(fields: UpdateDefaultPairDripFeesParamsFields) {
         return {
-            newDefaultPairDripFeesBps: fields.newDefaultPairDripFeesBps,
+            newDefaultPairDripFeesBps: new BN(
+                fields.newDefaultPairDripFeesBps.toString()
+            ),
         }
     }
 
@@ -46,7 +49,7 @@ export class UpdateDefaultPairDripFeesParams {
         obj: UpdateDefaultPairDripFeesParamsJSON
     ): UpdateDefaultPairDripFeesParams {
         return new UpdateDefaultPairDripFeesParams({
-            newDefaultPairDripFeesBps: new BN(obj.newDefaultPairDripFeesBps),
+            newDefaultPairDripFeesBps: BigInt(obj.newDefaultPairDripFeesBps),
         })
     }
 

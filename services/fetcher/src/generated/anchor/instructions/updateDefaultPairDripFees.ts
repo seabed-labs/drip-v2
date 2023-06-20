@@ -1,44 +1,106 @@
-import { TransactionInstruction, PublicKey, AccountMeta } from '@solana/web3.js' // eslint-disable-line @typescript-eslint/no-unused-vars
-// eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from '@coral-xyz/borsh' // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from '../types' // eslint-disable-line @typescript-eslint/no-unused-vars
-import { PROGRAM_ID } from '../programId'
-
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
+import { TransactionInstruction, PublicKey, AccountMeta } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId"
+// UpdateDefaultPairDripFeesFields are raw anchor decoded values
+export interface UpdateDefaultPairDripFeesFields {
+  params: types.UpdateDefaultPairDripFeesParamsFields
+}
+// UpdateDefaultPairDripFeesArgs convert properties to type classes if available. This is used for converting to JSON
 export interface UpdateDefaultPairDripFeesArgs {
-    params: types.UpdateDefaultPairDripFeesParamsFields
+  params: types.UpdateDefaultPairDripFeesParams
+}
+
+export interface UpdateDefaultPairDripFeesFieldsJSON {
+  params: types.UpdateDefaultPairDripFeesParamsJSON
 }
 
 export interface UpdateDefaultPairDripFeesAccounts {
-    signer: PublicKey
-    pairConfig: PublicKey
-    globalConfig: PublicKey
+  signer: PublicKey
+  pairConfig: PublicKey
+  globalConfig: PublicKey
 }
 
-export const layout = borsh.struct([
-    types.UpdateDefaultPairDripFeesParams.layout('params'),
+export interface UpdateDefaultPairDripFeesAccountsJSON {
+  signer: string
+  pairConfig: string
+  globalConfig: string
+}
+
+const layout = borsh.struct([
+  types.UpdateDefaultPairDripFeesParams.layout("params"),
 ])
 
-export function updateDefaultPairDripFees(
-    args: UpdateDefaultPairDripFeesArgs,
-    accounts: UpdateDefaultPairDripFeesAccounts,
-    programId: PublicKey = PROGRAM_ID
-) {
-    const keys: Array<AccountMeta> = [
-        { pubkey: accounts.signer, isSigner: true, isWritable: false },
-        { pubkey: accounts.pairConfig, isSigner: false, isWritable: true },
-        { pubkey: accounts.globalConfig, isSigner: false, isWritable: false },
+export class UpdateDefaultPairDripFees {
+  static readonly ixName = "updateDefaultPairDripFees"
+  readonly identifier: Buffer
+  readonly keys: Array<AccountMeta>
+  readonly args: UpdateDefaultPairDripFeesArgs
+
+  constructor(
+    readonly fields: UpdateDefaultPairDripFeesFields,
+    readonly accounts: UpdateDefaultPairDripFeesAccounts,
+    readonly programId: PublicKey = PROGRAM_ID
+  ) {
+    this.identifier = Buffer.from([213, 197, 141, 244, 167, 253, 130, 190])
+    this.keys = [
+      { pubkey: this.accounts.signer, isSigner: true, isWritable: false },
+      { pubkey: this.accounts.pairConfig, isSigner: false, isWritable: true },
+      {
+        pubkey: this.accounts.globalConfig,
+        isSigner: false,
+        isWritable: false,
+      },
     ]
-    const identifier = Buffer.from([213, 197, 141, 244, 167, 253, 130, 190])
+    this.args = {
+      params: new types.UpdateDefaultPairDripFeesParams({ ...fields.params }),
+    }
+  }
+
+  static fromDecoded(
+    fields: UpdateDefaultPairDripFeesFields,
+    flattenedAccounts: PublicKey[]
+  ) {
+    const accounts = {
+      signer: flattenedAccounts[0],
+      pairConfig: flattenedAccounts[1],
+      globalConfig: flattenedAccounts[2],
+    }
+    return new UpdateDefaultPairDripFees(fields, accounts)
+  }
+
+  build() {
     const buffer = Buffer.alloc(1000)
     const len = layout.encode(
-        {
-            params: types.UpdateDefaultPairDripFeesParams.toEncodable(
-                args.params
-            ),
-        },
-        buffer
+      {
+        params: types.UpdateDefaultPairDripFeesParams.toEncodable(
+          this.fields.params
+        ),
+      },
+      buffer
     )
-    const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
-    const ix = new TransactionInstruction({ keys, programId, data })
+    const data = Buffer.concat([this.identifier, buffer]).slice(0, 8 + len)
+    const ix = new TransactionInstruction({
+      keys: this.keys,
+      programId: this.programId,
+      data,
+    })
     return ix
+  }
+
+  toArgsJSON(): UpdateDefaultPairDripFeesFieldsJSON {
+    return {
+      params: this.args.params.toJSON(),
+    }
+  }
+
+  toAccountsJSON(): UpdateDefaultPairDripFeesAccountsJSON {
+    return {
+      signer: this.accounts.signer.toString(),
+      pairConfig: this.accounts.pairConfig.toString(),
+      globalConfig: this.accounts.globalConfig.toString(),
+    }
+  }
 }

@@ -1,40 +1,61 @@
-export { initGlobalConfig } from './initGlobalConfig'
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
+export * from "./initGlobalConfig"
 export type {
-    InitGlobalConfigArgs,
-    InitGlobalConfigAccounts,
-} from './initGlobalConfig'
-export { initPairConfig } from './initPairConfig'
-export type { InitPairConfigAccounts } from './initPairConfig'
-export { updateSuperAdmin } from './updateSuperAdmin'
-export type { UpdateSuperAdminAccounts } from './updateSuperAdmin'
-export { updateAdmin } from './updateAdmin'
-export type { UpdateAdminArgs, UpdateAdminAccounts } from './updateAdmin'
-export { updateDefaultDripFees } from './updateDefaultDripFees'
+  InitGlobalConfigFields,
+  InitGlobalConfigAccounts,
+} from "./initGlobalConfig"
+export * from "./initPairConfig"
+export type { InitPairConfigAccounts } from "./initPairConfig"
+export * from "./updateSuperAdmin"
+export type { UpdateSuperAdminAccounts } from "./updateSuperAdmin"
+export * from "./updateAdmin"
+export type { UpdateAdminFields, UpdateAdminAccounts } from "./updateAdmin"
+export * from "./updateDefaultDripFees"
 export type {
-    UpdateDefaultDripFeesArgs,
-    UpdateDefaultDripFeesAccounts,
-} from './updateDefaultDripFees'
-export { updatePythPriceFeed } from './updatePythPriceFeed'
-export type { UpdatePythPriceFeedAccounts } from './updatePythPriceFeed'
-export { updateDefaultPairDripFees } from './updateDefaultPairDripFees'
+  UpdateDefaultDripFeesFields,
+  UpdateDefaultDripFeesAccounts,
+} from "./updateDefaultDripFees"
+export * from "./updatePythPriceFeed"
+export type { UpdatePythPriceFeedAccounts } from "./updatePythPriceFeed"
+export * from "./updateDefaultPairDripFees"
 export type {
-    UpdateDefaultPairDripFeesArgs,
-    UpdateDefaultPairDripFeesAccounts,
-} from './updateDefaultPairDripFees'
-export { withdrawFees } from './withdrawFees'
-export type { WithdrawFeesArgs, WithdrawFeesAccounts } from './withdrawFees'
-export { initDripPosition } from './initDripPosition'
+  UpdateDefaultPairDripFeesFields,
+  UpdateDefaultPairDripFeesAccounts,
+} from "./updateDefaultPairDripFees"
+export * from "./collectFees"
+export type { CollectFeesFields, CollectFeesAccounts } from "./collectFees"
+export * from "./initDripPosition"
 export type {
-    InitDripPositionArgs,
-    InitDripPositionAccounts,
-} from './initDripPosition'
-export { initDripPositionNft } from './initDripPositionNft'
-export type { InitDripPositionNftAccounts } from './initDripPositionNft'
-export { tokenizeDripPosition } from './tokenizeDripPosition'
-export type { TokenizeDripPositionAccounts } from './tokenizeDripPosition'
-export { detokenizeDripPosition } from './detokenizeDripPosition'
-export type { DetokenizeDripPositionAccounts } from './detokenizeDripPosition'
-export { toggleAutoCredit } from './toggleAutoCredit'
-export type { ToggleAutoCreditAccounts } from './toggleAutoCredit'
-export { deposit } from './deposit'
-export type { DepositArgs, DepositAccounts } from './deposit'
+  InitDripPositionFields,
+  InitDripPositionAccounts,
+} from "./initDripPosition"
+export * from "./initDripPositionNft"
+export type { InitDripPositionNftAccounts } from "./initDripPositionNft"
+export * from "./tokenizeDripPosition"
+export type { TokenizeDripPositionAccounts } from "./tokenizeDripPosition"
+export * from "./detokenizeDripPosition"
+export type { DetokenizeDripPositionAccounts } from "./detokenizeDripPosition"
+export * from "./toggleAutoCredit"
+export type { ToggleAutoCreditAccounts } from "./toggleAutoCredit"
+export * from "./deposit"
+export type { DepositFields, DepositAccounts } from "./deposit"
+export * from "./withdraw"
+export type { WithdrawFields, WithdrawAccounts } from "./withdraw"
+
+export enum DripV2InstructionNames {
+  initGlobalConfig = "initGlobalConfig",
+  initPairConfig = "initPairConfig",
+  updateSuperAdmin = "updateSuperAdmin",
+  updateAdmin = "updateAdmin",
+  updateDefaultDripFees = "updateDefaultDripFees",
+  updatePythPriceFeed = "updatePythPriceFeed",
+  updateDefaultPairDripFees = "updateDefaultPairDripFees",
+  collectFees = "collectFees",
+  initDripPosition = "initDripPosition",
+  initDripPositionNft = "initDripPositionNft",
+  tokenizeDripPosition = "tokenizeDripPosition",
+  detokenizeDripPosition = "detokenizeDripPosition",
+  toggleAutoCredit = "toggleAutoCredit",
+  deposit = "deposit",
+  withdraw = "withdraw",
+}

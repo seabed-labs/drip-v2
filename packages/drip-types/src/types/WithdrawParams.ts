@@ -1,11 +1,12 @@
+// This file was automatically generated. DO NOT MODIFY DIRECTLY.
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from 'bn.js' // eslint-disable-line @typescript-eslint/no-unused-vars
 // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from '@coral-xyz/borsh'
 
 export interface WithdrawParamsFields {
-    withdrawInputAmount: BN
-    withdrawOutputAmount: BN
+    withdrawInputAmount: bigint
+    withdrawOutputAmount: bigint
 }
 
 export interface WithdrawParamsJSON {
@@ -14,8 +15,8 @@ export interface WithdrawParamsJSON {
 }
 
 export class WithdrawParams {
-    readonly withdrawInputAmount: BN
-    readonly withdrawOutputAmount: BN
+    readonly withdrawInputAmount: bigint
+    readonly withdrawOutputAmount: bigint
 
     constructor(fields: WithdrawParamsFields) {
         this.withdrawInputAmount = fields.withdrawInputAmount
@@ -42,8 +43,10 @@ export class WithdrawParams {
 
     static toEncodable(fields: WithdrawParamsFields) {
         return {
-            withdrawInputAmount: fields.withdrawInputAmount,
-            withdrawOutputAmount: fields.withdrawOutputAmount,
+            withdrawInputAmount: new BN(fields.withdrawInputAmount.toString()),
+            withdrawOutputAmount: new BN(
+                fields.withdrawOutputAmount.toString()
+            ),
         }
     }
 
@@ -56,8 +59,8 @@ export class WithdrawParams {
 
     static fromJSON(obj: WithdrawParamsJSON): WithdrawParams {
         return new WithdrawParams({
-            withdrawInputAmount: new BN(obj.withdrawInputAmount),
-            withdrawOutputAmount: new BN(obj.withdrawOutputAmount),
+            withdrawInputAmount: BigInt(obj.withdrawInputAmount),
+            withdrawOutputAmount: BigInt(obj.withdrawOutputAmount),
         })
     }
 
