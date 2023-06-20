@@ -128,3 +128,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# generated files
+src/accounts/*.ts
+src/errors/*.ts
+src/instructions/*.ts
+src/types/*.ts
+src/drip_v2.ts
+!/src/**/.gitkeep
