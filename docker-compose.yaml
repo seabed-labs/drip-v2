@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+    postgres:
+        image: postgres:14.6-alpine
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_USER=docker
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_DB=micro
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -d micro -U docker']
+            interval: 5s
+            timeout: 5s
+            retries: 3
+
+    redis:
+        image: redis:7.0-alpine
+        ports:
+            - 6379:6379
+        command: redis-server --requirepass docker
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            timeout: 5s
+            retries: 3
+
+    rabbitmq:
+        image: rabbitmq:3.9-management
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        environment:
+            RABBITMQ_DEFAULT_USER: docker
+            RABBITMQ_DEFAULT_PASS: docker
+        healthcheck:
+            test: ['CMD', 'rabbitmq-diagnostics -q ping']
+            interval: 5s
+            timeout: 5s
+            retries: 3
+
+    solana:
+        build:
+            context: .
+            dockerfile: ./build/solana.dockerfile
+            args:
+                SOLANA_CLI: v1.14.17
+                ANCHOR_CLI: v0.27.0
+        ports:
+            - '8899:8899'
+            - '8900:8900'
+            - '9900:9900'
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', 'http://localhost:8899/health || exit 1']
+            interval: 5s
+            timeout: 5s
+            retries: 3
+
+    # drip-api:
+    #     image: rabbitmq:3.9-management
+
+    # drip-fetcher:
+    #     image: rabbitmq:3.9-management
+
+networks:
+    default:
+        name: local
