@@ -17,36 +17,38 @@ type transactionConsumerQueueInterface interface {
 
 type transactionConsumerTranslatorInterface interface{}
 
-type consumer struct {
+type transactionConsumer struct {
 	doneC      chan struct{}
 	log        *zap.Logger
 	name       string
 	qName      app.Queue
 	queue      transactionConsumerQueueInterface
 	translator transactionConsumerTranslatorInterface
-	client     fetcher.ClientInterface
+	fetcher    fetcher.ClientInterface
 }
 
 func NewTransactionConsumer(
 	queue transactionConsumerQueueInterface,
 	translator transactionConsumerTranslatorInterface,
-	client fetcher.ClientInterface,
-) *consumer {
+	fetcher fetcher.ClientInterface,
+) *transactionConsumer {
 	qName := app.TransactionQueue
 	name := fmt.Sprintf("%s_consumer", qName)
 
-	return &consumer{
+	return &transactionConsumer{
 		doneC:      make(chan struct{}),
 		log:        logger.NewZapLogger(name),
 		name:       name,
 		qName:      qName,
 		queue:      queue,
 		translator: translator,
-		client:     client,
+		fetcher:    fetcher,
 	}
 }
 
-func (c *consumer) Run() error {
+func (c *transactionConsumer) Run() error {
+	ctx := context.Background()
+
 	msgs, err := c.queue.Consume(c.qName, c.name)
 	if err != nil {
 		c.log.Error(
@@ -64,21 +66,31 @@ func (c *consumer) Run() error {
 		case <-c.doneC:
 			return nil
 		case msg := <-msgs:
-			c.log.Info(
+			c.log.Debug(
 				"received message",
 				zap.String("queue name", string(c.qName)),
 				zap.String("consumer name", c.name),
 				zap.String("message", string(msg.Body)),
 			)
+
+			_, err := c.fetcher.GetTransaction(ctx, app.TransactionSignature(string(msg.Body)))
+			if err != nil {
+				c.log.Error(
+					"failed to get transaction",
+					zap.Error(err),
+				)
+			}
+
+			//c.translator.CreateTransaction(tx)
 		}
 	}
 }
 
-func (c *consumer) Stop(ctx context.Context) error {
+func (c *transactionConsumer) Stop(ctx context.Context) error {
 	c.doneC <- struct{}{}
 	return nil
 }
 
-func (c *consumer) Name() string {
+func (c *transactionConsumer) Name() string {
 	return c.name
 }

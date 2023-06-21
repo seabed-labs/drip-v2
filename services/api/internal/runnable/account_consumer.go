@@ -24,13 +24,13 @@ type accountConsumer struct {
 	qName      app.Queue
 	queue      accountConsumerQueueInterface
 	translator accountConsumerTranslatorInterface
-	client     fetcher.ClientInterface
+	fetcher    fetcher.ClientInterface
 }
 
 func NewAccountConsumer(
 	queue accountConsumerQueueInterface,
 	translator accountConsumerTranslatorInterface,
-	client fetcher.ClientInterface,
+	fetcher fetcher.ClientInterface,
 ) *accountConsumer {
 	qName := app.AccountQueue
 	name := fmt.Sprintf("%s_consumer", qName)
@@ -42,11 +42,13 @@ func NewAccountConsumer(
 		qName:      qName,
 		queue:      queue,
 		translator: translator,
-		client:     client,
+		fetcher:    fetcher,
 	}
 }
 
 func (c *accountConsumer) Run() error {
+	ctx := context.Background()
+
 	msgs, err := c.queue.Consume(c.qName, c.name)
 	if err != nil {
 		c.log.Error(
@@ -70,6 +72,16 @@ func (c *accountConsumer) Run() error {
 				zap.String("consumer name", c.name),
 				zap.String("message", string(msg.Body)),
 			)
+
+			_, err := c.fetcher.GetAccount(ctx, app.AccountPublicKey(string(msg.Body)))
+			if err != nil {
+				c.log.Error(
+					"failed to get account",
+					zap.Error(err),
+				)
+			}
+
+			//c.translator.CreateAccount(acc)
 		}
 	}
 }

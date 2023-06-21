@@ -16,3 +16,7 @@ rabbitmq:
   port: 5672
   user: "docker"
   password: "docker"
+
+fetcher:
+  host: "localhost"
+  port: 3000

@@ -58,7 +58,11 @@ func main() {
 	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
-	f := fetcher.NewClient()
+	f := fetcher.NewClient(
+		viper.GetString("fetcher.host"),
+		viper.GetInt64("fetcher.port"),
+	)
+
 	a := app.NewApp(t, jup, rc, rq)
 
 	runnable.NewRunner(

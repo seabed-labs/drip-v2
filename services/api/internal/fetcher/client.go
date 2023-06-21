@@ -13,7 +13,10 @@ import (
 	"go.uber.org/zap"
 )
 
-type ClientInterface interface{}
+type ClientInterface interface {
+	GetAccount(ctx context.Context, publicKey app.AccountPublicKey) ([]string, error)
+	GetTransaction(ctx context.Context, signature app.TransactionSignature) ([]string, error)
+}
 
 type client struct {
 	log    *zap.Logger
@@ -21,10 +24,10 @@ type client struct {
 	client *http.Client
 }
 
-func NewClient() *client {
+func NewClient(host string, port int64) *client {
 	return &client{
 		log:    logger.NewZapLogger("fetcher_client"),
-		base:   "/fetch", // TODO: add base url
+		base:   fmt.Sprintf("http://%s:%d", host, port),
 		client: http.DefaultClient,
 	}
 }

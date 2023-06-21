@@ -54,12 +54,12 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 	)
 
 	address := fmt.Sprintf("amqp://%s:%s@%s:%d", o.user, o.password, host, port)
-
 	conn, err := amqp.Dial(address)
 	if err != nil {
 		log.Fatal(
 			"failed to connect to rabbitMQ",
-			zap.String("address", address),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
@@ -68,7 +68,8 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 	if err != nil {
 		log.Fatal(
 			"failed to open rabbitMQ channel",
-			zap.String("address", address),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
