@@ -1,8 +1,10 @@
 package app
 
+type Queue string
+
 const (
-	QueueTransaction = "transaction"
-	QueueAccount     = "account"
+	TransactionQueue Queue = "transaction"
+	AccountQueue     Queue = "account"
 )
 
 type (

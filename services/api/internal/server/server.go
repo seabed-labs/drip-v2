@@ -29,7 +29,8 @@ func NewHTTPServer(listenAddress int, handler http.Handler) *httpServer {
 			Handler: http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
 					mux.ServeHTTP(w, r)
-				}),
+				},
+			),
 		},
 		log:               log,
 		httpListenAddress: httpListenAddress,

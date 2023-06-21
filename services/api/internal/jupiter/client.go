@@ -17,21 +17,21 @@ type ClientInterface interface {
 }
 
 type client struct {
-	log     *zap.Logger
-	address string
-	client  *http.Client
+	log    *zap.Logger
+	base   string
+	client *http.Client
 }
 
 func NewClient() *client {
 	return &client{
-		log:     logger.NewZapLogger("jupiter_client"),
-		address: "https://token.jup.ag",
-		client:  http.DefaultClient,
+		log:    logger.NewZapLogger("jupiter_client"),
+		base:   "https://token.jup.ag",
+		client: http.DefaultClient,
 	}
 }
 
 func (c *client) GetTokens(ctx context.Context) ([]*Token, error) {
-	url := fmt.Sprintf("%s/all", c.address)
+	url := fmt.Sprintf("%s/all", c.base)
 	resp, err := c.do(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err

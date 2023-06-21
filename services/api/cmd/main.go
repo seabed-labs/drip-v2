@@ -6,6 +6,7 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/config"
+	"github.com/dcaf-labs/drip-v2/services/api/internal/fetcher"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/handler"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
@@ -32,9 +33,9 @@ func main() {
 	)
 	defer t.Close()
 
-	if err := t.Migrate("./modeler/migrations"); err != nil {
+	if err := t.MigrateUp("./modeler/migrations"); err != nil {
 		log.Fatal(
-			"failed to migrate",
+			"failed to migrate up",
 			zap.Error(err),
 		)
 	}
@@ -54,17 +55,16 @@ func main() {
 	)
 	defer rq.Close()
 
-	rq.DeclareQueue(app.QueueAccount, app.QueueTransaction)
+	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
-	app := app.NewApp(t, jup, rc, rq)
-
-	h := handler.NewHandler(app)
+	f := fetcher.NewClient()
+	a := app.NewApp(t, jup, rc, rq)
 
 	runnable.NewRunner(
-		server.NewHTTPServer(20000, h),
+		server.NewHTTPServer(20000, handler.NewHandler(a)),
 		runnable.NewTokenCacheSyncer(rc, jup),
-		runnable.NewTransactionFetcher(rq, t),
-		runnable.NewAccountFetcher(rq, t),
+		runnable.NewAccountConsumer(rq, t, f),
+		runnable.NewTransactionConsumer(rq, t, f),
 	).Run().ThenStop()
 }
