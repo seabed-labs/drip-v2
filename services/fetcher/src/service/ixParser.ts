@@ -63,7 +63,7 @@ export function tryDecodeIx(
         try {
             return decodeIxToParsedDripIx(tx, ix)
         } catch (e) {
-            if ((e as RestError).statusCode >= 500) {
+            if ((e as RestError).status >= 500) {
                 throw e
             }
         }
@@ -301,8 +301,10 @@ export function getAccountMetas(
     ix: CompiledInstruction
 ): AccountMetaWithIndex[] {
     return ix.accounts.map((accountIndx) => {
+        const pubkey = message.getAccountKeys().get(accountIndx)
+        assert(pubkey, RestError.internal('unexpected missing account'))
         return {
-            pubkey: message.getAccountKeys().get(accountIndx)!,
+            pubkey,
             isSigner: message.isAccountSigner(accountIndx),
             isWritable: message.isAccountWritable(accountIndx),
             accountIndex: accountIndx,

@@ -9,18 +9,9 @@ import {
 import { Address, translateAddress } from '@coral-xyz/anchor'
 import { PROGRAM_ID } from '@dcaf/drip-types'
 import { RestError } from './types'
+import { getErrMessage } from './common'
 
 const MAX_SUPPORTED_TRANSACTION_VERSION = 0
-
-function getInvalidOwnerError(
-    account: string,
-    owner: string,
-    expectedOwner: string
-): RestError {
-    return RestError.invalid(
-        `account ${account} was expected to be owned by ${expectedOwner} but it is owned by ${owner}`
-    )
-}
 
 export class Connection extends Web3Conn {
     private readonly rpcUrl: string
@@ -37,18 +28,22 @@ export class Connection extends Web3Conn {
         commitment: Commitment = 'finalized',
         owner: PublicKey = PROGRAM_ID
     ): Promise<AccountInfo<Buffer>> {
-        const accountInfo = await this.getAccountInfo(
-            translateAddress(address),
-            commitment
-        )
+        let accountInfo: AccountInfo<Buffer> | null
+        try {
+            accountInfo = await this.getAccountInfo(
+                translateAddress(address),
+                commitment
+            )
+        } catch (e) {
+            console.error(e)
+            throw RestError.invalid(getErrMessage(e))
+        }
         if (!accountInfo) {
             throw RestError.notFound(`account ${address.toString()} not found`)
         }
         if (accountInfo.owner.toString() !== owner.toString()) {
-            throw getInvalidOwnerError(
-                address.toString(),
-                accountInfo.owner.toString(),
-                owner.toString()
+            throw RestError.invalid(
+                `account ${address.toString()} was expected to be owned by ${accountInfo.owner.toString()} but it is owned by ${owner.toString()}`
             )
         }
         return accountInfo
@@ -58,10 +53,17 @@ export class Connection extends Web3Conn {
         signature: string,
         commitment: Finality = 'finalized'
     ): Promise<VersionedTransactionResponse> {
-        const tx = await this.getTransaction(signature, {
-            commitment,
-            maxSupportedTransactionVersion: MAX_SUPPORTED_TRANSACTION_VERSION,
-        })
+        let tx: VersionedTransactionResponse | null
+        try {
+            tx = await this.getTransaction(signature, {
+                commitment,
+                maxSupportedTransactionVersion:
+                    MAX_SUPPORTED_TRANSACTION_VERSION,
+            })
+        } catch (e) {
+            console.error(e)
+            throw RestError.invalid(getErrMessage(e))
+        }
         if (!tx) {
             throw RestError.notFound(
                 `signature ${signature.toString()} not found`

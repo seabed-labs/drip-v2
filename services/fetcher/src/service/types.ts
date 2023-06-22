@@ -33,8 +33,8 @@ import {
 ////////////////////////////////////////////////////////////////
 
 export class RestError extends Error {
-    constructor(readonly statusCode: number, readonly message: string) {
-        super(`${statusCode}: ${message ?? ''}`)
+    constructor(readonly status: number, readonly message: string) {
+        super(`${status}: ${message ?? ''}`)
     }
 
     static invalid(message: string): RestError {
@@ -51,6 +51,13 @@ export class RestError extends Error {
 
     static internal(message: string): RestError {
         return new RestError(500, message)
+    }
+
+    toJSON() {
+        return {
+            status: this.status,
+            message: this.message,
+        }
     }
 }
 

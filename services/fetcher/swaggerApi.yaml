@@ -606,21 +606,15 @@ components:
             type: object
         RestError:
             properties:
-                name:
-                    type: string
                 message:
                     type: string
-                stack:
-                    type: string
-                statusCode:
+                status:
                     type: number
                     format: double
             required:
-                - name
                 - message
-                - statusCode
+                - status
             type: object
-            additionalProperties: false
         Commitment:
             type: string
             enum:
