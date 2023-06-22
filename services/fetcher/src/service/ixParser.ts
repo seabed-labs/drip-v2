@@ -255,7 +255,7 @@ function parseUpdateAdmin(
     return {
         name: DripV2InstructionNames.updateAdmin,
         accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON() as any,
+        data: parsedIx.toArgsJSON(),
     }
 }
 

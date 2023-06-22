@@ -13,7 +13,7 @@ import {
 } from '../service/accountParser'
 import { programId } from '../service/programId'
 import { PublicKey } from '@solana/web3.js'
-import { DefinedRestError } from 'restify-errors'
+import { HttpError } from 'restify-errors'
 import { tryDecodeIx } from '../service/ixParser'
 
 @Route('fetch')
@@ -49,7 +49,9 @@ export class FetchController extends Controller {
                 })
             })
         } catch (err) {
-            if (err instanceof DefinedRestError) {
+            // TODO(mocha): better logger
+            console.error(err)
+            if (err instanceof HttpError) {
                 this.setStatus(err.statusCode)
             } else {
                 this.setStatus(500)
@@ -57,9 +59,12 @@ export class FetchController extends Controller {
             return {
                 ...getServerResponseCommon(),
                 error:
-                    err instanceof Error
-                        ? err
-                        : new Error('failed to get or parse tx'),
+                    err && typeof err === 'object'
+                        ? {
+                              ...err,
+                              message: err.toString(),
+                          }
+                        : err,
             }
         }
 
@@ -88,7 +93,9 @@ export class FetchController extends Controller {
             )
             parsedAccount = tryDecodeToParsedDripAccount(accountInfo.data)
         } catch (err) {
-            if (err instanceof DefinedRestError) {
+            // TODO(mocha): better logger
+            console.error(err)
+            if (err instanceof HttpError) {
                 this.setStatus(err.statusCode)
             } else {
                 this.setStatus(500)
@@ -96,9 +103,12 @@ export class FetchController extends Controller {
             return {
                 ...getServerResponseCommon(),
                 error:
-                    err instanceof Error
-                        ? err
-                        : new Error('failed to get or parse account info'),
+                    err && typeof err === 'object'
+                        ? {
+                              ...err,
+                              message: err.toString(),
+                          }
+                        : err,
             }
         }
         this.setStatus(200)

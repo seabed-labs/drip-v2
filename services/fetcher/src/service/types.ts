@@ -69,60 +69,51 @@ export type Commitment = 'confirmed' | 'finalized'
 // Responses
 ////////////////////////////////////////////////////////////////
 
-export type PingResponse = ResponseCommon<
-    {
-        message: string
-    },
-    Error
->
+export type PingResponse = ResponseCommon<{
+    message: string
+}>
 
-export type ParsedAccountResponse = ResponseCommon<
-    {
-        publicKey: string
-        name:
-            | 'DripPosition'
-            | 'DripPositionNftMapping'
-            | 'DripPositionSigner'
-            | 'GlobalConfig'
-            | 'GlobalConfigSigner'
-            | 'PairConfig'
-        account:
-            | DripPositionJSON
-            | DripPositionNftMappingJSON
-            | DripPositionSignerJSON
-            | GlobalConfigJSON
-            | GlobalConfigSignerJSON
-            | PairConfigJSON
-    },
-    Error
->
+export type ParsedAccountResponse = ResponseCommon<{
+    publicKey: string
+    name:
+        | 'DripPosition'
+        | 'DripPositionNftMapping'
+        | 'DripPositionSigner'
+        | 'GlobalConfig'
+        | 'GlobalConfigSigner'
+        | 'PairConfig'
+    account:
+        | DripPositionJSON
+        | DripPositionNftMappingJSON
+        | DripPositionSignerJSON
+        | GlobalConfigJSON
+        | GlobalConfigSignerJSON
+        | PairConfigJSON
+}>
 
-export type ParsedTxResponse = ResponseCommon<
-    {
-        signature: string
-        instructions: {
-            index: number
-            /* Undefined represents an ix we are unable to parse at this time*/
-            parsedIx?: ParsedDripIx
-        }[]
-    },
-    Error
->
+export type ParsedTxResponse = ResponseCommon<{
+    signature: string
+    instructions: {
+        index: number
+        /* Undefined represents an ix we are unable to parse at this time*/
+        parsedIx?: ParsedDripIx
+    }[]
+}>
 
 ////////////////////////////////////////////////////////////////
 // Misc
 ////////////////////////////////////////////////////////////////
 
-export type ResponseCommon<T extends object, E extends Error> =
+export type ResponseCommon<T extends object> =
     | {
           serverTimestamp: number
           data: T
-          error?: E
+          error?: unknown
       }
     | {
           serverTimestamp: number
           data?: T
-          error: E
+          error: unknown
       }
 
 export type ParsedIx<A, T = undefined> = {
@@ -184,7 +175,7 @@ export type ParsedUpdateAdmin = ParsedIxWithMetadata<
     UpdateAdminAccountsJSON,
     DripV2InstructionNames.updateAdmin,
     // Note: openapi does not have support for tuples!
-    Record<string, unknown>
+    unknown
 >
 
 export type ParsedUpdateDefaultDripFees = ParsedIxWithMetadata<
