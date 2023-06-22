@@ -7,11 +7,14 @@ process.on('SIGINT', () => {
 });
 
 localnet.stdout.on('data', (data) => {
-  console.log(`${data}`);
+  const logData = `${data}`
+  if (logData && !logData.includes("Processed Slot")) {
+    console.log(logData)
+  }
 });
 
 localnet.stderr.on('data', (data) => {
-  console.error(`stderr: ${data}`);
+  console.error(`${data}`);
 });
 
 localnet.on('close', (code) => {

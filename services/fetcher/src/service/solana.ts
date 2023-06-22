@@ -17,7 +17,7 @@ export class Connection extends Web3Conn {
     private readonly rpcUrl: string
     constructor() {
         const rpcUrl =
-            process.env.fetcher_RPC_URL ||
+            process.env.FETCHER_RPC_URL ||
             'https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e'
         super(rpcUrl, 'finalized')
         this.rpcUrl = rpcUrl
@@ -35,7 +35,6 @@ export class Connection extends Web3Conn {
                 commitment
             )
         } catch (e) {
-            console.error(e)
             throw RestError.invalid(getErrMessage(e))
         }
         if (!accountInfo) {

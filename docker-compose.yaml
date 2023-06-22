@@ -60,8 +60,20 @@ services:
     # drip-api:
     #     image: rabbitmq:3.9-management
 
-    # drip-fetcher:
-    #     image: rabbitmq:3.9-management
+    drip-fetcher:
+        build:
+            context: .
+            dockerfile: ./build/fetcher.dockerfile
+        ports:
+            - '3000:3000'
+        environment:
+            PORT: 3000
+            FETCHER_RPC_URL: "http://solana:8899"
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', 'http://localhost:3000/ || exit 1']
+            interval: 5s
+            timeout: 5s
+            retries: 3
 
 networks:
     default:
