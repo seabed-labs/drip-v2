@@ -27,35 +27,30 @@ import {
     UpdatePythPriceFeedAccountsJSON,
     UpdateSuperAdminAccountsJSON,
 } from '../generated/anchor/instructions'
-import * as RestErrors from 'restify-errors'
 
 ////////////////////////////////////////////////////////////////
 // Errors
 ////////////////////////////////////////////////////////////////
 
-export class InvalidAccountError extends RestErrors.UnprocessableEntityError {
-    constructor(discriminator: Buffer) {
-        super(`unknown discriminator ${discriminator.toString('hex')}`)
+export class RestError extends Error {
+    constructor(readonly statusCode: number, readonly message: string) {
+        super(`${statusCode}: ${message ?? ''}`)
     }
-}
 
-export class InvalidOwnerError extends RestErrors.InvalidArgumentError {
-    constructor(account: string, owner: string, expectedOwner: string) {
-        super(
-            `account ${account} was expected to be owned by ${expectedOwner} but it is owned by ${owner}`
-        )
+    static invalid(message: string): RestError {
+        return new RestError(400, message)
     }
-}
 
-export class RpcNotFoundError extends RestErrors.NotFoundError {
-    constructor(identifier: string) {
-        super(`account or tx identified by ${identifier} was not found`)
+    static notFound(message: string): RestError {
+        return new RestError(404, message)
     }
-}
 
-export class FailedToDecodeError extends RestErrors.InternalServerError {
-    constructor() {
-        super(`failed to decode ix`)
+    static unprocessable(message: string): RestError {
+        return new RestError(422, message)
+    }
+
+    static internal(message: string): RestError {
+        return new RestError(500, message)
     }
 }
 
@@ -69,11 +64,11 @@ export type Commitment = 'confirmed' | 'finalized'
 // Responses
 ////////////////////////////////////////////////////////////////
 
-export type PingResponse = ResponseCommon<{
+export type PingResponse = {
     message: string
-}>
+}
 
-export type ParsedAccountResponse = ResponseCommon<{
+export type ParsedAccountResponse = {
     publicKey: string
     name:
         | 'DripPosition'
@@ -89,116 +84,93 @@ export type ParsedAccountResponse = ResponseCommon<{
         | GlobalConfigJSON
         | GlobalConfigSignerJSON
         | PairConfigJSON
-}>
+}
 
-export type ParsedTxResponse = ResponseCommon<{
+export type ParsedTxResponse = {
     signature: string
     instructions: {
         index: number
         /* Undefined represents an ix we are unable to parse at this time*/
         parsedIx?: ParsedDripIx
     }[]
-}>
+}
 
 ////////////////////////////////////////////////////////////////
 // Misc
 ////////////////////////////////////////////////////////////////
 
-export type ResponseCommon<T extends object> =
-    | {
-          serverTimestamp: number
-          data: T
-          error?: unknown
-      }
-    | {
-          serverTimestamp: number
-          data?: T
-          error: unknown
-      }
-
-export type ParsedIx<A, T = undefined> = {
-    accounts: A
-    data: T
+export type ParsedDeposit = {
+    name: DripV2InstructionNames.deposit
+    accounts: DepositAccountsJSON
+    data: DepositFieldsJSON
 }
 
-export type ParsedIxWithMetadata<A, N extends string, T = undefined> = ParsedIx<
-    A,
-    T
-> & {
-    name: N
+export type ParsedDetokenizeDripPosition = {
+    name: DripV2InstructionNames.detokenizeDripPosition
+    accounts: DetokenizeDripPositionAccountsJSON
 }
 
-export type ParsedDeposit = ParsedIxWithMetadata<
-    DepositAccountsJSON,
-    DripV2InstructionNames.deposit,
-    DepositFieldsJSON
->
+export type ParsedInitDripPosition = {
+    name: DripV2InstructionNames.initDripPosition
+    accounts: InitDripPositionAccountsJSON
+    data: InitDripPositionFieldsJSON
+}
 
-export type ParsedDetokenizeDripPosition = ParsedIxWithMetadata<
-    DetokenizeDripPositionAccountsJSON,
-    DripV2InstructionNames.detokenizeDripPosition
->
+export type ParsedInitDripPositionNft = {
+    name: DripV2InstructionNames.initDripPositionNft
+    accounts: InitDripPositionNftAccountsJSON
+}
 
-export type ParsedInitDripPosition = ParsedIxWithMetadata<
-    InitDripPositionAccountsJSON,
-    DripV2InstructionNames.initDripPosition,
-    InitDripPositionFieldsJSON
->
+export type ParsedInitGlobalConfig = {
+    name: DripV2InstructionNames.initGlobalConfig
+    accounts: InitGlobalConfigAccountsJSON
+    data: InitGlobalConfigFieldsJSON
+}
 
-export type ParsedInitDripPositionNft = ParsedIxWithMetadata<
-    InitDripPositionNftAccountsJSON,
-    DripV2InstructionNames.initDripPositionNft
->
+export type ParsedInitPairConfig = {
+    name: DripV2InstructionNames.initPairConfig
+    accounts: InitPairConfigAccountsJSON
+}
 
-export type ParsedInitGlobalConfig = ParsedIxWithMetadata<
-    InitGlobalConfigAccountsJSON,
-    DripV2InstructionNames.initGlobalConfig,
-    InitGlobalConfigFieldsJSON
->
+export type ParsedToggleAutoCredit = {
+    name: DripV2InstructionNames.toggleAutoCredit
+    accounts: ToggleAutoCreditAccountsJSON
+}
 
-export type ParsedInitPairConfig = ParsedIxWithMetadata<
-    InitPairConfigAccountsJSON,
-    DripV2InstructionNames.initPairConfig
->
+export type ParsedTokenizeDripPosition = {
+    name: DripV2InstructionNames.tokenizeDripPosition
+    accounts: TokenizeDripPositionAccountsJSON
+}
 
-export type ParsedToggleAutoCredit = ParsedIxWithMetadata<
-    ToggleAutoCreditAccountsJSON,
-    DripV2InstructionNames.toggleAutoCredit
->
-
-export type ParsedTokenizeDripPosition = ParsedIxWithMetadata<
-    TokenizeDripPositionAccountsJSON,
-    DripV2InstructionNames.tokenizeDripPosition
->
-
-export type ParsedUpdateAdmin = ParsedIxWithMetadata<
-    UpdateAdminAccountsJSON,
-    DripV2InstructionNames.updateAdmin,
+export type ParsedUpdateAdmin = {
+    name: DripV2InstructionNames.updateAdmin
+    accounts: UpdateAdminAccountsJSON
     // Note: openapi does not have support for tuples!
-    unknown
->
+    data: unknown
+}
 
-export type ParsedUpdateDefaultDripFees = ParsedIxWithMetadata<
-    UpdateDefaultDripFeesAccountsJSON,
-    DripV2InstructionNames.updateDefaultDripFees,
-    UpdateDefaultDripFeesFieldsJSON
->
+export type ParsedUpdateDefaultDripFees = {
+    name: DripV2InstructionNames.updateDefaultDripFees
+    accounts: UpdateDefaultDripFeesAccountsJSON
+    data: UpdateDefaultDripFeesFieldsJSON
+}
 
-export type ParsedUpdateDefaultPairDripFees = ParsedIxWithMetadata<
-    UpdateDefaultPairDripFeesAccountsJSON,
-    DripV2InstructionNames.updateDefaultPairDripFees,
-    UpdateDefaultPairDripFeesFieldsJSON
->
+export type ParsedUpdateDefaultPairDripFees = {
+    name: DripV2InstructionNames.updateDefaultPairDripFees
 
-export type ParsedUpdatePythPriceFeed = ParsedIxWithMetadata<
-    UpdatePythPriceFeedAccountsJSON,
-    DripV2InstructionNames.updatePythPriceFeed
->
+    accounts: UpdateDefaultPairDripFeesAccountsJSON
+    data: UpdateDefaultPairDripFeesFieldsJSON
+}
 
-export type ParsedUpdateSuperAdmin = ParsedIxWithMetadata<
-    UpdateSuperAdminAccountsJSON,
-    DripV2InstructionNames.updateSuperAdmin
->
+export type ParsedUpdatePythPriceFeed = {
+    name: DripV2InstructionNames.updatePythPriceFeed
+    accounts: UpdatePythPriceFeedAccountsJSON
+}
+
+export type ParsedUpdateSuperAdmin = {
+    name: DripV2InstructionNames.updateSuperAdmin
+    accounts: UpdateSuperAdminAccountsJSON
+}
 
 export type ParsedDripIx =
     | ParsedDeposit

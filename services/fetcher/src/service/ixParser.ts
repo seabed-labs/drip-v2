@@ -9,9 +9,7 @@ import {
     VersionedMessage,
     VersionedTransactionResponse,
 } from '@solana/web3.js'
-import * as RestErrors from 'restify-errors'
 import {
-    FailedToDecodeError,
     ParsedDeposit,
     ParsedDetokenizeDripPosition,
     ParsedDripIx,
@@ -26,6 +24,7 @@ import {
     ParsedUpdateDefaultPairDripFees,
     ParsedUpdatePythPriceFeed,
     ParsedUpdateSuperAdmin,
+    RestError,
 } from './types'
 import {
     DepositFields,
@@ -61,12 +60,18 @@ export function tryDecodeIx(
 ): Omit<ParsedDripIx, 'index'> | undefined {
     const ixProgram = accountKeys.get(ix.programIdIndex)
     if (ixProgram?.toString() === programId) {
-        return tryDecodeIxToParsedDripIx(tx, ix)
+        try {
+            return decodeIxToParsedDripIx(tx, ix)
+        } catch (e) {
+            if ((e as RestError).statusCode >= 500) {
+                throw e
+            }
+        }
     }
     return undefined
 }
 
-export function tryDecodeIxToParsedDripIx(
+export function decodeIxToParsedDripIx(
     tx: VersionedTransactionResponse,
     ix: MessageCompiledInstruction
 ): Omit<ParsedDripIx, 'index'> {
@@ -75,16 +80,14 @@ export function tryDecodeIxToParsedDripIx(
         'base58'
     )
     if (!decodedIx) {
-        throw new FailedToDecodeError()
+        throw RestError.internal(`failed to decode ix`)
     }
     const ixName = decodedIx.name as DripV2InstructionNames
     const accounts = ix.accountKeyIndexes.map((accountIndx) => {
         const pubKey = tx.transaction.message.getAccountKeys().get(accountIndx)
         assert(
             pubKey,
-            new RestErrors.InternalServerError(
-                'unexpected missing account while processing ix'
-            )
+            RestError.internal('unexpected missing account while processing ix')
         )
         return pubKey
     })
@@ -119,12 +122,10 @@ export function tryDecodeIxToParsedDripIx(
         default:
             if (decodedIx.name in DripV2InstructionNames) {
                 // TODO(mocha): update anchor-client-codegen so that this can be caught at compile time
-                throw new RestErrors.InternalError(`unhandled drip`)
+                throw RestError.internal(`unhandled drip`)
             }
     }
-    throw new RestErrors.InvalidArgumentError(
-        `invalid ix passed to tryDecodeToParsedDripIx`
-    )
+    throw RestError.invalid(`invalid ix passed to tryDecodeToParsedDripIx`)
 }
 
 function parseDeposit(
@@ -147,7 +148,6 @@ function parseToggleAutoCredit(
     return {
         name: DripV2InstructionNames.toggleAutoCredit,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -159,7 +159,6 @@ function parseDetokenizeDripPosition(
     return {
         name: DripV2InstructionNames.detokenizeDripPosition,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -171,7 +170,6 @@ function parseTokenizeDripPosition(
     return {
         name: DripV2InstructionNames.tokenizeDripPosition,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -183,7 +181,6 @@ function parseInitDripPositionNft(
     return {
         name: DripV2InstructionNames.initDripPositionNft,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -225,7 +222,6 @@ function parseUpdatePythPriceFeed(
     return {
         name: DripV2InstructionNames.updatePythPriceFeed,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -267,7 +263,6 @@ function parseUpdateSuperAdmin(
     return {
         name: DripV2InstructionNames.updateSuperAdmin,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 
@@ -279,7 +274,6 @@ function parseInitPairConfig(
     return {
         name: DripV2InstructionNames.initPairConfig,
         accounts: parsedIx.toAccountsJSON(),
-        data: undefined,
     }
 }
 

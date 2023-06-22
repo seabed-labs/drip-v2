@@ -8,9 +8,20 @@ import {
 } from '@solana/web3.js'
 import { Address, translateAddress } from '@coral-xyz/anchor'
 import { PROGRAM_ID } from '@dcaf/drip-types'
-import { RpcNotFoundError, InvalidOwnerError } from './types'
+import { RestError } from './types'
 
 const MAX_SUPPORTED_TRANSACTION_VERSION = 0
+
+function getInvalidOwnerError(
+    account: string,
+    owner: string,
+    expectedOwner: string
+): RestError {
+    return RestError.invalid(
+        `account ${account} was expected to be owned by ${expectedOwner} but it is owned by ${owner}`
+    )
+}
+
 export class Connection extends Web3Conn {
     private readonly rpcUrl: string
     constructor() {
@@ -31,10 +42,10 @@ export class Connection extends Web3Conn {
             commitment
         )
         if (!accountInfo) {
-            throw new RpcNotFoundError(address.toString())
+            throw RestError.notFound(`account ${address.toString()} not found`)
         }
         if (accountInfo.owner.toString() !== owner.toString()) {
-            throw new InvalidOwnerError(
+            throw getInvalidOwnerError(
                 address.toString(),
                 accountInfo.owner.toString(),
                 owner.toString()
@@ -52,7 +63,9 @@ export class Connection extends Web3Conn {
             maxSupportedTransactionVersion: MAX_SUPPORTED_TRANSACTION_VERSION,
         })
         if (!tx) {
-            throw new RpcNotFoundError(signature)
+            throw RestError.notFound(
+                `signature ${signature.toString()} not found`
+            )
         }
         return tx
     }

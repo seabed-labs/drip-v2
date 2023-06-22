@@ -1,4 +1,5 @@
 import { Accounts } from '@dcaf/drip-types'
+import { RestError } from './types'
 
 // note: we use drip-types here on purpose
 // if the types in drip-types and the duplicated types in this generated/anchor diverge,
@@ -28,12 +29,6 @@ export type DripAccountDecodeResponse =
           name: 'PairConfig'
           parsed: Accounts.PairConfigJSON
       }
-
-export class InvalidAccountError extends Error {
-    constructor(discriminator: Buffer) {
-        super(`unknown discriminator ${discriminator.toString('hex')}`)
-    }
-}
 
 export function tryDecodeToParsedDripAccount(
     data: Buffer
@@ -76,5 +71,7 @@ export function tryDecodeToParsedDripAccount(
             parsed: Accounts.PairConfig.decode(data).toJSON(),
         }
     }
-    throw new InvalidAccountError(discriminator)
+    throw RestError.invalid(
+        `unknown discriminator ${discriminator.toString('hex')}`
+    )
 }

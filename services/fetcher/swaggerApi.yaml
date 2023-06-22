@@ -5,6 +5,10 @@ components:
     requestBodies: {}
     responses: {}
     schemas:
+        DripV2InstructionNames.deposit:
+            enum:
+                - deposit
+            type: string
         DepositAccountsJSON:
             properties:
                 signer:
@@ -41,33 +45,23 @@ components:
                 - params
             type: object
             additionalProperties: false
-        ParsedIx_DepositAccountsJSON.DepositFieldsJSON_:
+        ParsedDeposit:
             properties:
                 data:
                     $ref: '#/components/schemas/DepositFieldsJSON'
                 accounts:
                     $ref: '#/components/schemas/DepositAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.deposit'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.deposit:
+        DripV2InstructionNames.detokenizeDripPosition:
             enum:
-                - deposit
+                - detokenizeDripPosition
             type: string
-        ParsedIxWithMetadata_DepositAccountsJSON.DripV2InstructionNames.deposit.DepositFieldsJSON_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_DepositAccountsJSON.DepositFieldsJSON_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.deposit'
-                    required:
-                        - name
-                    type: object
-        ParsedDeposit:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_DepositAccountsJSON.DripV2InstructionNames.deposit.DepositFieldsJSON_'
         DetokenizeDripPositionAccountsJSON:
             properties:
                 payer:
@@ -97,31 +91,20 @@ components:
                 - tokenProgram
             type: object
             additionalProperties: false
-        ParsedIx_DetokenizeDripPositionAccountsJSON.undefined_:
+        ParsedDetokenizeDripPosition:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/DetokenizeDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.detokenizeDripPosition'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.detokenizeDripPosition:
+        DripV2InstructionNames.initDripPosition:
             enum:
-                - detokenizeDripPosition
+                - initDripPosition
             type: string
-        ParsedIxWithMetadata_DetokenizeDripPositionAccountsJSON.DripV2InstructionNames.detokenizeDripPosition_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_DetokenizeDripPositionAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.detokenizeDripPosition'
-                    required:
-                        - name
-                    type: object
-        ParsedDetokenizeDripPosition:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_DetokenizeDripPositionAccountsJSON.DripV2InstructionNames.detokenizeDripPosition_'
         InitDripPositionAccountsJSON:
             properties:
                 payer:
@@ -182,33 +165,23 @@ components:
                 - params
             type: object
             additionalProperties: false
-        ParsedIx_InitDripPositionAccountsJSON.InitDripPositionFieldsJSON_:
+        ParsedInitDripPosition:
             properties:
                 data:
                     $ref: '#/components/schemas/InitDripPositionFieldsJSON'
                 accounts:
                     $ref: '#/components/schemas/InitDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initDripPosition'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.initDripPosition:
+        DripV2InstructionNames.initDripPositionNft:
             enum:
-                - initDripPosition
+                - initDripPositionNft
             type: string
-        ParsedIxWithMetadata_InitDripPositionAccountsJSON.DripV2InstructionNames.initDripPosition.InitDripPositionFieldsJSON_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_InitDripPositionAccountsJSON.InitDripPositionFieldsJSON_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.initDripPosition'
-                    required:
-                        - name
-                    type: object
-        ParsedInitDripPosition:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_InitDripPositionAccountsJSON.DripV2InstructionNames.initDripPosition.InitDripPositionFieldsJSON_'
         InitDripPositionNftAccountsJSON:
             properties:
                 payer:
@@ -235,31 +208,20 @@ components:
                 - tokenProgram
             type: object
             additionalProperties: false
-        ParsedIx_InitDripPositionNftAccountsJSON.undefined_:
+        ParsedInitDripPositionNft:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/InitDripPositionNftAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initDripPositionNft'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.initDripPositionNft:
+        DripV2InstructionNames.initGlobalConfig:
             enum:
-                - initDripPositionNft
+                - initGlobalConfig
             type: string
-        ParsedIxWithMetadata_InitDripPositionNftAccountsJSON.DripV2InstructionNames.initDripPositionNft_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_InitDripPositionNftAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.initDripPositionNft'
-                    required:
-                        - name
-                    type: object
-        ParsedInitDripPositionNft:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_InitDripPositionNftAccountsJSON.DripV2InstructionNames.initDripPositionNft_'
         InitGlobalConfigAccountsJSON:
             properties:
                 payer:
@@ -296,33 +258,23 @@ components:
                 - params
             type: object
             additionalProperties: false
-        ParsedIx_InitGlobalConfigAccountsJSON.InitGlobalConfigFieldsJSON_:
+        ParsedInitGlobalConfig:
             properties:
                 data:
                     $ref: '#/components/schemas/InitGlobalConfigFieldsJSON'
                 accounts:
                     $ref: '#/components/schemas/InitGlobalConfigAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initGlobalConfig'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.initGlobalConfig:
+        DripV2InstructionNames.initPairConfig:
             enum:
-                - initGlobalConfig
+                - initPairConfig
             type: string
-        ParsedIxWithMetadata_InitGlobalConfigAccountsJSON.DripV2InstructionNames.initGlobalConfig.InitGlobalConfigFieldsJSON_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_InitGlobalConfigAccountsJSON.InitGlobalConfigFieldsJSON_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.initGlobalConfig'
-                    required:
-                        - name
-                    type: object
-        ParsedInitGlobalConfig:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_InitGlobalConfigAccountsJSON.DripV2InstructionNames.initGlobalConfig.InitGlobalConfigFieldsJSON_'
         InitPairConfigAccountsJSON:
             properties:
                 payer:
@@ -346,31 +298,20 @@ components:
                 - systemProgram
             type: object
             additionalProperties: false
-        ParsedIx_InitPairConfigAccountsJSON.undefined_:
+        ParsedInitPairConfig:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/InitPairConfigAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initPairConfig'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.initPairConfig:
+        DripV2InstructionNames.toggleAutoCredit:
             enum:
-                - initPairConfig
+                - toggleAutoCredit
             type: string
-        ParsedIxWithMetadata_InitPairConfigAccountsJSON.DripV2InstructionNames.initPairConfig_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_InitPairConfigAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.initPairConfig'
-                    required:
-                        - name
-                    type: object
-        ParsedInitPairConfig:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_InitPairConfigAccountsJSON.DripV2InstructionNames.initPairConfig_'
         ToggleAutoCreditAccountsJSON:
             properties:
                 signer:
@@ -382,31 +323,20 @@ components:
                 - dripPosition
             type: object
             additionalProperties: false
-        ParsedIx_ToggleAutoCreditAccountsJSON.undefined_:
+        ParsedToggleAutoCredit:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/ToggleAutoCreditAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.toggleAutoCredit'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.toggleAutoCredit:
+        DripV2InstructionNames.tokenizeDripPosition:
             enum:
-                - toggleAutoCredit
+                - tokenizeDripPosition
             type: string
-        ParsedIxWithMetadata_ToggleAutoCreditAccountsJSON.DripV2InstructionNames.toggleAutoCredit_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_ToggleAutoCreditAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.toggleAutoCredit'
-                    required:
-                        - name
-                    type: object
-        ParsedToggleAutoCredit:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_ToggleAutoCreditAccountsJSON.DripV2InstructionNames.toggleAutoCredit_'
         TokenizeDripPositionAccountsJSON:
             properties:
                 payer:
@@ -436,31 +366,20 @@ components:
                 - tokenProgram
             type: object
             additionalProperties: false
-        ParsedIx_TokenizeDripPositionAccountsJSON.undefined_:
+        ParsedTokenizeDripPosition:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/TokenizeDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.tokenizeDripPosition'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.tokenizeDripPosition:
+        DripV2InstructionNames.updateAdmin:
             enum:
-                - tokenizeDripPosition
+                - updateAdmin
             type: string
-        ParsedIxWithMetadata_TokenizeDripPositionAccountsJSON.DripV2InstructionNames.tokenizeDripPosition_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_TokenizeDripPositionAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.tokenizeDripPosition'
-                    required:
-                        - name
-                    type: object
-        ParsedTokenizeDripPosition:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_TokenizeDripPositionAccountsJSON.DripV2InstructionNames.tokenizeDripPosition_'
         UpdateAdminAccountsJSON:
             properties:
                 signer:
@@ -472,32 +391,22 @@ components:
                 - globalConfig
             type: object
             additionalProperties: false
-        ParsedIx_UpdateAdminAccountsJSON.unknown_:
+        ParsedUpdateAdmin:
             properties:
                 data: {}
                 accounts:
                     $ref: '#/components/schemas/UpdateAdminAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateAdmin'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.updateAdmin:
+        DripV2InstructionNames.updateDefaultDripFees:
             enum:
-                - updateAdmin
+                - updateDefaultDripFees
             type: string
-        ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!unknown_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_UpdateAdminAccountsJSON.unknown_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.updateAdmin'
-                    required:
-                        - name
-                    type: object
-        ParsedUpdateAdmin:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!unknown_'
         UpdateDefaultDripFeesAccountsJSON:
             properties:
                 signer:
@@ -525,33 +434,23 @@ components:
                 - params
             type: object
             additionalProperties: false
-        ParsedIx_UpdateDefaultDripFeesAccountsJSON.UpdateDefaultDripFeesFieldsJSON_:
+        ParsedUpdateDefaultDripFees:
             properties:
                 data:
                     $ref: '#/components/schemas/UpdateDefaultDripFeesFieldsJSON'
                 accounts:
                     $ref: '#/components/schemas/UpdateDefaultDripFeesAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultDripFees'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.updateDefaultDripFees:
+        DripV2InstructionNames.updateDefaultPairDripFees:
             enum:
-                - updateDefaultDripFees
+                - updateDefaultPairDripFees
             type: string
-        ParsedIxWithMetadata_UpdateDefaultDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultDripFees.UpdateDefaultDripFeesFieldsJSON_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_UpdateDefaultDripFeesAccountsJSON.UpdateDefaultDripFeesFieldsJSON_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultDripFees'
-                    required:
-                        - name
-                    type: object
-        ParsedUpdateDefaultDripFees:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateDefaultDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultDripFees.UpdateDefaultDripFeesFieldsJSON_'
         UpdateDefaultPairDripFeesAccountsJSON:
             properties:
                 signer:
@@ -582,33 +481,23 @@ components:
                 - params
             type: object
             additionalProperties: false
-        ParsedIx_UpdateDefaultPairDripFeesAccountsJSON.UpdateDefaultPairDripFeesFieldsJSON_:
+        ParsedUpdateDefaultPairDripFees:
             properties:
                 data:
                     $ref: '#/components/schemas/UpdateDefaultPairDripFeesFieldsJSON'
                 accounts:
                     $ref: '#/components/schemas/UpdateDefaultPairDripFeesAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultPairDripFees'
             required:
                 - data
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.updateDefaultPairDripFees:
+        DripV2InstructionNames.updatePythPriceFeed:
             enum:
-                - updateDefaultPairDripFees
+                - updatePythPriceFeed
             type: string
-        ParsedIxWithMetadata_UpdateDefaultPairDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultPairDripFees.UpdateDefaultPairDripFeesFieldsJSON_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_UpdateDefaultPairDripFeesAccountsJSON.UpdateDefaultPairDripFeesFieldsJSON_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultPairDripFees'
-                    required:
-                        - name
-                    type: object
-        ParsedUpdateDefaultPairDripFees:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateDefaultPairDripFeesAccountsJSON.DripV2InstructionNames.updateDefaultPairDripFees.UpdateDefaultPairDripFeesFieldsJSON_'
         UpdatePythPriceFeedAccountsJSON:
             properties:
                 signer:
@@ -629,31 +518,20 @@ components:
                 - outputTokenPythPriceFeed
             type: object
             additionalProperties: false
-        ParsedIx_UpdatePythPriceFeedAccountsJSON.undefined_:
+        ParsedUpdatePythPriceFeed:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/UpdatePythPriceFeedAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updatePythPriceFeed'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.updatePythPriceFeed:
+        DripV2InstructionNames.updateSuperAdmin:
             enum:
-                - updatePythPriceFeed
+                - updateSuperAdmin
             type: string
-        ParsedIxWithMetadata_UpdatePythPriceFeedAccountsJSON.DripV2InstructionNames.updatePythPriceFeed_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_UpdatePythPriceFeedAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.updatePythPriceFeed'
-                    required:
-                        - name
-                    type: object
-        ParsedUpdatePythPriceFeed:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdatePythPriceFeedAccountsJSON.DripV2InstructionNames.updatePythPriceFeed_'
         UpdateSuperAdminAccountsJSON:
             properties:
                 signer:
@@ -668,31 +546,16 @@ components:
                 - globalConfig
             type: object
             additionalProperties: false
-        ParsedIx_UpdateSuperAdminAccountsJSON.undefined_:
+        ParsedUpdateSuperAdmin:
             properties:
-                data: {}
                 accounts:
                     $ref: '#/components/schemas/UpdateSuperAdminAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateSuperAdmin'
             required:
                 - accounts
+                - name
             type: object
-        DripV2InstructionNames.updateSuperAdmin:
-            enum:
-                - updateSuperAdmin
-            type: string
-        ParsedIxWithMetadata_UpdateSuperAdminAccountsJSON.DripV2InstructionNames.updateSuperAdmin_:
-            allOf:
-                -
-                    $ref: '#/components/schemas/ParsedIx_UpdateSuperAdminAccountsJSON.undefined_'
-                -
-                    properties:
-                        name:
-                            $ref: '#/components/schemas/DripV2InstructionNames.updateSuperAdmin'
-                    required:
-                        - name
-                    type: object
-        ParsedUpdateSuperAdmin:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateSuperAdminAccountsJSON.DripV2InstructionNames.updateSuperAdmin_'
         ParsedDripIx:
             anyOf:
                 -
@@ -721,52 +584,43 @@ components:
                     $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
                 -
                     $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
-        'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array__':
-            anyOf:
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                instructions:
-                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [index], type: object}
-                                    type: array
-                                signature:
-                                    type: string
-                            required:
-                                - instructions
-                                - signature
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - data
-                        - serverTimestamp
-                    type: object
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                instructions:
-                                    items: {properties: {parsedIx: {$ref: '#/components/schemas/ParsedDripIx'}, index: {type: number, format: double}}, required: [index], type: object}
-                                    type: array
-                                signature:
-                                    type: string
-                            required:
-                                - instructions
-                                - signature
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - error
-                        - serverTimestamp
-                    type: object
         ParsedTxResponse:
-            $ref: '#/components/schemas/ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array__'
+            properties:
+                instructions:
+                    items:
+                        properties:
+                            parsedIx:
+                                $ref: '#/components/schemas/ParsedDripIx'
+                            index:
+                                type: number
+                                format: double
+                        required:
+                            - index
+                        type: object
+                    type: array
+                signature:
+                    type: string
+            required:
+                - instructions
+                - signature
+            type: object
+        RestError:
+            properties:
+                name:
+                    type: string
+                message:
+                    type: string
+                stack:
+                    type: string
+                statusCode:
+                    type: number
+                    format: double
+            required:
+                - name
+                - message
+                - statusCode
+            type: object
+            additionalProperties: false
         Commitment:
             type: string
             enum:
@@ -1002,96 +856,45 @@ components:
                 - outputTokenPriceOracle
             type: object
             additionalProperties: false
-        ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON__:
-            anyOf:
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                account:
-                                    anyOf: [{$ref: '#/components/schemas/DripPositionJSON'}, {$ref: '#/components/schemas/DripPositionNftMappingJSON'}, {$ref: '#/components/schemas/DripPositionSignerJSON'}, {$ref: '#/components/schemas/GlobalConfigJSON'}, {$ref: '#/components/schemas/GlobalConfigSignerJSON'}, {$ref: '#/components/schemas/PairConfigJSON'}]
-                                name:
-                                    type: string
-                                    enum: [DripPosition, DripPositionNftMapping, DripPositionSigner, GlobalConfig, GlobalConfigSigner, PairConfig]
-                                publicKey:
-                                    type: string
-                            required:
-                                - account
-                                - name
-                                - publicKey
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - data
-                        - serverTimestamp
-                    type: object
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                account:
-                                    anyOf: [{$ref: '#/components/schemas/DripPositionJSON'}, {$ref: '#/components/schemas/DripPositionNftMappingJSON'}, {$ref: '#/components/schemas/DripPositionSignerJSON'}, {$ref: '#/components/schemas/GlobalConfigJSON'}, {$ref: '#/components/schemas/GlobalConfigSignerJSON'}, {$ref: '#/components/schemas/PairConfigJSON'}]
-                                name:
-                                    type: string
-                                    enum: [DripPosition, DripPositionNftMapping, DripPositionSigner, GlobalConfig, GlobalConfigSigner, PairConfig]
-                                publicKey:
-                                    type: string
-                            required:
-                                - account
-                                - name
-                                - publicKey
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - error
-                        - serverTimestamp
-                    type: object
         ParsedAccountResponse:
-            $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON__'
-        ResponseCommon__message-string__:
-            anyOf:
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                message:
-                                    type: string
-                            required:
-                                - message
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - data
-                        - serverTimestamp
-                    type: object
-                -
-                    properties:
-                        error: {}
-                        data:
-                            properties:
-                                message:
-                                    type: string
-                            required:
-                                - message
-                            type: object
-                        serverTimestamp:
-                            type: number
-                            format: double
-                    required:
-                        - error
-                        - serverTimestamp
-                    type: object
+            properties:
+                account:
+                    anyOf:
+                        -
+                            $ref: '#/components/schemas/DripPositionJSON'
+                        -
+                            $ref: '#/components/schemas/DripPositionNftMappingJSON'
+                        -
+                            $ref: '#/components/schemas/DripPositionSignerJSON'
+                        -
+                            $ref: '#/components/schemas/GlobalConfigJSON'
+                        -
+                            $ref: '#/components/schemas/GlobalConfigSignerJSON'
+                        -
+                            $ref: '#/components/schemas/PairConfigJSON'
+                name:
+                    type: string
+                    enum:
+                        - DripPosition
+                        - DripPositionNftMapping
+                        - DripPositionSigner
+                        - GlobalConfig
+                        - GlobalConfigSigner
+                        - PairConfig
+                publicKey:
+                    type: string
+            required:
+                - account
+                - name
+                - publicKey
+            type: object
         PingResponse:
-            $ref: '#/components/schemas/ResponseCommon__message-string__'
+            properties:
+                message:
+                    type: string
+            required:
+                - message
+            type: object
     securitySchemes: {}
 info:
     title: '@dcaf/drip-fetcher'
@@ -1113,6 +916,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ParsedTxResponse'
+                '400':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '404':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '422':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '500':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
             security: []
             parameters:
                 -
@@ -1137,6 +964,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ParsedAccountResponse'
+                '400':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '404':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '500':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
             security: []
             parameters:
                 -
