@@ -472,14 +472,9 @@ components:
                 - globalConfig
             type: object
             additionalProperties: false
-        Record_string.unknown_:
-            properties: {}
-            type: object
-            description: 'Construct a type with a set of properties K of type T'
-        ParsedIx_UpdateAdminAccountsJSON.Record_string.unknown__:
+        ParsedIx_UpdateAdminAccountsJSON.unknown_:
             properties:
-                data:
-                    $ref: '#/components/schemas/Record_string.unknown_'
+                data: {}
                 accounts:
                     $ref: '#/components/schemas/UpdateAdminAccountsJSON'
             required:
@@ -490,10 +485,10 @@ components:
             enum:
                 - updateAdmin
             type: string
-        ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!Record_string.unknown__:
+        ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!unknown_:
             allOf:
                 -
-                    $ref: '#/components/schemas/ParsedIx_UpdateAdminAccountsJSON.Record_string.unknown__'
+                    $ref: '#/components/schemas/ParsedIx_UpdateAdminAccountsJSON.unknown_'
                 -
                     properties:
                         name:
@@ -502,7 +497,7 @@ components:
                         - name
                     type: object
         ParsedUpdateAdmin:
-            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!Record_string.unknown__'
+            $ref: '#/components/schemas/ParsedIxWithMetadata_UpdateAdminAccountsJSON.DripV2InstructionNames.updateAdmin.%2F%2FNote-openapidoesnothavesupportfortuples!unknown_'
         UpdateDefaultDripFeesAccountsJSON:
             properties:
                 signer:
@@ -726,25 +721,11 @@ components:
                     $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
                 -
                     $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
-        Error:
-            properties:
-                name:
-                    type: string
-                message:
-                    type: string
-                stack:
-                    type: string
-            required:
-                - name
-                - message
-            type: object
-            additionalProperties: false
-        'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_':
+        'ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array__':
             anyOf:
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 instructions:
@@ -765,8 +746,7 @@ components:
                     type: object
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 instructions:
@@ -786,7 +766,7 @@ components:
                         - serverTimestamp
                     type: object
         ParsedTxResponse:
-            $ref: '#/components/schemas/ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array_.Error_'
+            $ref: '#/components/schemas/ResponseCommon__signature-stringinstructions%3A_index-number%2F*Undefinedrepresentsanixweareunabletoparseatthistime*%2FparsedIx%3F%3AParsedDripIx_-Array__'
         Commitment:
             type: string
             enum:
@@ -1022,12 +1002,11 @@ components:
                 - outputTokenPriceOracle
             type: object
             additionalProperties: false
-        ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_:
+        ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON__:
             anyOf:
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 account:
@@ -1051,8 +1030,7 @@ components:
                     type: object
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 account:
@@ -1075,13 +1053,12 @@ components:
                         - serverTimestamp
                     type: object
         ParsedAccountResponse:
-            $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON_.Error_'
-        ResponseCommon__message-string_.Error_:
+            $ref: '#/components/schemas/ResponseCommon__publicKey-stringname%3A-or-DripPosition-or-DripPositionNftMapping-or-DripPositionSigner-or-GlobalConfig-or-GlobalConfigSigner-or-PairConfigaccount%3A-or-DripPositionJSON-or-DripPositionNftMappingJSON-or-DripPositionSignerJSON-or-GlobalConfigJSON-or-GlobalConfigSignerJSON-or-PairConfigJSON__'
+        ResponseCommon__message-string__:
             anyOf:
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 message:
@@ -1098,8 +1075,7 @@ components:
                     type: object
                 -
                     properties:
-                        error:
-                            $ref: '#/components/schemas/Error'
+                        error: {}
                         data:
                             properties:
                                 message:
@@ -1115,7 +1091,7 @@ components:
                         - serverTimestamp
                     type: object
         PingResponse:
-            $ref: '#/components/schemas/ResponseCommon__message-string_.Error_'
+            $ref: '#/components/schemas/ResponseCommon__message-string__'
     securitySchemes: {}
 info:
     title: '@dcaf/drip-fetcher'
