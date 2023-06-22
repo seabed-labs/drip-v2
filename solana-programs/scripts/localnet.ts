@@ -4,6 +4,7 @@ import { Program } from '@coral-xyz/anchor'
 import { DripV2 } from '@dcaf/drip-types'
 import { spawn } from 'node:child_process';
 import fs from 'fs/promises';
+import fetch from 'node-fetch';
 
 const localnet = spawn('anchor', ['localnet']);
 
@@ -12,6 +13,45 @@ function keyPairToObject(key: Keypair) {
     pub: key.publicKey.toString(),
     priv: key.secretKey.toString(),
   }
+}
+
+async function getRawAccountInfo(address: string) {
+  const response = await fetch('http://localhost:8899', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "1",
+      method: "getAccountInfo",
+      params: [
+        address,
+        {
+          encoding: "base64"
+        }
+      ]
+    })
+  });
+  return await response.json();
+}
+
+async function getRawTransaction(txSig: string) {
+  const response = await fetch('http://localhost:8899', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "1",
+      method: "getTransaction",
+      params: [
+        txSig,
+        {
+          commitment: "confirmed",
+          encoding: 'json'
+        }
+      ]
+    })
+  });
+  return await response.json();
 }
 
 async function setup() {
@@ -27,7 +67,7 @@ async function setup() {
       ],
       program.programId
   )
-  await program.methods
+  const initGlobalConfigTxSig = await program.methods
       .initGlobalConfig({
           superAdmin: superAdmin.publicKey,
           defaultDripFeeBps: new anchor.BN(100),
@@ -40,12 +80,18 @@ async function setup() {
       })
       .signers([globalConfigKeypair])
       .rpc()
+
   await fs.writeFile("mocks/setup.json", JSON.stringify({
     superAdmin: keyPairToObject(superAdmin),
     globalConfigKeypair: keyPairToObject(globalConfigKeypair),
     globalSignerPubkey: globalSignerPubkey.toString(),
+    initGlobalConfigTxSig,
   }));
-  console.log("Setup data written to mocks/setup.json")
+
+  await fs.writeFile("mocks/globalConfigAccountInfo.json", JSON.stringify(await getRawAccountInfo(globalConfigKeypair.publicKey.toString())))
+  await fs.writeFile("mocks/globalSigner.json", JSON.stringify(await getRawAccountInfo(globalSignerPubkey.toString())))
+  await fs.writeFile("mocks/initGlobalConfig.json", JSON.stringify(await getRawTransaction(initGlobalConfigTxSig)))
+  console.log("Setup data written to mocks/")
 }
 
 // Propagate SIGINT to the child process
