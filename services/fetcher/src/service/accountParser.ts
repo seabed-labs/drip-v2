@@ -33,7 +33,7 @@ export type DripAccountDecodeResponse =
 export function tryDecodeToParsedDripAccount(
     data: Buffer
 ): DripAccountDecodeResponse {
-    const discriminator = data.slice(0, 7)
+    const discriminator = data.slice(0, 8)
     if (discriminator.equals(Accounts.DripPosition.discriminator)) {
         return {
             name: 'DripPosition',
