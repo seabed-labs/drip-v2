@@ -26,19 +26,19 @@ services:
             timeout: 5s
             retries: 3
 
-    rabbitmq:
-        image: rabbitmq:3.9-management
-        ports:
-            - '5672:5672'
-            - '15672:15672'
-        environment:
-            RABBITMQ_DEFAULT_USER: docker
-            RABBITMQ_DEFAULT_PASS: docker
-        healthcheck:
-            test: ['CMD', 'rabbitmq-diagnostics -q ping']
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # rabbitmq:
+    #     image: rabbitmq:3.9-management
+    #     ports:
+    #         - '5672:5672'
+    #         - '15672:15672'
+    #     environment:
+    #         RABBITMQ_DEFAULT_USER: docker
+    #         RABBITMQ_DEFAULT_PASS: docker
+    #     healthcheck:
+    #         test: ['CMD', 'rabbitmq-diagnostics -q ping']
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 3
 
     solana:
         build:

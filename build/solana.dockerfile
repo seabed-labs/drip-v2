@@ -10,6 +10,7 @@ COPY ./solana-programs/Anchor.toml ./
 COPY ./solana-programs/programs ./programs/
 RUN anchor build
 
+COPY ./solana-programs/scripts ./scripts
 ENV RUST_BACKTRACE=1
 
-ENTRYPOINT [ "anchor", "localnet" ]
+ENTRYPOINT [ "node", "./scripts/localnet.js" ]
