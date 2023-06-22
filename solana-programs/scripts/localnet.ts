@@ -31,7 +31,8 @@ async function setup() {
       })
       .signers([globalConfigKeypair])
       .rpc()
-  console.log(globalConfigKeypair.publicKey.toString())
+  console.log("GlobalConfig", globalConfigKeypair.publicKey.toString())
+  console.log("GlobalConfigSigner", globalSignerPubkey.toString())
 }
 
 // Propagate SIGINT to the child process
