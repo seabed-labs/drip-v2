@@ -71,6 +71,7 @@ services:
         environment:
             PORT: 3000
             FETCHER_RPC_URL: "http://solana:8899"
+            DRIP_PROGRAM_ID: 74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
         healthcheck:
             test: ['CMD', 'curl', '--fail', 'http://localhost:3000/ || exit 1']
             interval: 5s
