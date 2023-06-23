@@ -1,20 +1,28 @@
 import request from 'supertest'
 import nock from 'nock'
+import missingAccountInfo from './fixtures/missingAccountInfo.json'
 import mockGlobalConfigAccountInfo from './fixtures/globalConfigAccountInfo.json'
 import mockGlobalConfig from './fixtures/globalConfig.json'
-import missingAccountInfo from './fixtures/missingAccountInfo.json'
+import mockInitGlobalConfigInfo from './fixtures/initGlobalConfigInfo.json'
+import mockInitGlobalConfig from './fixtures/initGlobalConfig.json'
 import { app } from '../../src/app'
 import { rpcUrl } from '../../src/service/env'
 
 describe('Test Fetch Controller', () => {
-    describe('Route GET /fetch/account/{accountPublicKey}', () => {
-        beforeAll(() => {
-            jest.spyOn(console, 'error')
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore jest.spyOn adds this functionallity
-            console.error.mockImplementation(() => null)
-        })
+    beforeAll(() => {
+        jest.spyOn(console, 'error')
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore jest.spyOn adds this functionallity
+        console.error.mockImplementation(() => null)
+    })
 
+    afterAll(() => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore jest.spyOn adds this functionallity
+        console.error.mockRestore()
+    })
+
+    describe('Route GET /fetch/account/{accountPublicKey}', () => {
         beforeEach(() => {
             if (!nock.isActive()) {
                 nock.activate()
@@ -24,12 +32,6 @@ describe('Test Fetch Controller', () => {
         afterEach(() => {
             nock.cleanAll()
             nock.restore()
-        })
-
-        afterAll(() => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore jest.spyOn adds this functionallity
-            console.error.mockRestore()
         })
 
         test('should return 400 for invalid public key', async () => {
@@ -79,6 +81,37 @@ describe('Test Fetch Controller', () => {
             expect(res.status).toEqual(200)
             // await fs.writeFile('./test/controllers/fixtures/globalConfig.json', JSON.stringify(res.body))
             expect(res.body).toEqual(mockGlobalConfig)
+        })
+    })
+
+    describe('Route GET /fetch/tx/{signature}', () => {
+        beforeEach(() => {
+            if (!nock.isActive()) {
+                nock.activate()
+            }
+        })
+
+        afterEach(() => {
+            nock.cleanAll()
+            nock.restore()
+        })
+
+        test('should return 200 for initGlobalConfig', async () => {
+            nock(rpcUrl)
+                .post(
+                    '/',
+                    (body) =>
+                        body.params &&
+                        body.params[0] ===
+                            '2YA8y5j3bCdrV4LUCaZ1mFuAuQMNHjyJmjV1FXUKQFGkwGzSCp3nkzNiX3fpeE1VoAnCXEvxPsLC5yoNa1FAkqMt'
+                )
+                .reply(200, mockInitGlobalConfigInfo)
+            const res = await request(app).get(
+                '/fetch/tx/2YA8y5j3bCdrV4LUCaZ1mFuAuQMNHjyJmjV1FXUKQFGkwGzSCp3nkzNiX3fpeE1VoAnCXEvxPsLC5yoNa1FAkqMt'
+            )
+            expect(res.status).toEqual(200)
+            // await fs.writeFile('./test/controllers/fixtures/initGlobalConfig.json', JSON.stringify(res.body))
+            expect(res.body).toEqual(mockInitGlobalConfig)
         })
     })
 })
