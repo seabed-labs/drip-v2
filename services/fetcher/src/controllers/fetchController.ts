@@ -16,7 +16,7 @@ import {
 } from '../service/types'
 import { Connection } from '../service/solana'
 import { tryDecodeToParsedDripAccount } from '../service/accountParser'
-import { programId } from '../service/programId'
+import { programId } from '../service/env'
 import { PublicKey } from '@solana/web3.js'
 import { tryDecodeIx } from '../service/ixParser'
 import { translateAddress } from '@coral-xyz/anchor'
@@ -76,9 +76,7 @@ export class FetchController extends Controller {
             accountPublicKey = translateAddress(accountPublicKeyStr)
         } catch (e) {
             throw RestError.invalid(
-                `public key ${accountPublicKeyStr} is not valid, err ${JSON.stringify(
-                    e
-                )}`
+                `public key ${accountPublicKeyStr} is not valid`
             )
         }
         const accountInfo = await this.connection.getNonNullableAccountInfo(

@@ -10,15 +10,13 @@ import { Address, translateAddress } from '@coral-xyz/anchor'
 import { PROGRAM_ID } from '@dcaf/drip-types'
 import { RestError } from './types'
 import { getErrMessage } from './common'
+import { rpcUrl } from './env'
 
 const MAX_SUPPORTED_TRANSACTION_VERSION = 0
 
 export class Connection extends Web3Conn {
     private readonly rpcUrl: string
     constructor() {
-        const rpcUrl =
-            process.env.FETCHER_RPC_URL ||
-            'https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e'
         super(rpcUrl, 'finalized')
         this.rpcUrl = rpcUrl
     }

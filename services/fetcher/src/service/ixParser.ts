@@ -49,7 +49,7 @@ import {
     Deposit,
 } from '../generated/anchor/instructions'
 import assert from 'assert'
-import { programId } from './programId'
+import { programId } from './env'
 
 const dripCoder: BorshCoder = new BorshCoder(IDL)
 
