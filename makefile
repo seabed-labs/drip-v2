@@ -5,14 +5,14 @@ root:
 format:
 	cd solana-programs && cargo fmt
 	yarn
-	yarn workspaces run lint:fix
+	yarn workspaces foreach run lint:fix
 	
 test: program sdk
 	cd solana-programs && cargo test
 	cd solana-programs && anchor test
 
 clean:
-	yarn workspaces run clean
+	yarn workspaces foreach clean
 	cd packages/sdk && yarn clean
 	cd solana-programs && cargo clean
 

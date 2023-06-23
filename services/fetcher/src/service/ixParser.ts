@@ -66,6 +66,7 @@ export function tryDecodeIx(
             if ((e as RestError).status >= 500) {
                 throw e
             }
+            console.error(e)
         }
     }
     return undefined

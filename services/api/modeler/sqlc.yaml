@@ -1,12 +1,12 @@
-version: "1"
+version: '1'
 packages:
-  - name: "store"
-    path: "../gen/store"
-    queries: "./queries"
-    schema: "./model.sql"
-    engine: "postgresql"
-    emit_json_tags: false
-    emit_prepared_queries: true
-    emit_interface: false
-    emit_exact_table_names: false
-    emit_empty_slices: false
+    - name: 'store'
+      path: '../gen/store'
+      queries: './queries'
+      schema: './model.sql'
+      engine: 'postgresql'
+      emit_json_tags: false
+      emit_prepared_queries: true
+      emit_interface: false
+      emit_exact_table_names: false
+      emit_empty_slices: false

@@ -558,32 +558,19 @@ components:
             type: object
         ParsedDripIx:
             anyOf:
-                -
-                    $ref: '#/components/schemas/ParsedDeposit'
-                -
-                    $ref: '#/components/schemas/ParsedDetokenizeDripPosition'
-                -
-                    $ref: '#/components/schemas/ParsedInitDripPosition'
-                -
-                    $ref: '#/components/schemas/ParsedInitDripPositionNft'
-                -
-                    $ref: '#/components/schemas/ParsedInitGlobalConfig'
-                -
-                    $ref: '#/components/schemas/ParsedInitPairConfig'
-                -
-                    $ref: '#/components/schemas/ParsedToggleAutoCredit'
-                -
-                    $ref: '#/components/schemas/ParsedTokenizeDripPosition'
-                -
-                    $ref: '#/components/schemas/ParsedUpdateAdmin'
-                -
-                    $ref: '#/components/schemas/ParsedUpdateDefaultDripFees'
-                -
-                    $ref: '#/components/schemas/ParsedUpdateDefaultPairDripFees'
-                -
-                    $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
-                -
-                    $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
+                - $ref: '#/components/schemas/ParsedDeposit'
+                - $ref: '#/components/schemas/ParsedDetokenizeDripPosition'
+                - $ref: '#/components/schemas/ParsedInitDripPosition'
+                - $ref: '#/components/schemas/ParsedInitDripPositionNft'
+                - $ref: '#/components/schemas/ParsedInitGlobalConfig'
+                - $ref: '#/components/schemas/ParsedInitPairConfig'
+                - $ref: '#/components/schemas/ParsedToggleAutoCredit'
+                - $ref: '#/components/schemas/ParsedTokenizeDripPosition'
+                - $ref: '#/components/schemas/ParsedUpdateAdmin'
+                - $ref: '#/components/schemas/ParsedUpdateDefaultDripFees'
+                - $ref: '#/components/schemas/ParsedUpdateDefaultPairDripFees'
+                - $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
+                - $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
         ParsedTxResponse:
             properties:
                 instructions:
@@ -652,10 +639,8 @@ components:
             additionalProperties: false
         types.DripPositionOwnerJSON:
             anyOf:
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
+                - $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
+                - $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
         DripPositionJSON:
             properties:
                 globalConfig:
@@ -812,10 +797,8 @@ components:
             additionalProperties: false
         types.PriceOracleJSON:
             anyOf:
-                -
-                    $ref: '#/components/schemas/PriceOracle.UnavailableJSON'
-                -
-                    $ref: '#/components/schemas/PriceOracle.PythJSON'
+                - $ref: '#/components/schemas/PriceOracle.UnavailableJSON'
+                - $ref: '#/components/schemas/PriceOracle.PythJSON'
         PairConfigJSON:
             properties:
                 version:
@@ -854,18 +837,12 @@ components:
             properties:
                 account:
                     anyOf:
-                        -
-                            $ref: '#/components/schemas/DripPositionJSON'
-                        -
-                            $ref: '#/components/schemas/DripPositionNftMappingJSON'
-                        -
-                            $ref: '#/components/schemas/DripPositionSignerJSON'
-                        -
-                            $ref: '#/components/schemas/GlobalConfigJSON'
-                        -
-                            $ref: '#/components/schemas/GlobalConfigSignerJSON'
-                        -
-                            $ref: '#/components/schemas/PairConfigJSON'
+                        - $ref: '#/components/schemas/DripPositionJSON'
+                        - $ref: '#/components/schemas/DripPositionNftMappingJSON'
+                        - $ref: '#/components/schemas/DripPositionSignerJSON'
+                        - $ref: '#/components/schemas/GlobalConfigJSON'
+                        - $ref: '#/components/schemas/GlobalConfigSignerJSON'
+                        - $ref: '#/components/schemas/PairConfigJSON'
                 name:
                     type: string
                     enum:
@@ -905,91 +882,87 @@ paths:
             operationId: ParseTx
             responses:
                 '200':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ParsedTxResponse'
                 '400':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
                 '404':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
                 '422':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
                 '500':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
             security: []
             parameters:
-                -
-                    in: path
-                    name: signature
-                    required: true
-                    schema:
-                        type: string
-                -
-                    in: query
-                    name: commitment
-                    required: false
-                    schema:
-                        $ref: '#/components/schemas/Commitment'
+                - in: path
+                  name: signature
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: commitment
+                  required: false
+                  schema:
+                      $ref: '#/components/schemas/Commitment'
     '/fetch/account/{accountPublicKey}':
         get:
             operationId: ParseAccount
             responses:
                 '200':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ParsedAccountResponse'
                 '400':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
                 '404':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
                 '500':
-                    description: ""
+                    description: ''
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RestError'
             security: []
             parameters:
-                -
-                    in: path
-                    name: accountPublicKey
-                    required: true
-                    schema:
-                        type: string
-                -
-                    in: query
-                    name: commitment
-                    required: false
-                    schema:
-                        $ref: '#/components/schemas/Commitment'
+                - in: path
+                  name: accountPublicKey
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: commitment
+                  required: false
+                  schema:
+                      $ref: '#/components/schemas/Commitment'
     /:
         get:
             operationId: Ping
@@ -1003,5 +976,4 @@ paths:
             security: []
             parameters: []
 servers:
-    -
-        url: /
+    - url: /

@@ -8,5 +8,6 @@
         "unused-imports/no-unused-imports-ts": 2
     },
     "plugins": ["unused-imports"],
-    "ignorePatterns": ["dist", "node_modules"]
+    "ignorePatterns": ["dist", "node_modules"],
+    "root": true
 }
