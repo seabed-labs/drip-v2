@@ -7,7 +7,7 @@ import mockInitGlobalConfigInfo from './fixtures/initGlobalConfigInfo.json'
 import mockInitGlobalConfig from './fixtures/initGlobalConfig.json'
 import { app } from '../../src/app'
 import { rpcUrl } from '../../src/service/env'
-
+// import fs from 'fs/promises'
 describe('Test Fetch Controller', () => {
     beforeAll(() => {
         jest.spyOn(console, 'error')

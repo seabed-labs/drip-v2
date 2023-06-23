@@ -21,7 +21,7 @@
     "lint:prettier": "prettier \"*/**/*{.js,.ts,.yaml}\" --check --ignore-path .gitignore",
     "lint:eslint:fix": "eslint --ignore-path .gitignore --fix --ext .ts . ",
     "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore",
-    "test": "FETCHER_RPC_URL=http://localhost:8899 jest --coverage"
+    "test": "cross-env DRIP_PROGRAM_ID=74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk FETCHER_RPC_URL=http://localhost:8899 jest --coverage"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.1",
