@@ -12,7 +12,7 @@ test: program sdk
 	cd solana-programs && anchor test
 
 clean:
-	yarn workspaces foreach clean
+	yarn workspaces foreach run clean
 	cd packages/sdk && yarn clean
 	cd solana-programs && cargo clean
 
