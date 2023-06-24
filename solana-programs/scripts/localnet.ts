@@ -111,7 +111,14 @@ async function setup() {
         'mocks/initGlobalConfig.json',
         JSON.stringify(await getRawTransaction(initGlobalConfigTxSig))
     )
-    await fs.writeFile('mocks/missingAccountInfo.json', JSON.stringify(await getRawAccountInfo("sHXA3HojCdXz9tupED61S8dnfHRqx9DaVSYv1mBqn6h")))
+    await fs.writeFile(
+        'mocks/missingAccountInfo.json',
+        JSON.stringify(
+            await getRawAccountInfo(
+                'sHXA3HojCdXz9tupED61S8dnfHRqx9DaVSYv1mBqn6h'
+            )
+        )
+    )
     console.log('Setup data written to mocks/')
 }
 
