@@ -5,5 +5,7 @@ tsconfig.tsbuildinfo
 coverage
 
 /src/generated/**/*.ts
+/src/generated/**/*.map
+/src/generated/**/*.js
 !/src/generated/**/.gitkeep
 
