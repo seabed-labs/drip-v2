@@ -1,13 +1,18 @@
 import request from 'supertest'
 import nock from 'nock'
-import missingAccountInfo from './fixtures/missingAccountInfo.json'
-import mockGlobalConfigAccountInfo from './fixtures/globalConfigAccountInfo.json'
-import mockGlobalConfig from './fixtures/globalConfig.json'
-import mockInitGlobalConfigInfo from './fixtures/initGlobalConfigInfo.json'
-import mockInitGlobalConfig from './fixtures/initGlobalConfig.json'
 import { app } from '../../src/app'
 import { rpcUrl } from '../../src/service/env'
 // import fs from 'fs/promises'
+
+/* eslint-disable */
+// @ts-ignore
+import missingAccountInfo from './fixtures/missingAccountInfo.json' // @ts-ignore
+import mockGlobalConfigAccountInfo from './fixtures/globalConfigAccountInfo.json' // @ts-ignore
+import mockGlobalConfig from './fixtures/globalConfig.json' // @ts-ignore
+import mockInitGlobalConfigInfo from './fixtures/initGlobalConfigInfo.json' // @ts-ignore
+import mockInitGlobalConfig from './fixtures/initGlobalConfig.json' // @ts-ignore
+/* eslint-enable */
+
 describe('Test Fetch Controller', () => {
     beforeAll(() => {
         jest.spyOn(console, 'error')

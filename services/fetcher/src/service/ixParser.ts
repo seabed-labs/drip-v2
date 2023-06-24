@@ -1,12 +1,9 @@
 import { BorshCoder, Instruction } from '@coral-xyz/anchor'
 import { IDL } from '@dcaf/drip-types'
 import {
-    AccountMeta,
-    CompiledInstruction,
     MessageAccountKeys,
     MessageCompiledInstruction,
     PublicKey,
-    VersionedMessage,
     VersionedTransactionResponse,
 } from '@solana/web3.js'
 import {
@@ -57,7 +54,7 @@ export function tryDecodeIx(
     tx: VersionedTransactionResponse,
     accountKeys: MessageAccountKeys,
     ix: MessageCompiledInstruction
-): Omit<ParsedDripIx, 'index'> | undefined {
+): ParsedDripIx | undefined {
     const ixProgram = accountKeys.get(ix.programIdIndex)
     if (ixProgram?.toString() === programId) {
         try {
@@ -75,7 +72,7 @@ export function tryDecodeIx(
 export function decodeIxToParsedDripIx(
     tx: VersionedTransactionResponse,
     ix: MessageCompiledInstruction
-): Omit<ParsedDripIx, 'index'> {
+): ParsedDripIx {
     const decodedIx = dripCoder.instruction.decode(
         Buffer.from(ix.data),
         'base58'
@@ -132,183 +129,191 @@ export function decodeIxToParsedDripIx(
 function parseDeposit(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedDeposit, 'index'> {
+): { parsedDeposit: ParsedDeposit } {
     const parsedIx = Deposit.fromDecoded(ixData.data as DepositFields, accounts)
     return {
-        name: DripV2InstructionNames.deposit,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedDeposit: {
+            name: DripV2InstructionNames.deposit,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
 }
 
 function parseToggleAutoCredit(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedToggleAutoCredit, 'index'> {
+): { parsedToggleAutoCredit: ParsedToggleAutoCredit } {
     const parsedIx = ToggleAutoCredit.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.toggleAutoCredit,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedToggleAutoCredit: {
+            name: DripV2InstructionNames.toggleAutoCredit,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseDetokenizeDripPosition(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedDetokenizeDripPosition, 'index'> {
+): {
+    parsedDetokenizeDripPosition: Omit<ParsedDetokenizeDripPosition, 'index'>
+} {
     const parsedIx = DetokenizeDripPosition.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.detokenizeDripPosition,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedDetokenizeDripPosition: {
+            name: DripV2InstructionNames.detokenizeDripPosition,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseTokenizeDripPosition(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedTokenizeDripPosition, 'index'> {
+): { parsedTokenizeDripPosition: Omit<ParsedTokenizeDripPosition, 'index'> } {
     const parsedIx = TokenizeDripPosition.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.tokenizeDripPosition,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedTokenizeDripPosition: {
+            name: DripV2InstructionNames.tokenizeDripPosition,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseInitDripPositionNft(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedInitDripPositionNft, 'index'> {
+): { parsedInitDripPositionNft: ParsedInitDripPositionNft } {
     const parsedIx = InitDripPositionNft.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.initDripPositionNft,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedInitDripPositionNft: {
+            name: DripV2InstructionNames.initDripPositionNft,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseInitDripPosition(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedInitDripPosition, 'index'> {
+): { parsedInitDripPosition: ParsedInitDripPosition } {
     const parsedIx = InitDripPosition.fromDecoded(
         ixData.data as InitDripPositionFields,
         accounts
     )
     return {
-        name: DripV2InstructionNames.initDripPosition,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedInitDripPosition: {
+            name: DripV2InstructionNames.initDripPosition,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
 }
 
 function parseUpdateDefaultPairDripFees(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedUpdateDefaultPairDripFees, 'index'> {
+): { parsedUpdateDefaultPairDripFees: ParsedUpdateDefaultPairDripFees } {
     const parsedIx = UpdateDefaultPairDripFees.fromDecoded(
         ixData.data as UpdateDefaultPairDripFeesFields,
         accounts
     )
     return {
-        name: DripV2InstructionNames.updateDefaultPairDripFees,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedUpdateDefaultPairDripFees: {
+            name: DripV2InstructionNames.updateDefaultPairDripFees,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
 }
 
 function parseUpdatePythPriceFeed(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedUpdatePythPriceFeed, 'index'> {
+): { parsedUpdatePythPriceFeed: ParsedUpdatePythPriceFeed } {
     const parsedIx = UpdatePythPriceFeed.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.updatePythPriceFeed,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedUpdatePythPriceFeed: {
+            name: DripV2InstructionNames.updatePythPriceFeed,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseUpdateDefaultDripFees(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedUpdateDefaultDripFees, 'index'> {
+): { parsedUpdateDefaultDripFees: ParsedUpdateDefaultDripFees } {
     const parsedIx = UpdateDefaultDripFees.fromDecoded(
         ixData.data as UpdateDefaultDripFeesFields,
         accounts
     )
     return {
-        name: DripV2InstructionNames.updateDefaultDripFees,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedUpdateDefaultDripFees: {
+            name: DripV2InstructionNames.updateDefaultDripFees,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
 }
 
 function parseUpdateAdmin(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedUpdateAdmin, 'index'> {
+): { parsedUpdateAdmin: ParsedUpdateAdmin } {
     const parsedIx = UpdateAdmin.fromDecoded(
         ixData.data as UpdateAdminFields,
         accounts
     )
     return {
-        name: DripV2InstructionNames.updateAdmin,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedUpdateAdmin: {
+            name: DripV2InstructionNames.updateAdmin,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
 }
 
 function parseUpdateSuperAdmin(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedUpdateSuperAdmin, 'index'> {
+): { parsedUpdateSuperAdmin: ParsedUpdateSuperAdmin } {
     const parsedIx = UpdateSuperAdmin.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.updateSuperAdmin,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedUpdateSuperAdmin: {
+            name: DripV2InstructionNames.updateSuperAdmin,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseInitPairConfig(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedInitPairConfig, 'index'> {
+): { parsedInitPairConfig: ParsedInitPairConfig } {
     const parsedIx = InitPairConfig.fromDecoded(accounts)
     return {
-        name: DripV2InstructionNames.initPairConfig,
-        accounts: parsedIx.toAccountsJSON(),
+        parsedInitPairConfig: {
+            name: DripV2InstructionNames.initPairConfig,
+            accounts: parsedIx.toAccountsJSON(),
+        },
     }
 }
 
 function parseInitGlobalConfig(
     ixData: Instruction,
     accounts: PublicKey[]
-): Omit<ParsedInitGlobalConfig, 'index'> {
+): { parsedInitGlobalConfig: ParsedInitGlobalConfig } {
     const parsedIx = InitGlobalConfig.fromDecoded(
         ixData.data as InitGlobalConfigFields,
         accounts
     )
     return {
-        name: DripV2InstructionNames.initGlobalConfig,
-        accounts: parsedIx.toAccountsJSON(),
-        data: parsedIx.toArgsJSON(),
+        parsedInitGlobalConfig: {
+            name: DripV2InstructionNames.initGlobalConfig,
+            accounts: parsedIx.toAccountsJSON(),
+            data: parsedIx.toArgsJSON(),
+        },
     }
-}
-
-export type AccountMetaWithIndex = AccountMeta & {
-    accountIndex: number
-}
-
-export function getAccountMetas(
-    message: VersionedMessage,
-    ix: CompiledInstruction
-): AccountMetaWithIndex[] {
-    return ix.accounts.map((accountIndx) => {
-        const pubkey = message.getAccountKeys().get(accountIndx)
-        assert(pubkey, RestError.internal('unexpected missing account'))
-        return {
-            pubkey,
-            isSigner: message.isAccountSigner(accountIndx),
-            isWritable: message.isAccountWritable(accountIndx),
-            accountIndex: accountIndx,
-        }
-    })
 }

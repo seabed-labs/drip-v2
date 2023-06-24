@@ -11,8 +11,8 @@ import {
     ParsedAccountResponse,
     Commitment,
     ParsedTxResponse,
-    ParsedDripIx,
     RestError,
+    ParsedDripIxWithIndex,
 } from '../service/types'
 import { Connection } from '../service/solana'
 import { tryDecodeToParsedDripAccount } from '../service/accountParser'
@@ -40,10 +40,7 @@ export class FetchController extends Controller {
         @Path() signature: string,
         @Query() commitment: Commitment = 'finalized'
     ): Promise<ParsedTxResponse> {
-        const instructions: {
-            index: number
-            instruction?: ParsedDripIx
-        }[] = []
+        const instructions: ParsedDripIxWithIndex[] = []
         const tx = await this.connection.getNonNullableTransaction(
             signature,
             commitment
@@ -87,9 +84,8 @@ export class FetchController extends Controller {
         const parsedAccount = tryDecodeToParsedDripAccount(accountInfo.data)
         this.setStatus(200)
         return {
-            name: parsedAccount.name,
             publicKey: accountPublicKey.toString(),
-            account: parsedAccount.parsed,
+            ...parsedAccount,
         }
     }
 }

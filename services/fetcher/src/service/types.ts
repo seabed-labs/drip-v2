@@ -76,30 +76,33 @@ export type PingResponse = {
 }
 
 export type ParsedAccountResponse = {
+    // name:
+    //     | 'DripPosition'
+    //     | 'DripPositionNftMapping'
+    //     | 'DripPositionSigner'
+    //     | 'GlobalConfig'
+    //     | 'GlobalConfigSigner'
+    //     | 'PairConfig'
+    // account:
+    //     | DripPositionJSON
+    //     | DripPositionNftMappingJSON
+    //     | DripPositionSignerJSON
+    //     | GlobalConfigJSON
+    //     | GlobalConfigSignerJSON
+    //     | PairConfigJSON
     publicKey: string
-    name:
-        | 'DripPosition'
-        | 'DripPositionNftMapping'
-        | 'DripPositionSigner'
-        | 'GlobalConfig'
-        | 'GlobalConfigSigner'
-        | 'PairConfig'
-    account:
-        | DripPositionJSON
-        | DripPositionNftMappingJSON
-        | DripPositionSignerJSON
-        | GlobalConfigJSON
-        | GlobalConfigSignerJSON
-        | PairConfigJSON
+    name: string
+    parsedDripPosition?: DripPositionJSON
+    parsedDripPositionNftMapping?: DripPositionNftMappingJSON
+    parsedDripPositionSigner?: DripPositionSignerJSON
+    parsedGlobalConfig?: GlobalConfigJSON
+    parsedGlobalConfigSigner?: GlobalConfigSignerJSON
+    parsedPairConfig?: PairConfigJSON
 }
 
 export type ParsedTxResponse = {
     signature: string
-    instructions: {
-        index: number
-        /* Undefined represents an ix we are unable to parse at this time*/
-        parsedIx?: ParsedDripIx
-    }[]
+    instructions: ParsedDripIxWithIndex[]
 }
 
 ////////////////////////////////////////////////////////////////
@@ -179,17 +182,37 @@ export type ParsedUpdateSuperAdmin = {
     accounts: UpdateSuperAdminAccountsJSON
 }
 
-export type ParsedDripIx =
-    | ParsedDeposit
-    | ParsedDetokenizeDripPosition
-    | ParsedInitDripPosition
-    | ParsedInitDripPositionNft
-    | ParsedInitGlobalConfig
-    | ParsedInitPairConfig
-    | ParsedToggleAutoCredit
-    | ParsedTokenizeDripPosition
-    | ParsedUpdateAdmin
-    | ParsedUpdateDefaultDripFees
-    | ParsedUpdateDefaultPairDripFees
-    | ParsedUpdatePythPriceFeed
-    | ParsedUpdateSuperAdmin
+// export type ParsedDripIx =
+//     | ParsedDeposit
+//     | ParsedDetokenizeDripPosition
+//     | ParsedInitDripPosition
+//     | ParsedInitDripPositionNft
+//     | ParsedInitGlobalConfig
+//     | ParsedInitPairConfig
+//     | ParsedToggleAutoCredit
+//     | ParsedTokenizeDripPosition
+//     | ParsedUpdateAdmin
+//     | ParsedUpdateDefaultDripFees
+//     | ParsedUpdateDefaultPairDripFees
+//     | ParsedUpdatePythPriceFeed
+//     | ParsedUpdateSuperAdmin
+
+export type ParsedDripIxWithIndex = {
+    index: number
+} & ParsedDripIx
+
+export type ParsedDripIx = {
+    parsedDeposit?: ParsedDeposit
+    parsedDetokenizeDripPosition?: ParsedDetokenizeDripPosition
+    parsedInitDripPosition?: ParsedInitDripPosition
+    parsedInitDripPositionNft?: ParsedInitDripPositionNft
+    parsedInitGlobalConfig?: ParsedInitGlobalConfig
+    parsedInitPairConfig?: ParsedInitPairConfig
+    parsedToggleAutoCredit?: ParsedToggleAutoCredit
+    parsedTokenizeDripPosition?: ParsedTokenizeDripPosition
+    parsedUpdateAdmin?: ParsedUpdateAdmin
+    parsedUpdateDefaultDripFees?: ParsedUpdateDefaultDripFees
+    parsedUpdateDefaultPairDripFees?: ParsedUpdateDefaultPairDripFees
+    parsedUpdatePythPriceFeed?: ParsedUpdatePythPriceFeed
+    parsedUpdateSuperAdmin?: ParsedUpdateSuperAdmin
+}

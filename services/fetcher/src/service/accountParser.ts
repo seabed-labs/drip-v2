@@ -7,27 +7,27 @@ import { RestError } from './types'
 export type DripAccountDecodeResponse =
     | {
           name: 'DripPosition'
-          parsed: Accounts.DripPositionJSON
+          parsedDripPosition: Accounts.DripPositionJSON
       }
     | {
           name: 'DripPositionNftMapping'
-          parsed: Accounts.DripPositionNftMappingJSON
+          parsedDripPositionNftMapping: Accounts.DripPositionNftMappingJSON
       }
     | {
           name: 'DripPositionSigner'
-          parsed: Accounts.DripPositionSignerJSON
+          parsedDripPositionSigner: Accounts.DripPositionSignerJSON
       }
     | {
           name: 'GlobalConfig'
-          parsed: Accounts.GlobalConfigJSON
+          parsedGlobalConfig: Accounts.GlobalConfigJSON
       }
     | {
           name: 'GlobalConfigSigner'
-          parsed: Accounts.GlobalConfigSignerJSON
+          parsedGlobalConfigSigner: Accounts.GlobalConfigSignerJSON
       }
     | {
           name: 'PairConfig'
-          parsed: Accounts.PairConfigJSON
+          parsedPairConfig: Accounts.PairConfigJSON
       }
 
 export function tryDecodeToParsedDripAccount(
@@ -37,38 +37,41 @@ export function tryDecodeToParsedDripAccount(
     if (discriminator.equals(Accounts.DripPosition.discriminator)) {
         return {
             name: 'DripPosition',
-            parsed: Accounts.DripPosition.decode(data).toJSON(),
+            parsedDripPosition: Accounts.DripPosition.decode(data).toJSON(),
         }
     } else if (
         discriminator.equals(Accounts.DripPositionNftMapping.discriminator)
     ) {
         return {
             name: 'DripPositionNftMapping',
-            parsed: Accounts.DripPositionNftMapping.decode(data).toJSON(),
+            parsedDripPositionNftMapping:
+                Accounts.DripPositionNftMapping.decode(data).toJSON(),
         }
     } else if (
         discriminator.equals(Accounts.DripPositionSigner.discriminator)
     ) {
         return {
             name: 'DripPositionSigner',
-            parsed: Accounts.DripPositionSigner.decode(data).toJSON(),
+            parsedDripPositionSigner:
+                Accounts.DripPositionSigner.decode(data).toJSON(),
         }
     } else if (discriminator.equals(Accounts.GlobalConfig.discriminator)) {
         return {
             name: 'GlobalConfig',
-            parsed: Accounts.GlobalConfig.decode(data).toJSON(),
+            parsedGlobalConfig: Accounts.GlobalConfig.decode(data).toJSON(),
         }
     } else if (
         discriminator.equals(Accounts.GlobalConfigSigner.discriminator)
     ) {
         return {
             name: 'GlobalConfigSigner',
-            parsed: Accounts.GlobalConfigSigner.decode(data).toJSON(),
+            parsedGlobalConfigSigner:
+                Accounts.GlobalConfigSigner.decode(data).toJSON(),
         }
     } else if (discriminator.equals(Accounts.PairConfig.discriminator)) {
         return {
             name: 'PairConfig',
-            parsed: Accounts.PairConfig.decode(data).toJSON(),
+            parsedPairConfig: Accounts.PairConfig.decode(data).toJSON(),
         }
     }
     throw RestError.invalid(
