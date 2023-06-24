@@ -1,5 +1,9 @@
 import { Accounts } from '@dcaf/drip-types'
-import { RestError } from './types'
+import {
+    DripPositionJSONWrapper,
+    PairConfigJSONWrapper,
+    RestError,
+} from './types'
 
 // note: we use drip-types here on purpose
 // if the types in drip-types and the duplicated types in this generated/anchor diverge,
@@ -7,7 +11,7 @@ import { RestError } from './types'
 export type DripAccountDecodeResponse =
     | {
           name: 'DripPosition'
-          parsedDripPosition: Accounts.DripPositionJSON
+          parsedDripPosition: DripPositionJSONWrapper
       }
     | {
           name: 'DripPositionNftMapping'
@@ -27,7 +31,7 @@ export type DripAccountDecodeResponse =
       }
     | {
           name: 'PairConfig'
-          parsedPairConfig: Accounts.PairConfigJSON
+          parsedPairConfig: PairConfigJSONWrapper
       }
 
 export function tryDecodeToParsedDripAccount(
@@ -35,9 +39,14 @@ export function tryDecodeToParsedDripAccount(
 ): DripAccountDecodeResponse {
     const discriminator = data.slice(0, 8)
     if (discriminator.equals(Accounts.DripPosition.discriminator)) {
+        const decodedData = Accounts.DripPosition.decode(data).toJSON()
         return {
             name: 'DripPosition',
-            parsedDripPosition: Accounts.DripPosition.decode(data).toJSON(),
+            parsedDripPosition: {
+                ...decodedData,
+                ownerIsDirect: decodedData.owner.kind === 'Direct',
+                ownerIsTokenized: decodedData.owner.kind === 'Tokenized',
+            },
         }
     } else if (
         discriminator.equals(Accounts.DripPositionNftMapping.discriminator)
@@ -69,9 +78,28 @@ export function tryDecodeToParsedDripAccount(
                 Accounts.GlobalConfigSigner.decode(data).toJSON(),
         }
     } else if (discriminator.equals(Accounts.PairConfig.discriminator)) {
+        const decodedData = Accounts.PairConfig.decode(data).toJSON()
         return {
             name: 'PairConfig',
-            parsedPairConfig: Accounts.PairConfig.decode(data).toJSON(),
+            parsedPairConfig: {
+                ...decodedData,
+                inputTokenPriceOracle: {
+                    priceOracleJsonIsPyth:
+                        decodedData.inputTokenPriceOracle.kind ===
+                        'Unavailable',
+                    priceOracleJsonIsUnavailable:
+                        decodedData.inputTokenPriceOracle.kind ===
+                        'Unavailable',
+                },
+                outputTokenPriceOracle: {
+                    priceOracleJsonIsPyth:
+                        decodedData.outputTokenPriceOracle.kind ===
+                        'Unavailable',
+                    priceOracleJsonIsUnavailable:
+                        decodedData.outputTokenPriceOracle.kind ===
+                        'Unavailable',
+                },
+            },
         }
     }
     throw RestError.invalid(

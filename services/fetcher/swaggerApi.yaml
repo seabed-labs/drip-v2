@@ -625,48 +625,10 @@ components:
             enum:
                 - confirmed
                 - finalized
-        DripPositionOwner.DirectJSON:
-            properties:
-                kind:
-                    type: string
-                    enum:
-                        - Direct
-                    nullable: false
-                value:
-                    properties:
-                        owner:
-                            type: string
-                    required:
-                        - owner
-                    type: object
-            required:
-                - kind
-                - value
-            type: object
-            additionalProperties: false
-        DripPositionOwner.TokenizedJSON:
-            properties:
-                kind:
-                    type: string
-                    enum:
-                        - Tokenized
-                    nullable: false
-            required:
-                - kind
-            type: object
-            additionalProperties: false
-        types.DripPositionOwnerJSON:
-            anyOf:
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
-        DripPositionJSON:
+        Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__:
             properties:
                 globalConfig:
                     type: string
-                owner:
-                    $ref: '#/components/schemas/types.DripPositionOwnerJSON'
                 dripPositionSigner:
                     type: string
                 autoCreditEnabled:
@@ -692,7 +654,6 @@ components:
                     nullable: true
             required:
                 - globalConfig
-                - owner
                 - dripPositionSigner
                 - autoCreditEnabled
                 - inputTokenMint
@@ -705,7 +666,24 @@ components:
                 - totalOutputTokenReceived
                 - dripPositionNftMint
             type: object
-            additionalProperties: false
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        Omit_DripPositionJSON.owner_:
+            $ref: '#/components/schemas/Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__'
+            description: 'Construct a type with the properties of T except for those in type K.'
+        DripPositionJSONWrapper:
+            allOf:
+                -
+                    $ref: '#/components/schemas/Omit_DripPositionJSON.owner_'
+                -
+                    properties:
+                        ownerIsDirect:
+                            type: boolean
+                        ownerIsTokenized:
+                            type: boolean
+                    required:
+                        - ownerIsDirect
+                        - ownerIsTokenized
+                    type: object
         DripPositionNftMappingJSON:
             properties:
                 version:
@@ -785,53 +763,17 @@ components:
                 - bump
             type: object
             additionalProperties: false
-        PriceOracle.UnavailableJSON:
+        Pick_PairConfigJSON.Exclude_keyofPairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__:
             properties:
-                kind:
-                    type: string
-                    enum:
-                        - Unavailable
-                    nullable: false
-            required:
-                - kind
-            type: object
-            additionalProperties: false
-        PriceOracle.PythJSON:
-            properties:
-                kind:
-                    type: string
-                    enum:
-                        - Pyth
-                    nullable: false
-                value:
-                    properties:
-                        pythPriceFeedAccount:
-                            type: string
-                    required:
-                        - pythPriceFeedAccount
-                    type: object
-            required:
-                - kind
-                - value
-            type: object
-            additionalProperties: false
-        types.PriceOracleJSON:
-            anyOf:
-                -
-                    $ref: '#/components/schemas/PriceOracle.UnavailableJSON'
-                -
-                    $ref: '#/components/schemas/PriceOracle.PythJSON'
-        PairConfigJSON:
-            properties:
-                version:
-                    type: number
-                    format: double
                 globalConfig:
                     type: string
                 inputTokenMint:
                     type: string
                 outputTokenMint:
                     type: string
+                version:
+                    type: number
+                    format: double
                 bump:
                     type: number
                     format: double
@@ -839,26 +781,47 @@ components:
                     type: string
                 inputTokenDripFeePortionBps:
                     type: string
-                inputTokenPriceOracle:
-                    $ref: '#/components/schemas/types.PriceOracleJSON'
-                outputTokenPriceOracle:
-                    $ref: '#/components/schemas/types.PriceOracleJSON'
             required:
-                - version
                 - globalConfig
                 - inputTokenMint
                 - outputTokenMint
+                - version
                 - bump
                 - defaultPairDripFeeBps
                 - inputTokenDripFeePortionBps
-                - inputTokenPriceOracle
-                - outputTokenPriceOracle
             type: object
-            additionalProperties: false
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        Omit_PairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_:
+            $ref: '#/components/schemas/Pick_PairConfigJSON.Exclude_keyofPairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__'
+            description: 'Construct a type with the properties of T except for those in type K.'
+        PriceOracleJSON:
+            properties:
+                priceOracleJsonIsPyth:
+                    type: boolean
+                priceOracleJsonIsUnavailable:
+                    type: boolean
+            required:
+                - priceOracleJsonIsPyth
+                - priceOracleJsonIsUnavailable
+            type: object
+        PairConfigJSONWrapper:
+            allOf:
+                -
+                    $ref: '#/components/schemas/Omit_PairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_'
+                -
+                    properties:
+                        outputTokenPriceOracle:
+                            $ref: '#/components/schemas/PriceOracleJSON'
+                        inputTokenPriceOracle:
+                            $ref: '#/components/schemas/PriceOracleJSON'
+                    required:
+                        - outputTokenPriceOracle
+                        - inputTokenPriceOracle
+                    type: object
         ParsedAccountResponse:
             properties:
                 parsedPairConfig:
-                    $ref: '#/components/schemas/PairConfigJSON'
+                    $ref: '#/components/schemas/PairConfigJSONWrapper'
                 parsedGlobalConfigSigner:
                     $ref: '#/components/schemas/GlobalConfigSignerJSON'
                 parsedGlobalConfig:
@@ -868,7 +831,7 @@ components:
                 parsedDripPositionNftMapping:
                     $ref: '#/components/schemas/DripPositionNftMappingJSON'
                 parsedDripPosition:
-                    $ref: '#/components/schemas/DripPositionJSON'
+                    $ref: '#/components/schemas/DripPositionJSONWrapper'
                 name:
                     type: string
                 publicKey:

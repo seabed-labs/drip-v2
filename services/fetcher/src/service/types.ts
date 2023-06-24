@@ -92,12 +92,12 @@ export type ParsedAccountResponse = {
     //     | PairConfigJSON
     publicKey: string
     name: string
-    parsedDripPosition?: DripPositionJSON
+    parsedDripPosition?: DripPositionJSONWrapper
     parsedDripPositionNftMapping?: DripPositionNftMappingJSON
     parsedDripPositionSigner?: DripPositionSignerJSON
     parsedGlobalConfig?: GlobalConfigJSON
     parsedGlobalConfigSigner?: GlobalConfigSignerJSON
-    parsedPairConfig?: PairConfigJSON
+    parsedPairConfig?: PairConfigJSONWrapper
 }
 
 export type ParsedTxResponse = {
@@ -108,6 +108,23 @@ export type ParsedTxResponse = {
 ////////////////////////////////////////////////////////////////
 // Misc
 ////////////////////////////////////////////////////////////////
+
+export type PriceOracleJSON = {
+    priceOracleJsonIsUnavailable: boolean
+    priceOracleJsonIsPyth: boolean
+}
+export type PairConfigJSONWrapper = Omit<
+    PairConfigJSON,
+    'inputTokenPriceOracle' | 'outputTokenPriceOracle'
+> & {
+    inputTokenPriceOracle: PriceOracleJSON
+    outputTokenPriceOracle: PriceOracleJSON
+}
+
+export type DripPositionJSONWrapper = Omit<DripPositionJSON, 'owner'> & {
+    ownerIsTokenized: boolean
+    ownerIsDirect: boolean
+}
 
 export type ParsedDeposit = {
     name: DripV2InstructionNames.deposit
