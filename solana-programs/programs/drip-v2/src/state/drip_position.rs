@@ -117,10 +117,7 @@ pub struct EphemeralDripState {
 
 impl DripPosition {
     pub fn is_tokenized(&self) -> bool {
-        match self.owner {
-            DripPositionOwner::Tokenized => true,
-            _ => false,
-        }
+        matches!(self.owner, DripPositionOwner::Tokenized)
     }
 
     pub fn is_directly_owned_by(&self, signer: Pubkey) -> bool {
@@ -156,7 +153,7 @@ impl DripPosition {
                             && signer.key().eq(&nft_account.owner)
                             && nft_account.amount.eq(&1))
                     }
-                    _ => return err!(DripError::InsufficientInfoForTokenizedOwnerCheck),
+                    _ => err!(DripError::InsufficientInfoForTokenizedOwnerCheck),
                 }
             }
             DripPositionOwner::Direct { owner } => Ok(owner.eq(signer.key)),

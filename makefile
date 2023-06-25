@@ -13,10 +13,12 @@ lint-fix: root lint-fix-inner
 lint: root lint-inner
 
 lint-fix-inner:
+	cd solana-programs && cargo clippy --fix --allow-dirty -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
 	cd solana-programs && cargo fix --allow-dirty && cargo fmt
 	yarn workspaces foreach run lint:fix
 
 lint-inner:
+	cd solana-programs && cargo clippy -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
 	cd solana-programs && cargo check
 	yarn workspaces foreach run lint
 

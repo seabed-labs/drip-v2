@@ -111,7 +111,7 @@ fn withdraw_tokens<'a, 'info>(
             Ok(())
         }
         (_, amount) if amount > 0 => {
-            return err!(DripError::InsufficientInfoForWithdrawal);
+            err!(DripError::InsufficientInfoForWithdrawal)
         }
         _ => Ok(()),
     }

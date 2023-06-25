@@ -89,7 +89,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     } = ctx.accounts;
 
     require!(
-        signer.is_authorized(&global_config, AdminPermission::Drip),
+        signer.is_authorized(global_config, AdminPermission::Drip),
         DripError::OperationUnauthorized
     );
 

@@ -29,7 +29,7 @@ impl anchor_lang::AccountDeserialize for PriceFeed {
         let zeros: [u8; 32] = [0; 32];
         let dummy_key = Pubkey::new_from_array(zeros);
         let feed = account.to_price_feed(&dummy_key);
-        return Ok(PriceFeed(feed));
+        Ok(PriceFeed(feed))
     }
 }
 
@@ -63,14 +63,11 @@ pub struct PairConfig {
     pub output_token_price_oracle: PriceOracle,
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace, Default)]
 pub enum PriceOracle {
+    #[default]
     Unavailable,
-    Pyth { pyth_price_feed_account: Pubkey },
-}
-
-impl Default for PriceOracle {
-    fn default() -> Self {
-        PriceOracle::Unavailable
-    }
+    Pyth {
+        pyth_price_feed_account: Pubkey,
+    },
 }
