@@ -11,7 +11,7 @@
     "prepack": "yarn run build",
     "start": "node dist/index.js",
     "dev": "nodemon ./src/index.ts",
-    "build": "yarn run build:api-spec && yarn run build:anchor-types && yarn run build:tsc",
+    "build": "yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc",
     "build:tsc": "yarn run tsc",
     "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src/generated/anchor --program-id \"74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk\"",
     "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
