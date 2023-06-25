@@ -8,7 +8,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "yarn run build",
-    "build": "yarn run tsc",
+    "build": "yarn run build:anchor-types && yarn run build:tsc",
+    "build:tsc": "yarn run tsc",
+    "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src --program-id \"74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk\"",
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
@@ -24,7 +26,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.5.1",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "@dcaf/anchor-client-gen": "0.28.1-beta.2"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.27.0",
