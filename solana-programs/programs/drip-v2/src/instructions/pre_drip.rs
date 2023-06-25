@@ -107,7 +107,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
     require!(
         pair_config
-            .input_token_mint
+            .output_token_mint
             .eq(&drip_position.output_token_mint.key()),
         DripError::PairConfigMismatch
     );
