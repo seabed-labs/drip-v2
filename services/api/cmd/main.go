@@ -6,13 +6,12 @@ import (
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/config"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/fetcher"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/handler"
+	"github.com/dcaf-labs/drip-v2/services/api/internal/http/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/queue"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/runnable"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/translator"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
@@ -58,17 +57,13 @@ func main() {
 	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
-	f := fetcher.NewClient(
-		viper.GetString("fetcher.host"),
-		viper.GetInt64("fetcher.port"),
-	)
 
 	a := app.NewApp(t, jup, rc, rq)
 
 	runnable.NewRunner(
 		server.NewHTTPServer(20000, handler.NewHandler(a)),
 		runnable.NewTokenCacheSyncer(rc, jup),
-		runnable.NewAccountConsumer(rq, t, f),
-		runnable.NewTransactionConsumer(rq, t, f),
+		runnable.NewAccountConsumer(rq, t),
+		runnable.NewTransactionConsumer(rq, t),
 	).Run().ThenStop()
 }

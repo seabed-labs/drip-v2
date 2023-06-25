@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/fetcher"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/streadway/amqp"
 	"go.uber.org/zap"
@@ -24,13 +23,11 @@ type transactionConsumer struct {
 	qName      app.Queue
 	queue      transactionConsumerQueueInterface
 	translator transactionConsumerTranslatorInterface
-	fetcher    fetcher.ClientInterface
 }
 
 func NewTransactionConsumer(
 	queue transactionConsumerQueueInterface,
 	translator transactionConsumerTranslatorInterface,
-	fetcher fetcher.ClientInterface,
 ) *transactionConsumer {
 	qName := app.TransactionQueue
 	name := fmt.Sprintf("%s_consumer", qName)
@@ -42,13 +39,10 @@ func NewTransactionConsumer(
 		qName:      qName,
 		queue:      queue,
 		translator: translator,
-		fetcher:    fetcher,
 	}
 }
 
 func (c *transactionConsumer) Run() error {
-	ctx := context.Background()
-
 	msgs, err := c.queue.Consume(c.qName, c.name)
 	if err != nil {
 		c.log.Error(
@@ -72,14 +66,6 @@ func (c *transactionConsumer) Run() error {
 				zap.String("consumer name", c.name),
 				zap.String("message", string(msg.Body)),
 			)
-
-			_, err := c.fetcher.GetTransaction(ctx, app.TransactionSignature(string(msg.Body)))
-			if err != nil {
-				c.log.Error(
-					"failed to get transaction",
-					zap.Error(err),
-				)
-			}
 
 			//c.translator.CreateTransaction(tx)
 		}
