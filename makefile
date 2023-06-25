@@ -13,7 +13,7 @@ format:
 	
 test: program-inner sdk-inner test-inner
 
-fetcher: drip-types-inner sdk-inner fetcher-inner
+fetcher: program-inner drip-types-inner sdk-inner fetcher-inner
 
 sdk: program-inner drip-types-inner sdk-inner
 

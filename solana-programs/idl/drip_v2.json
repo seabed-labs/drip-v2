@@ -837,33 +837,7 @@
         {
           "name": "globalConfig",
           "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "global_config_signer"
-          ]
-        },
-        {
-          "name": "globalConfigSigner",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "string",
-                "value": "drip-v2-global-signer"
-              },
-              {
-                "kind": "account",
-                "type": "publicKey",
-                "account": "GlobalConfig",
-                "path": "global_config"
-              }
-            ]
-          },
-          "relations": [
-            "global_config"
-          ]
+          "isSigner": false
         },
         {
           "name": "inputTokenFeeAccount",
@@ -884,8 +858,8 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "GlobalConfig",
-                "path": "global_config"
+                "account": "DripPosition",
+                "path": "drip_position.global_config"
               },
               {
                 "kind": "account",

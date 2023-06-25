@@ -20,7 +20,6 @@ export interface PreDripFieldsJSON {
 export interface PreDripAccounts {
   signer: PublicKey
   globalConfig: PublicKey
-  globalConfigSigner: PublicKey
   inputTokenFeeAccount: PublicKey
   pairConfig: PublicKey
   dripPosition: PublicKey
@@ -35,7 +34,6 @@ export interface PreDripAccounts {
 export interface PreDripAccountsJSON {
   signer: string
   globalConfig: string
-  globalConfigSigner: string
   inputTokenFeeAccount: string
   pairConfig: string
   dripPosition: string
@@ -65,11 +63,6 @@ export class PreDrip {
       { pubkey: this.accounts.signer, isSigner: true, isWritable: false },
       {
         pubkey: this.accounts.globalConfig,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: this.accounts.globalConfigSigner,
         isSigner: false,
         isWritable: false,
       },
@@ -120,16 +113,15 @@ export class PreDrip {
     const accounts = {
       signer: flattenedAccounts[0],
       globalConfig: flattenedAccounts[1],
-      globalConfigSigner: flattenedAccounts[2],
-      inputTokenFeeAccount: flattenedAccounts[3],
-      pairConfig: flattenedAccounts[4],
-      dripPosition: flattenedAccounts[5],
-      dripPositionSigner: flattenedAccounts[6],
-      dripPositionInputTokenAccount: flattenedAccounts[7],
-      dripPositionOutputTokenAccount: flattenedAccounts[8],
-      dripperInputTokenAccount: flattenedAccounts[9],
-      instructions: flattenedAccounts[10],
-      tokenProgram: flattenedAccounts[11],
+      inputTokenFeeAccount: flattenedAccounts[2],
+      pairConfig: flattenedAccounts[3],
+      dripPosition: flattenedAccounts[4],
+      dripPositionSigner: flattenedAccounts[5],
+      dripPositionInputTokenAccount: flattenedAccounts[6],
+      dripPositionOutputTokenAccount: flattenedAccounts[7],
+      dripperInputTokenAccount: flattenedAccounts[8],
+      instructions: flattenedAccounts[9],
+      tokenProgram: flattenedAccounts[10],
     }
     return new PreDrip(fields, accounts)
   }
@@ -161,7 +153,6 @@ export class PreDrip {
     return {
       signer: this.accounts.signer.toString(),
       globalConfig: this.accounts.globalConfig.toString(),
-      globalConfigSigner: this.accounts.globalConfigSigner.toString(),
       inputTokenFeeAccount: this.accounts.inputTokenFeeAccount.toString(),
       pairConfig: this.accounts.pairConfig.toString(),
       dripPosition: this.accounts.dripPosition.toString(),

@@ -372,6 +372,38 @@
           "isSigner": false
         },
         {
+          "name": "pairConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "GlobalConfig",
+                "path": "global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "input_token_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Mint",
+                "path": "output_token_mint"
+              }
+            ]
+          }
+        },
+        {
           "name": "inputTokenMint",
           "isMut": false,
           "isSigner": false
@@ -793,6 +825,140 @@
           }
         }
       ]
+    },
+    {
+      "name": "preDrip",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.input_token_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.output_token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionOutputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripperInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PreDripParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "postDrip",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "PostDripParams"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -810,6 +976,10 @@
             "type": {
               "defined": "DripPositionOwner"
             }
+          },
+          {
+            "name": "dripFeeBps",
+            "type": "u64"
           },
           {
             "name": "dripPositionSigner",
@@ -840,6 +1010,10 @@
             "type": "u64"
           },
           {
+            "name": "dripAmountFilled",
+            "type": "u64"
+          },
+          {
             "name": "frequencyInSeconds",
             "type": "u64"
           },
@@ -855,6 +1029,26 @@
             "name": "dripPositionNftMint",
             "type": {
               "option": "publicKey"
+            }
+          },
+          {
+            "name": "dripMaxJitter",
+            "type": "u32"
+          },
+          {
+            "name": "dripActivationGenesisShift",
+            "type": "i64"
+          },
+          {
+            "name": "dripActivationTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "ephemeralDripState",
+            "type": {
+              "option": {
+                "defined": "EphemeralDripState"
+              }
             }
           }
         ]
@@ -1073,6 +1267,25 @@
       }
     },
     {
+      "name": "PostDripParams",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "PreDripParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dripAmountToFill",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateAdminParams",
       "type": {
         "kind": "struct",
@@ -1125,6 +1338,22 @@
           },
           {
             "name": "withdrawOutputAmount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EphemeralDripState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "outputTokenAccountBalancePreDripSnapshot",
+            "type": "u64"
+          },
+          {
+            "name": "currentPreFeesPartialDripAmount",
             "type": "u64"
           }
         ]
@@ -1283,7 +1512,7 @@
     },
     {
       "code": 6010,
-      "name": "GlobalConfigGlobalSignerMismatch",
+      "name": "GlobalConfigSignerMismatch",
       "msg": "Global config and global config signer mismatch"
     },
     {
@@ -1365,6 +1594,41 @@
       "code": 6026,
       "name": "CannotCloseDripPositionWithTokens",
       "msg": "Cannot close position with non-zero input/output token balance"
+    },
+    {
+      "code": 6027,
+      "name": "CannotFindPostDripIx",
+      "msg": "Cannot find post-drip IX"
+    },
+    {
+      "code": 6028,
+      "name": "InvalidDripperInputTokenAccount",
+      "msg": "Invalid dripper input token account"
+    },
+    {
+      "code": 6029,
+      "name": "DripAlreadyInProgress",
+      "msg": "Drip already in progress"
+    },
+    {
+      "code": 6030,
+      "name": "DripFillAmountTooHigh",
+      "msg": "Drip fill amount higher than remaining amount"
+    },
+    {
+      "code": 6031,
+      "name": "UnexpectedDripPositionOutputTokenAccount",
+      "msg": "Unexpected drip position output token account"
+    },
+    {
+      "code": 6032,
+      "name": "PairConfigMismatch",
+      "msg": "Pair config mismatch"
+    },
+    {
+      "code": 6033,
+      "name": "PreDripInvariantFailed",
+      "msg": "Pre drip invariant failed"
     }
   ]
 }
