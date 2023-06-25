@@ -256,7 +256,11 @@ fn validate_price_constraints(
         &ctx.accounts.pair_config.input_token_price_oracle,
         &ctx.accounts.pair_config.output_token_price_oracle,
     ) {
+        // TODO: Add logs
         (PriceOracle::Unavailable, PriceOracle::Unavailable) => {}
+        (PriceOracle::Unavailable, _) => {}
+        (_, PriceOracle::Unavailable) => {}
+        // TODO: Handle
         _ => todo!("price oracles not implemented"),
     }
 
