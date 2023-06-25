@@ -212,6 +212,8 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         current_pre_fees_partial_drip_amount: params.drip_amount_to_fill,
     });
 
+    // TODO: Refactor the function so that it can be called at the top of the handler
+    //       Right now there's issues with borrowing if we try to do that.
     validate_post_drip_ix_present(&ctx)?;
 
     Ok(())
