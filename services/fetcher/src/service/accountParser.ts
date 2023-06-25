@@ -40,12 +40,23 @@ export function tryDecodeToParsedDripAccount(
     const discriminator = data.slice(0, 8)
     if (discriminator.equals(Accounts.DripPosition.discriminator)) {
         const decodedData = Accounts.DripPosition.decode(data).toJSON()
+        const owner =
+            decodedData.owner.kind === 'Direct'
+                ? decodedData.owner.value.owner
+                : decodedData.owner.kind === 'Tokenized'
+                ? undefined
+                : null
+        if (owner === null) {
+            throw RestError.internal(
+                `DripPosition owner value unexpected for kind ${decodedData.owner.kind}`
+            )
+        }
         return {
             name: 'DripPosition',
             parsedDripPosition: {
                 ...decodedData,
-                ownerIsDirect: decodedData.owner.kind === 'Direct',
-                ownerIsTokenized: decodedData.owner.kind === 'Tokenized',
+                owner,
+                ownerType: decodedData.owner.kind,
             },
         }
     } else if (

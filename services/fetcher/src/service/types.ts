@@ -122,8 +122,8 @@ export type PairConfigJSONWrapper = Omit<
 }
 
 export type DripPositionJSONWrapper = Omit<DripPositionJSON, 'owner'> & {
-    ownerIsTokenized: boolean
-    ownerIsDirect: boolean
+    ownerType: 'Direct' | 'Tokenized'
+    owner: string | undefined
 }
 
 export type ParsedDeposit = {
