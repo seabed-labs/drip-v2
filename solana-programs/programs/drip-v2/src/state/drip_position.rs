@@ -26,6 +26,7 @@ pub struct DripPosition {
     pub drip_max_jitter: u32, // only used to validate pre-jitter, post-jitter is infinite
     pub drip_activation_genesis_shift: i64,
     pub drip_activation_timestamp: i64,
+    // TODO: Separate ephemeral state to its own ephemeral account
     pub ephemeral_drip_state: Option<EphemeralDripState>,
 }
 
@@ -89,7 +90,7 @@ impl DripPosition {
         Ok(())
     }
 
-    pub fn reset_drip_activation_timestamp(&mut self) -> Result<()> {
+    pub fn advance_drip_activation_timestamp(&mut self) -> Result<()> {
         let drip_frequency = self.frequency_in_seconds as i64;
 
         // If pre-jitter, clip it to current activation
@@ -113,6 +114,7 @@ impl DripPosition {
 pub struct EphemeralDripState {
     pub output_token_account_balance_pre_drip_snapshot: u64,
     pub current_pre_fees_partial_drip_amount: u64,
+    pub minimum_output_expected: u64,
 }
 
 impl DripPosition {

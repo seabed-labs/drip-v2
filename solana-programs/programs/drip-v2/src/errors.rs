@@ -81,26 +81,41 @@ pub enum DripError {
     IncorrectAccountsForClosePosition, // 6025 or 0x1789
 
     #[msg("Cannot close position with non-zero input/output token balance")]
-    CannotCloseDripPositionWithTokens, // 6026 or 0x1790
+    CannotCloseDripPositionWithTokens, // 6026 or 0x178A
 
     #[msg("Cannot find post-drip IX")]
-    CannotFindPostDripIx, // 6027 or 0x1791
+    CannotFindPostDripIx, // 6027 or 0x178B
 
     #[msg("Invalid dripper input token account")]
-    InvalidDripperInputTokenAccount, // 6028 or 0x1792
+    InvalidDripperInputTokenAccount, // 6028 or 0x178C
 
     #[msg("Drip already in progress")]
-    DripAlreadyInProgress, // 6029 or 0x1793
+    DripAlreadyInProgress, // 6029 or 0x178D
 
     #[msg("Drip fill amount higher than remaining amount")]
-    DripFillAmountTooHigh, // 6030 or 0x1794
+    DripFillAmountTooHigh, // 6030 or 0x178E
 
     #[msg("Unexpected drip position output token account")]
-    UnexpectedDripPositionOutputTokenAccount, // 6031 or 0x1795
+    UnexpectedDripPositionOutputTokenAccount, // 6031 or 0x178F
 
     #[msg("Pair config mismatch")]
-    PairConfigMismatch, // 6032 or 0x1796
+    PairConfigMismatch, // 6032 or 0x1790
 
     #[msg("Pre drip invariant failed")]
-    PreDripInvariantFailed, // 6033 or 0x1797
+    PreDripInvariantFailed, // 6033 or 0x1791
+
+    #[msg("Cannot find pre-drip IX")]
+    CannotFindPreDripIx, // 6034 or 0x1792
+
+    #[msg("No drip in progress")]
+    NoDripInProgres, // 6035 or 0x1793
+
+    #[msg("Drip not activated yet")]
+    DripNotActivated, // 6036 or 0x1794
+
+    #[msg("Expected non-zero received_output_amount post-drip")]
+    ExpectedNonZeroOutputPostDrip, // 6037 or 0x1795
+
+    #[msg("Exceeds slippages")]
+    ExceededSlippage, // 6038 or 0x1796
 }

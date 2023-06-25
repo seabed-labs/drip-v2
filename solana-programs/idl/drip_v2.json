@@ -949,6 +949,104 @@
           "name": "signer",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "globalConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputTokenFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pairConfig",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-pair-config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.global_config"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.input_token_mint"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position.output_token_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "dripPosition",
+          "isMut": true,
+          "isSigner": false,
+          "relations": [
+            "drip_position_signer"
+          ]
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionOutputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripperInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "instructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1629,6 +1727,26 @@
       "code": 6033,
       "name": "PreDripInvariantFailed",
       "msg": "Pre drip invariant failed"
+    },
+    {
+      "code": 6034,
+      "name": "CannotFindPreDripIx",
+      "msg": "Cannot find pre-drip IX"
+    },
+    {
+      "code": 6035,
+      "name": "NoDripInProgres",
+      "msg": "No drip in progress"
+    },
+    {
+      "code": 6036,
+      "name": "DripNotActivated",
+      "msg": "Drip not activated yet"
+    },
+    {
+      "code": 6037,
+      "name": "ExpectedNonZeroOutputPostDrip",
+      "msg": "Expected non-zero received_output_amount post-drip"
     }
   ]
 }

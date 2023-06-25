@@ -13,14 +13,18 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Add invariant checks to all IXs if needed
 // TODO: Be aggressive with signer requirements to avoid accidental unchecked params being blindly used
 //       (already done for super admin update and init_drip_position)
-// TODO: Make pair config default fees an option to allow globally changing the default by changing field in global config
-//       Instead of copying over.
+// TODO: Make pair config default fees and position fees an option to allow globally changing the default by changing field in global config
+//       Instead of having to update ALL pair configs.
+//       The fee read flow now becomes position_fees_override || pair_config_fees_override || global_default_fees;
 // TODO: Create a Metaplex Collection account when creating a global config to represent all drip positions under that global config.
 // TODO: Create a Metaplex Metadata account along with SPL token mint for a tokenized position. Point back to collection.
 // TODO: Allow users to specify trade slippage
 // TODO: Protect against tiny drip amounts that round to zero input or output fees
 // TODO: Make 2-way account 1:1 checks between pre-drip and post-drip in each IX
 // TODO: Add ability to pause drips (owner and also admin)
+// TODO: Add events
+// TODO: Remove forward references from keypair accounts to their PDAs (1:1 cases). Eg: Drip Position -> Drip Position Signer.
+// TODO: Make CPIs self-documented and clean up
 
 #[program]
 pub mod drip_v2 {
