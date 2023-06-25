@@ -240,6 +240,10 @@ fn validate_post_drip_ix_present(ctx: &Context<PreDrip>) -> Result<()> {
             let actual_discriminator = &ix.data[..8];
             let expected_discrimator = &PostDrip::discriminator();
 
+            // TODO: On top of the discriminator, verify that the accounts match what's passed into pre-drip
+            //       For now, we make the assumption that the accounts struct map in order to accounts.
+            //       Try to break this assumption in tests^.
+
             // TODO: Verify this is correct
             if actual_discriminator.eq(expected_discrimator) {
                 // Found post-drip IX
