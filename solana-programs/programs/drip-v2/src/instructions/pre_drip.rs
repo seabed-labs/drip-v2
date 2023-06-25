@@ -274,12 +274,9 @@ fn validate_post_drip_ix_present(ctx: &Context<PreDrip>) -> Result<()> {
                         && ctx.accounts.token_program.key().eq(&ix.accounts[10].pubkey)
                 };
 
-                require!(
-                    post_drip_accounts_match_expectation,
-                    DripError::UnexpectedPostDripAccounts
-                );
-
-                break;
+                if post_drip_accounts_match_expectation {
+                    break;
+                }
             }
         }
 
