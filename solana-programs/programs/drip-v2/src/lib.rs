@@ -18,6 +18,9 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Create a Metaplex Collection account when creating a global config to represent all drip positions under that global config.
 // TODO: Create a Metaplex Metadata account along with SPL token mint for a tokenized position. Point back to collection.
 // TODO: Allow users to specify trade slippage
+// TODO: Protect against tiny drip amounts that round to zero input or output fees
+// TODO: Make 2-way account 1:1 checks between pre-drip and post-drip in each IX
+// TODO: Add ability to pause drips (owner and also admin)
 
 #[program]
 pub mod drip_v2 {
