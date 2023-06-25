@@ -105,8 +105,6 @@ impl DripPosition {
         self.drip_activation_timestamp =
             shifted_current_canonical_activation_timestamp + drip_frequency;
 
-        // TODO
-
         Ok(())
     }
 }
