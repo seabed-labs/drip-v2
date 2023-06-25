@@ -30,7 +30,6 @@ program-inner:
 	cp solana-programs/idl/drip_v2.json packages/drip-types/drip_v2.json
 
 drip-types-inner:
-	cd packages/drip-types && yarn run anchor-client-gen ./drip_v2.json ./src --program-id "74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk"
 	cd packages/drip-types && yarn install && yarn build
 
 sdk-inner:
