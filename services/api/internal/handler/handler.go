@@ -113,7 +113,7 @@ func (h *handler) registerRoutes() {
 		return err
 	})
 
-	h.handler.GET("/users/:wallet_address/positions", func(ctx echo.Context) error {
+	h.handler.GET("/wallet/:public_key/positions", func(ctx echo.Context) error {
 		return echo.ErrNotImplemented
 	})
 }

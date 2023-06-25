@@ -3,6 +3,7 @@ package main
 import (
 	"go.uber.org/zap"
 
+	"github.com/dcaf-labs/drip-v2/services/api/gen/fetcher"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/config"
@@ -57,13 +58,14 @@ func main() {
 	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
+	f := fetcher.NewAPIClient(&fetcher.Configuration{Host: "localhost:3000"})
 
 	a := app.NewApp(t, jup, rc, rq)
 
 	runnable.NewRunner(
 		server.NewHTTPServer(20000, handler.NewHandler(a)),
 		runnable.NewTokenCacheSyncer(rc, jup),
-		runnable.NewAccountConsumer(rq, t),
-		runnable.NewTransactionConsumer(rq, t),
+		runnable.NewAccountConsumer(rq, t, f),
+		runnable.NewTransactionConsumer(rq, t, f),
 	).Run().ThenStop()
 }
