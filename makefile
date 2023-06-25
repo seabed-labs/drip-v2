@@ -1,3 +1,5 @@
+all: root program-inner drip-types-inner sdk-inner fetcher-inner test-inner
+
 root:
 	yarn
 
@@ -10,8 +12,8 @@ format:
 	cd solana-programs && cargo fmt
 	yarn
 	yarn workspaces foreach run lint:fix
-	
-test: program-inner sdk-inner test-inner
+
+test: program-inner drip-types-inner sdk-inner test-inner
 
 fetcher: program-inner drip-types-inner sdk-inner fetcher-inner
 
@@ -34,7 +36,7 @@ sdk-inner:
 	cd packages/sdk && yarn install && yarn build && yarn lint:fix
 
 fetcher-inner:
-	cd packages/sdk && yarn install && yarn build && yarn lint:fix
+	cd services/fetcher && yarn install && yarn build && yarn lint:fix
 
 test-inner:
 	cd solana-programs && cargo test
