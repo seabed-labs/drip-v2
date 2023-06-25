@@ -14,7 +14,7 @@
     "build": "yarn run build:api-spec && yarn run build:anchor-types && yarn run build:tsc",
     "build:tsc": "yarn run tsc",
     "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src/generated/anchor --program-id \"74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk\"",
-    "build:api-spec": "yarn run tsoa spec-and-routes --yaml && yarn run lint:fix",
+    "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",

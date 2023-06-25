@@ -4,6 +4,7 @@ WORKDIR /project
 
 FROM base AS dependencies
 
+COPY .eslintrc .
 COPY tsconfig.json .
 COPY package.json .
 COPY yarn.lock .
