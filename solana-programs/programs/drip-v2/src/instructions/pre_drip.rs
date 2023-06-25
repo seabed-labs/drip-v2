@@ -94,6 +94,13 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     );
 
     require!(
+        drip_position.ephemeral_drip_state.is_none(),
+        DripError::DripAlreadyInProgress
+    );
+
+    require!(drip_position.is_activated()?, DripError::DripNotActivated);
+
+    require!(
         pair_config.global_config.eq(&global_config.key()),
         DripError::GlobalConfigMismatch
     );
@@ -115,11 +122,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
             .output_token_mint
             .eq(&drip_position.output_token_mint.key()),
         DripError::PairConfigMismatch
-    );
-
-    require!(
-        drip_position.ephemeral_drip_state.is_none(),
-        DripError::DripAlreadyInProgress
     );
 
     require!(
