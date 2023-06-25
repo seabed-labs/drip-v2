@@ -156,6 +156,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
     // TODO: Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
     //       Else switch to checked math functions.
+    // TODO: Move all math here to a custom module to unit test better
     let partial_drip_amount = params.drip_amount_to_fill;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
     let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
