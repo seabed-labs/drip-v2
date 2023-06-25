@@ -13,6 +13,8 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Add invariant checks to all IXs if needed
 // TODO: Be aggressive with signer requirements to avoid accidental unchecked params being blindly used
 //       (already done for super admin update and init_drip_position)
+// TODO: Make pair config default fees an option to allow globally changing the default by changing field in global config
+//       Instead of copying over.
 
 #[program]
 pub mod drip_v2 {
