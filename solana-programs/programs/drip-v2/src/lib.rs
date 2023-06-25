@@ -25,6 +25,9 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Add events
 // TODO: Remove forward references from keypair accounts to their PDAs (1:1 cases). Eg: Drip Position -> Drip Position Signer.
 // TODO: Make CPIs self-documented and clean up
+// TODO: Slippage Bps (use override mechanism position -> pair -> global)
+// TODO: ONLY ALLOW SUPER ADMIN TO UPDATE ORACLES AFTER THEY ARE SET (i.e. NOT UNAVAILABLE)
+//       ADMIN PERMS FOR ORACLES SHOULD ONLY ALLOW SETTING AND NOT UNSETTING/UPDATING
 
 #[program]
 pub mod drip_v2 {
@@ -108,7 +111,7 @@ pub mod drip_v2 {
         handle_pre_drip(ctx, params)
     }
 
-    pub fn post_drip(ctx: Context<PostDrip>, params: PostDripParams) -> Result<()> {
-        handle_post_drip(ctx, params)
+    pub fn post_drip(ctx: Context<PostDrip>) -> Result<()> {
+        handle_post_drip(ctx)
     }
 }
