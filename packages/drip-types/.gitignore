@@ -131,9 +131,7 @@ dist
 
 
 # generated files
-src/accounts/*.ts
-src/errors/*.ts
-src/instructions/*.ts
-src/types/*.ts
-src/drip_v2.ts
+src/**/*.ts
+src/*.ts
+!src/index.ts
 !/src/**/.gitkeep
