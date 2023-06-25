@@ -33,7 +33,7 @@ pub enum DripError {
     GlobalConfigMismatch, // 6009 or 0x1779
 
     #[msg("Global config and global config signer mismatch")]
-    GlobalConfigGlobalSignerMismatch, // 6010 or 0x177A
+    GlobalConfigSignerMismatch, // 6010 or 0x177A
 
     #[msg("Drip position and drip position signer mismatch")]
     DripPositionSignerMismatch, // 6011 or 0x177B
@@ -82,4 +82,25 @@ pub enum DripError {
 
     #[msg("Cannot close position with non-zero input/output token balance")]
     CannotCloseDripPositionWithTokens, // 6026 or 0x1790
+
+    #[msg("Cannot find post-drip IX")]
+    CannotFindPostDripIx, // 6027 or 0x1791
+
+    #[msg("Invalid dripper input token account")]
+    InvalidDripperInputTokenAccount, // 6028 or 0x1792
+
+    #[msg("Drip already in progress")]
+    DripAlreadyInProgress, // 6029 or 0x1793
+
+    #[msg("Drip fill amount higher than remaining amount")]
+    DripFillAmountTooHigh, // 6030 or 0x1794
+
+    #[msg("Unexpected drip position output token account")]
+    UnexpectedDripPositionOutputTokenAccount, // 6031 or 0x1795
+
+    #[msg("Pair config mismatch")]
+    PairConfigMismatch, // 6032 or 0x1796
+
+    #[msg("Pre drip invariant failed")]
+    PreDripInvariantFailed, // 6033 or 0x1797
 }

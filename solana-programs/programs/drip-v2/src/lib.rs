@@ -96,4 +96,12 @@ pub mod drip_v2 {
     pub fn withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
         handle_withdraw(ctx, params)
     }
+
+    pub fn pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<()> {
+        handle_pre_drip(ctx, params)
+    }
+
+    pub fn post_drip(ctx: Context<PostDrip>, params: PostDripParams) -> Result<()> {
+        handle_post_drip(ctx, params)
+    }
 }

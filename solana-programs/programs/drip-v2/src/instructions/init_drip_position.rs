@@ -1,4 +1,7 @@
-use crate::state::{DripPosition, DripPositionOwner, DripPositionSigner, GlobalConfig};
+use crate::{
+    errors::DripError,
+    state::{DripPosition, DripPositionOwner, DripPositionSigner, GlobalConfig, PairConfig},
+};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -13,9 +16,20 @@ pub struct InitDripPosition<'info> {
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
+    #[account(
+        seeds = [
+            b"drip-v2-pair-config",
+            global_config.key().as_ref(),
+            input_token_mint.key().as_ref(),
+            output_token_mint.key().as_ref(),
+        ],
+        bump = pair_config.bump,
+    )]
+    pub pair_config: Box<Account<'info, PairConfig>>,
+
     pub input_token_mint: Box<Account<'info, Mint>>,
 
-    pub output_token_mint: Account<'info, Mint>,
+    pub output_token_mint: Box<Account<'info, Mint>>,
 
     #[account(
         init,
@@ -67,13 +81,38 @@ pub fn handle_init_drip_position(
     ctx: Context<InitDripPosition>,
     params: InitDripPositionParams,
 ) -> Result<()> {
-    // TODO: Verifications (if any)
+    // TODO: Verifications (if any left)
+    require!(
+        ctx.accounts
+            .pair_config
+            .global_config
+            .eq(&ctx.accounts.global_config.key()),
+        DripError::GlobalConfigMismatch
+    );
+
+    require!(
+        ctx.accounts
+            .pair_config
+            .input_token_mint
+            .eq(&ctx.accounts.input_token_mint.key()),
+        DripError::PairConfigMismatch
+    );
+
+    require!(
+        ctx.accounts
+            .pair_config
+            .output_token_mint
+            .eq(&ctx.accounts.output_token_mint.key()),
+        DripError::PairConfigMismatch
+    );
 
     let drip_position = &mut ctx.accounts.drip_position;
     drip_position.global_config = ctx.accounts.global_config.key();
     drip_position.owner = DripPositionOwner::Direct {
         owner: ctx.accounts.owner.key(),
     };
+
+    drip_position.drip_fee_bps = ctx.accounts.pair_config.default_pair_drip_fee_bps;
 
     drip_position.drip_position_signer = ctx.accounts.drip_position_signer.key();
     // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
@@ -86,6 +125,7 @@ pub fn handle_init_drip_position(
     drip_position.frequency_in_seconds = params.frequency_in_seconds;
     drip_position.total_input_token_dripped = 0;
     drip_position.total_output_token_received = 0;
+    drip_position.init_drip_timestamps()?;
 
     let drip_position_signer = &mut ctx.accounts.drip_position_signer;
     drip_position_signer.drip_position = ctx.accounts.drip_position.key();
