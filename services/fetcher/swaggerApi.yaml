@@ -113,6 +113,8 @@ components:
                     type: string
                 globalConfig:
                     type: string
+                pairConfig:
+                    type: string
                 inputTokenMint:
                     type: string
                 outputTokenMint:
@@ -135,6 +137,7 @@ components:
                 - payer
                 - owner
                 - globalConfig
+                - pairConfig
                 - inputTokenMint
                 - outputTokenMint
                 - inputTokenAccount
@@ -625,9 +628,22 @@ components:
             enum:
                 - confirmed
                 - finalized
+        types.EphemeralDripStateJSON:
+            properties:
+                outputTokenAccountBalancePreDripSnapshot:
+                    type: string
+                currentPreFeesPartialDripAmount:
+                    type: string
+            required:
+                - outputTokenAccountBalancePreDripSnapshot
+                - currentPreFeesPartialDripAmount
+            type: object
+            additionalProperties: false
         Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__:
             properties:
                 globalConfig:
+                    type: string
+                dripFeeBps:
                     type: string
                 dripPositionSigner:
                     type: string
@@ -643,6 +659,8 @@ components:
                     type: string
                 dripAmount:
                     type: string
+                dripAmountFilled:
+                    type: string
                 frequencyInSeconds:
                     type: string
                 totalInputTokenDripped:
@@ -652,8 +670,21 @@ components:
                 dripPositionNftMint:
                     type: string
                     nullable: true
+                dripMaxJitter:
+                    type: number
+                    format: double
+                dripActivationGenesisShift:
+                    type: string
+                dripActivationTimestamp:
+                    type: string
+                ephemeralDripState:
+                    allOf:
+                        -
+                            $ref: '#/components/schemas/types.EphemeralDripStateJSON'
+                    nullable: true
             required:
                 - globalConfig
+                - dripFeeBps
                 - dripPositionSigner
                 - autoCreditEnabled
                 - inputTokenMint
@@ -661,10 +692,15 @@ components:
                 - inputTokenAccount
                 - outputTokenAccount
                 - dripAmount
+                - dripAmountFilled
                 - frequencyInSeconds
                 - totalInputTokenDripped
                 - totalOutputTokenReceived
                 - dripPositionNftMint
+                - dripMaxJitter
+                - dripActivationGenesisShift
+                - dripActivationTimestamp
+                - ephemeralDripState
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
         Omit_DripPositionJSON.owner_:
