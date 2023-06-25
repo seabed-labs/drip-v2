@@ -119,15 +119,15 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
     require!(
         drip_position_input_token_account
-            .owner
-            .eq(&drip_position_signer.key()),
+            .key()
+            .eq(&drip_position.input_token_account),
         DripError::UnexpectedDripPositionInputTokenAccount
     );
 
     require!(
         drip_position_output_token_account
-            .owner
-            .eq(&drip_position_signer.key()),
+            .key()
+            .eq(&drip_position.output_token_account),
         DripError::UnexpectedDripPositionOutputTokenAccount
     );
 
