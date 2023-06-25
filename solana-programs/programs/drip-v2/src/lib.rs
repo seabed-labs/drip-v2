@@ -15,6 +15,8 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 //       (already done for super admin update and init_drip_position)
 // TODO: Make pair config default fees an option to allow globally changing the default by changing field in global config
 //       Instead of copying over.
+// TODO: Create a Metaplex Collection account when creating a global config to represent all drip positions under that global config.
+// TODO: Create a Metaplex Metadata account along with SPL token mint for a tokenized position. Point back to collection.
 
 #[program]
 pub mod drip_v2 {
