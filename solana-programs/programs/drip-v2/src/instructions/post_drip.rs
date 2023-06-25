@@ -8,6 +8,6 @@ pub struct PostDrip<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct PostDripParams {}
 
-pub fn handle_post_drip(ctx: Context<PostDrip>, params: PostDripParams) -> Result<()> {
+pub fn handle_post_drip(_ctx: Context<PostDrip>, _params: PostDripParams) -> Result<()> {
     todo!()
 }

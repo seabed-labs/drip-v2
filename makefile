@@ -1,4 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner test-inner format-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner test-inner lint-fix-inner
 
 root:
 	yarn
@@ -8,11 +8,17 @@ clean:
 	cd packages/sdk && yarn clean
 	cd solana-programs && cargo clean
 
-format: root format-inner
+lint-fix: root lint-fix-inner
 
-format-inner:
-	cd solana-programs && cargo fmt
+lint: root lint-inner
+
+lint-fix-inner:
+	cd solana-programs && cargo fix --allow-dirty && cargo fmt
 	yarn workspaces foreach run lint:fix
+
+lint-inner:
+	cd solana-programs && cargo check
+	yarn workspaces foreach run lint
 
 test: program-inner drip-types-inner sdk-inner test-inner
 
