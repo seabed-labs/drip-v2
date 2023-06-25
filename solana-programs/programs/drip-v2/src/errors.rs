@@ -115,4 +115,7 @@ pub enum DripError {
 
     #[msg("Expected non-zero received_output_amount post-drip")]
     ExpectedNonZeroOutputPostDrip, // 6037 or 0x1795
+
+    #[msg("Exceeds slippages")]
+    ExceededSlippage, // 6038 or 0x1796
 }

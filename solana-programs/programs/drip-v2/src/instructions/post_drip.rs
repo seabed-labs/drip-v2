@@ -145,8 +145,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>, _params: PostDripParams) -> Resu
         DripError::UnexpectedFeeTokenAccount
     );
 
-    // TODO
-
+    // TODO: These calculations are done in pre-drip. Just store the results in ephemeral state.
     let pre_fees_partal_drip_amount = ephemeral_drip_state.current_pre_fees_partial_drip_amount;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
 
@@ -162,6 +161,11 @@ pub fn handle_post_drip(ctx: Context<PostDrip>, _params: PostDripParams) -> Resu
     require!(
         received_output_tokens > 0,
         DripError::ExpectedNonZeroOutputPostDrip
+    );
+
+    require!(
+        received_output_tokens >= ephemeral_drip_state.minimum_output_expected,
+        DripError::ExceededSlippage
     );
 
     let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps

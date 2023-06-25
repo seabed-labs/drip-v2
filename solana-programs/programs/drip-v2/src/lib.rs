@@ -23,6 +23,8 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Make 2-way account 1:1 checks between pre-drip and post-drip in each IX
 // TODO: Add ability to pause drips (owner and also admin)
 // TODO: Add events
+// TODO: Remove forward references from keypair accounts to their PDAs (1:1 cases). Eg: Drip Position -> Drip Position Signer.
+// TODO: Make CPIs self-documented and clean up
 
 #[program]
 pub mod drip_v2 {
