@@ -89,6 +89,11 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     } = ctx.accounts;
 
     require!(
+        signer.is_authorized(&global_config, AdminPermission::Drip),
+        DripError::OperationUnauthorized
+    );
+
+    require!(
         pair_config.global_config.eq(&global_config.key()),
         DripError::GlobalConfigMismatch
     );
@@ -135,11 +140,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         params.drip_amount_to_fill
             <= (drip_position.drip_amount - drip_position.drip_amount_filled),
         DripError::DripFillAmountTooHigh
-    );
-
-    require!(
-        signer.is_authorized(&global_config, AdminPermission::Drip),
-        DripError::OperationUnauthorized
     );
 
     require!(
