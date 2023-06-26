@@ -1,4 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner test-inner lint-fix-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner test-inner lint-fix-inner
 
 root:
 	yarn
@@ -26,6 +26,8 @@ test: program-inner drip-types-inner sdk-inner test-inner
 
 fetcher: program-inner drip-types-inner sdk-inner fetcher-inner
 
+dripper: program-inner drip-types-inner sdk-inner dripper-inner
+
 sdk: program-inner drip-types-inner sdk-inner
 
 drip-types: root program-inner drip-types-inner
@@ -45,6 +47,9 @@ sdk-inner:
 
 fetcher-inner:
 	cd services/fetcher && yarn install && yarn build
+
+dripper-inner:
+	cd services/dripper && yarn install && yarn build
 
 test-inner:
 	cd solana-programs && cargo test

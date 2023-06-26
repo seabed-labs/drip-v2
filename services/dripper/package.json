@@ -35,9 +35,13 @@
   "dependencies": {
     "@coral-xyz/anchor": "0.27.0",
     "@dcaf/drip": "0.1.0",
+    "@jup-ag/core": "4.0.0-beta.20",
     "@solana/web3.js": "1.77.3",
     "bn.js": "^5.2.1",
     "dotenv": "^16.3.1",
-    "nodemon": "^2.0.22"
+    "jsbi": "4.3.0",
+    "nodemon": "^2.0.22",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.8.0"
   }
 }
