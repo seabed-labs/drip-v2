@@ -1,6 +1,6 @@
 import { IPositionsFetcher } from './index'
 import { Accounts } from '@dcaf/drip-types'
-import { IDripHandler } from '../drip'
+import { IDripHandler } from '../dripHandler'
 
 export class OnChainPositionsFetcher implements IPositionsFetcher {
     find(): Promise<Accounts.DripPosition[]> {
