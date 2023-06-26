@@ -8,7 +8,7 @@ import {
     TransactionMessage,
     VersionedTransaction,
 } from '@solana/web3.js'
-import { DEFAULT_CONFIRM_OPTIONS, paginate } from '../utils'
+import {dedupeInstructionsPublicKeys, DEFAULT_CONFIRM_OPTIONS, paginate} from '../utils'
 import Provider from '@coral-xyz/anchor/dist/cjs/provider'
 import assert from 'assert'
 import { AnchorProvider } from '@coral-xyz/anchor'
@@ -68,14 +68,7 @@ export abstract class DripHandlerBase {
     async createLookupTables(
         dripIxs: TransactionInstruction[]
     ): Promise<AddressLookupTableAccount[]> {
-        // TODO(mocha): is there an easier/cleaner way to dedupe?
-        const accounts = [
-            ...new Set(
-                dripIxs.flatMap((ix) => {
-                    return ix.keys.map((ixKey) => ixKey.pubkey.toString())
-                })
-            ),
-        ].map((accountString) => new PublicKey(accountString))
+        const accounts = dedupeInstructionsPublicKeys(dripIxs)
 
         // each row represents the instructions for a tx
         const ixsForTxs: TransactionInstruction[][] = []
