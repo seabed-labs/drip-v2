@@ -16,6 +16,7 @@ use crate::{
 
 // TODO: On the client-side leverage V0 TX and ALTs to decrease size and increase composability
 
+// NOTE: When changing this struct, also change validation in post-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PreDrip<'info> {
     pub signer: Signer<'info>,
@@ -244,14 +245,39 @@ fn validate_post_drip_ix_present(ctx: &Context<PreDrip>) -> Result<()> {
             let actual_discriminator = &ix.data[..8];
             let expected_discrimator = &PostDrip::discriminator();
 
-            // TODO: On top of the discriminator, verify that the accounts match what's passed into pre-drip
-            //       For now, we make the assumption that the accounts struct map in order to accounts.
-            //       Try to break this assumption in tests^.
-
-            // TODO: Verify this is correct
             if actual_discriminator.eq(expected_discrimator) {
-                // Found post-drip IX
-                break;
+                let post_drip_accounts_match_expectation = {
+                    ctx.accounts.signer.key().eq(&ix.accounts[0].pubkey)
+                        && ctx.accounts.global_config.key().eq(&ix.accounts[1].pubkey)
+                        && ctx.accounts.pair_config.key().eq(&ix.accounts[3].pubkey)
+                        && ctx.accounts.drip_position.key().eq(&ix.accounts[4].pubkey)
+                        && ctx
+                            .accounts
+                            .drip_position_signer
+                            .key()
+                            .eq(&ix.accounts[5].pubkey)
+                        && ctx
+                            .accounts
+                            .drip_position_input_token_account
+                            .key()
+                            .eq(&ix.accounts[6].pubkey)
+                        && ctx
+                            .accounts
+                            .drip_position_output_token_account
+                            .key()
+                            .eq(&ix.accounts[7].pubkey)
+                        && ctx
+                            .accounts
+                            .dripper_input_token_account
+                            .key()
+                            .eq(&ix.accounts[8].pubkey)
+                        && ctx.accounts.instructions.key().eq(&ix.accounts[9].pubkey)
+                        && ctx.accounts.token_program.key().eq(&ix.accounts[10].pubkey)
+                };
+
+                if post_drip_accounts_match_expectation {
+                    break;
+                }
             }
         }
 
