@@ -634,9 +634,12 @@ components:
                     type: string
                 currentPreFeesPartialDripAmount:
                     type: string
+                minimumOutputExpected:
+                    type: string
             required:
                 - outputTokenAccountBalancePreDripSnapshot
                 - currentPreFeesPartialDripAmount
+                - minimumOutputExpected
             type: object
             additionalProperties: false
         Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__:

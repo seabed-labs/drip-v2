@@ -1049,14 +1049,7 @@
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": "PostDripParams"
-          }
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -1365,19 +1358,16 @@
       }
     },
     {
-      "name": "PostDripParams",
-      "type": {
-        "kind": "struct",
-        "fields": []
-      }
-    },
-    {
       "name": "PreDripParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "dripAmountToFill",
+            "type": "u64"
+          },
+          {
+            "name": "minimumOutputTokensExpected",
             "type": "u64"
           }
         ]
@@ -1452,6 +1442,10 @@
           },
           {
             "name": "currentPreFeesPartialDripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "minimumOutputExpected",
             "type": "u64"
           }
         ]
@@ -1747,6 +1741,11 @@
       "code": 6037,
       "name": "ExpectedNonZeroOutputPostDrip",
       "msg": "Expected non-zero received_output_amount post-drip"
+    },
+    {
+      "code": 6038,
+      "name": "ExceededSlippage",
+      "msg": "Exceeds slippages"
     }
   ]
 }
