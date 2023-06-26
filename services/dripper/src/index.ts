@@ -27,7 +27,7 @@ async function main() {
         await exitHandler('SIGINT', worker)
     })
     process.on('SIGTERM', async () => {
-        await exitHandler('SIGINT', worker)
+        await exitHandler('SIGTERM', worker)
     })
     return worker.start()
 }

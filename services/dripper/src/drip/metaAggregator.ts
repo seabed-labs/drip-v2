@@ -22,7 +22,7 @@ export class MetaAggregator extends DripHandlerBase implements IDripHandler {
         position: Accounts.DripPosition
     ): Promise<TransactionInstruction[]> {
         const instructions: TransactionInstruction[] = []
-        if (await this.shouldInitPairConfig(position)) {
+        if (await this.shouldSetOracle(position)) {
             instructions.push(...(await this.getInitPairConfigIx(position)))
         }
 
@@ -51,7 +51,7 @@ export class MetaAggregator extends DripHandlerBase implements IDripHandler {
             return 0
         })
 
-        const quoteWithIxs = quotesWithIxs[0]
+        const [quoteWithIxs] = quotesWithIxs
 
         // TODO: pre drip
         instructions.push(...quoteWithIxs.instructions)

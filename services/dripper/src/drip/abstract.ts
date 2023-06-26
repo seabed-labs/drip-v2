@@ -34,9 +34,7 @@ export abstract class DripHandlerBase {
         throw new Error('not implemented')
     }
 
-    async shouldInitPairConfig(
-        position: Accounts.DripPosition
-    ): Promise<boolean> {
+    async shouldSetOracle(position: Accounts.DripPosition): Promise<boolean> {
         const pairConfig = await this.getPairConfig(position)
         return (
             pairConfig.inputTokenPriceOracle.kind === 'Unavailable' ||
@@ -56,10 +54,10 @@ export abstract class DripHandlerBase {
     ): Promise<string> {
         const dripIxs = await this.createDripInstructions(position)
         const luts = await this.createLookupTables(dripIxs)
-        const dripTxs = await this.createVersionedTransactions([dripIxs], luts)
-        assert(dripTxs.length === 1, new Error('TODO'))
+        const [dripTx] = await this.createVersionedTransactions([dripIxs], luts)
+        assert(dripTx, new Error('TODO'))
         const txSig = await this.provider.sendAndConfirm(
-            dripTxs[0],
+            dripTx,
             [],
             DEFAULT_CONFIRM_OPTIONS
         )
@@ -79,7 +77,6 @@ export abstract class DripHandlerBase {
             ),
         ].map((accountString) => new PublicKey(accountString))
 
-        const slot = await this.connection.getSlot()
         // each row represents the instructions for a tx
         const ixsForTxs: TransactionInstruction[][] = []
         const lutAddresses: PublicKey[] = []
@@ -88,6 +85,7 @@ export abstract class DripHandlerBase {
         await paginate(
             accounts,
             async (lutAccounts) => {
+                const slot = await this.connection.getSlot()
                 const [lookupTableInst, lookupTableAddress] =
                     AddressLookupTableProgram.createLookupTable({
                         authority: this.provider.publicKey,
@@ -118,22 +116,12 @@ export abstract class DripHandlerBase {
 
         const txs = await this.createVersionedTransactions(ixsForTxs)
         await this.provider.sendAll(
-            txs.map(
-                (tx) => {
-                    return {
-                        tx,
-                    }
-                },
-                {
-                    ...DEFAULT_CONFIRM_OPTIONS,
-                    minContextSlot: slot,
-                }
-            )
+            txs.map((tx) => ({ tx }), DEFAULT_CONFIRM_OPTIONS)
         )
         const luts = await Promise.all(
-            lutAddresses.map((lutAddress) => {
-                return this.connection.getAddressLookupTable(lutAddress)
-            })
+            lutAddresses.map((lutAddress) =>
+                this.connection.getAddressLookupTable(lutAddress)
+            )
         )
         return luts.map((lut) => {
             assert(lut.value, new Error('TODO'))
@@ -142,16 +130,14 @@ export abstract class DripHandlerBase {
     }
 
     async closeLookupTables(luts: AddressLookupTableAccount[]): Promise<void> {
-        const closeLutIxs = luts.map((lut) => {
-            return AddressLookupTableProgram.closeLookupTable({
+        const closeLutIxs = luts.map((lut) =>
+            AddressLookupTableProgram.closeLookupTable({
                 lookupTable: lut.key,
                 authority: this.provider.publicKey,
                 recipient: this.provider.publicKey,
             })
-        })
-        const tx = (
-            await this.createVersionedTransactions([closeLutIxs], luts)
-        )[0]
+        )
+        const [tx] = await this.createVersionedTransactions([closeLutIxs], luts)
         assert(tx, new Error('TODO'))
         await this.provider.sendAndConfirm(tx, [], DEFAULT_CONFIRM_OPTIONS)
     }
@@ -160,8 +146,9 @@ export abstract class DripHandlerBase {
         instructionsForTxs: TransactionInstruction[][],
         addressLookupTableAccounts?: AddressLookupTableAccount[]
     ): Promise<VersionedTransaction[]> {
-        const recentBlockhash = (await this.connection.getLatestBlockhash())
-            .blockhash
+        const recentBlockhash = await this.connection
+            .getLatestBlockhash()
+            .then((lb) => lb.blockhash)
         return instructionsForTxs.map((instructions) => {
             const messageV0 = new TransactionMessage({
                 payerKey: this.provider.publicKey,

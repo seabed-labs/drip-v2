@@ -17,11 +17,14 @@ export const DEFAULT_CONFIRM_OPTIONS: ConfirmOptions = {
 export async function paginate<T>(
     array: T[],
     fn: (items: T[]) => Promise<void>,
-    pageSize = 20
+    pageSize: number
 ) {
     let pageNumber = 0
     for (;;) {
-        const items = array.slice(pageNumber * pageSize, pageNumber * pageSize)
+        const items = array.slice(
+            pageNumber * pageSize,
+            (pageNumber + 1) * pageSize
+        )
         if (items.length === 0) {
             return
         }

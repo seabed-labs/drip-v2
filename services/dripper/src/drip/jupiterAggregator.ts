@@ -41,7 +41,7 @@ export class JupiterSwap implements ITokenSwapHandler {
             computeRoutesRes.routesInfos,
             new Error('no routes for jupiter swap')
         )
-        const route = computeRoutesRes.routesInfos[0]
+        const [route] = computeRoutesRes.routesInfos
 
         const { swapTransaction, addressLookupTableAccounts } =
             await jup.exchange({
