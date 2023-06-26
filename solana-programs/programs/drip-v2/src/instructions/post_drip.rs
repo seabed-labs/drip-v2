@@ -11,6 +11,7 @@ use crate::{
     },
 };
 
+// NOTE: When changing this struct, also change validation in pre-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PostDrip<'info> {
     pub signer: Signer<'info>,

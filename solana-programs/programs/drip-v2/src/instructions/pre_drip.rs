@@ -16,6 +16,7 @@ use crate::{
 
 // TODO: On the client-side leverage V0 TX and ALTs to decrease size and increase composability
 
+// NOTE: When changing this struct, also change validation in post-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PreDrip<'info> {
     pub signer: Signer<'info>,
