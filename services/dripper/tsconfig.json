@@ -9,13 +9,17 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
 
+        /* needed for tsyringe */
         /* Experimental Options */
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
     },
     "references": [
         {
-            "path": "../../packages/sdk"
+            "path": "../../packages/drip-types"
+        },
+        {
+            "path": "../../packages/sdk",
         }
     ],
     "ts-node": {
