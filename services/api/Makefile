@@ -53,6 +53,20 @@ gen-sql: sqlc
 		dcaf-sqlc:1.18.0 \
 			sqlc generate
 
+gen-fetcher:
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		--volume $(shell dirname "$(CURDIR)"):/services \
+		openapitools/openapi-generator-cli generate \
+			-i /services/fetcher/swaggerApi.yaml \
+			-g go \
+			-o /services/api/gen/fetcher \
+			--additional-properties=packageName=fetcher
+	@rm \
+		$(CURDIR)/gen/fetcher/go.mod \
+		$(CURDIR)/gen/fetcher/go.sum \
+		$(CURDIR)/gen/fetcher/git_push.sh \
+
 #### Code Lint ####
 lint: lint-go lint-sql
 
