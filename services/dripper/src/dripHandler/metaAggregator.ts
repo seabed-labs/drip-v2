@@ -1,36 +1,27 @@
-import { DripHandlerBase } from './abstract'
-import { IDripHandler, ITokenSwapHandler } from './index'
+import { PositionHandlerBase } from './abstract'
+import { DripInstructions, ITokenSwapHandler } from './index'
 import { Accounts } from '@dcaf/drip-types'
-import { Connection, TransactionInstruction } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import assert from 'assert'
 import { AnchorProvider } from '@coral-xyz/anchor'
+import { notEmpty } from '../utils'
 
-// todo: move this
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-    return value !== null && value !== undefined
-}
-
-export class MetaAggregator extends DripHandlerBase implements IDripHandler {
+export class MetaAggregator extends PositionHandlerBase {
     constructor(
         provider: AnchorProvider,
         connection: Connection,
+        dripPosition: Accounts.DripPosition,
         private readonly swaps: ITokenSwapHandler[]
     ) {
-        super(provider, connection)
+        super(provider, connection, dripPosition)
     }
-    async createDripInstructions(
-        position: Accounts.DripPosition
-    ): Promise<TransactionInstruction[]> {
-        const instructions: TransactionInstruction[] = []
-        if (await this.shouldSetOracle(position)) {
-            instructions.push(...(await this.getInitPairConfigIx(position)))
-        }
 
+    async createSwapInstructions(): Promise<DripInstructions> {
         const quotesWithIxs = (
             await Promise.all(
                 this.swaps.map((swapImpl) => {
                     try {
-                        return swapImpl.quote(position)
+                        return swapImpl.quote(this.dripPosition)
                     } catch (e) {
                         // todo: log unknown errors
                         console.error(e)
@@ -50,13 +41,7 @@ export class MetaAggregator extends DripHandlerBase implements IDripHandler {
         quotesWithIxs.sort((a, b): number => {
             return 0
         })
-
         const [quoteWithIxs] = quotesWithIxs
-
-        // TODO: pre drip
-        instructions.push(...quoteWithIxs.instructions)
-        // TODO: post drip
-
-        return instructions
+        return quoteWithIxs
     }
 }

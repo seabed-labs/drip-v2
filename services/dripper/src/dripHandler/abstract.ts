@@ -11,71 +11,117 @@ import {
     DEFAULT_CONFIRM_OPTIONS,
     paginate,
 } from '../utils'
-import Provider from '@coral-xyz/anchor/dist/cjs/provider'
 import assert from 'assert'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import { createVersionedTransactions } from '../solana'
+import { DripInstructions } from './index'
 
 const MAX_ACCOUNTS_PER_TX = 20
 const ACCOUNTS_PER_LUT = 256
 
-export abstract class DripHandlerBase {
-    constructor(
-        private readonly provider: AnchorProvider,
-        private readonly connection: Connection
+export abstract class PositionHandlerBase {
+    protected constructor(
+        readonly provider: AnchorProvider,
+        readonly connection: Connection,
+        readonly dripPosition: Accounts.DripPosition
     ) {}
 
-    async createDripInstructions(
-        position: Accounts.DripPosition
-    ): Promise<TransactionInstruction[]> {
+    async createSwapInstructions(): Promise<DripInstructions> {
         throw new Error('not implemented')
     }
 
-    async getPairConfig(
-        position: Accounts.DripPosition
-    ): Promise<Accounts.PairConfig> {
+    async getPairConfig(): Promise<Accounts.PairConfig> {
         throw new Error('not implemented')
     }
 
-    async shouldSetOracle(position: Accounts.DripPosition): Promise<boolean> {
-        const pairConfig = await this.getPairConfig(position)
+    shouldSetOracle(pairConfig: Accounts.PairConfig): boolean {
         return (
             pairConfig.inputTokenPriceOracle.kind === 'Unavailable' ||
             pairConfig.outputTokenPriceOracle.kind === 'Unavailable'
         )
     }
 
-    async getInitPairConfigIx(
-        position: Accounts.DripPosition
-    ): Promise<TransactionInstruction[]> {
+    async createUpdatePairConfigOracleIx(
+        pairConfig: Accounts.PairConfig
+    ): Promise<TransactionInstruction> {
         throw new Error('not implemented')
     }
 
-    async dripPosition(
-        provider: Provider,
-        position: Accounts.DripPosition
-    ): Promise<string> {
-        const dripIxs = await this.createDripInstructions(position)
-        const luts = await this.createLookupTables(dripIxs)
+    async drip(): Promise<string> {
+        const swapIxs = await this.createSwapInstructions()
+        // takes care of things like setting up token accounts
+        if (swapIxs.preSwapInstructions.length) {
+            const [preSwapSetupTx] = await createVersionedTransactions(
+                this.connection,
+                this.provider.publicKey,
+                [swapIxs.preSwapInstructions]
+            )
+            const txSig = await this.provider.sendAndConfirm(
+                preSwapSetupTx,
+                swapIxs.preSigners,
+                DEFAULT_CONFIRM_OPTIONS
+            )
+            console.log(`setup swap in tx ${txSig}`)
+        }
+        const dripIxsWithSandwich = await this.createDripSandwich(
+            swapIxs.swapInstructions
+        )
+        const { txSigs: createLutsTxSigs, luts } =
+            await this.createLookupTables(dripIxsWithSandwich)
+        console.log(`created luts in txs ${JSON.stringify(createLutsTxSigs)}`)
         const [dripTx] = await createVersionedTransactions(
             this.connection,
             this.provider.publicKey,
-            [dripIxs],
+            [dripIxsWithSandwich],
             luts
         )
         assert(dripTx, new Error('TODO'))
+        // TODO(Mocha): wrap closure of lut in try/catch, shouldn't block returning txSig for drip
         const txSig = await this.provider.sendAndConfirm(
             dripTx,
             [],
             DEFAULT_CONFIRM_OPTIONS
         )
-        await this.closeLookupTables(luts)
+        const closeLutsTxSig = await this.closeLookupTables(luts)
+        console.log(`closed luts in tx ${closeLutsTxSig}`)
+
+        // cleanup ephemeral token accounts
+        if (swapIxs.postSwapInstructions.length) {
+            const [postSwapCleanupTx] = await createVersionedTransactions(
+                this.connection,
+                this.provider.publicKey,
+                [swapIxs.postSwapInstructions]
+            )
+            const txSig = await this.provider.sendAndConfirm(
+                postSwapCleanupTx,
+                [],
+                DEFAULT_CONFIRM_OPTIONS
+            )
+            console.log(`cleaned up drip swap with ${txSig}`)
+        }
         return txSig
     }
 
-    async createLookupTables(
+    private async createDripSandwich(
+        swapIxs: TransactionInstruction[]
+    ): Promise<TransactionInstruction[]> {
+        const ixs: TransactionInstruction[] = []
+        const pairConfig = await this.getPairConfig()
+        if (this.shouldSetOracle(pairConfig)) {
+            ixs.push(await this.createUpdatePairConfigOracleIx(pairConfig))
+        }
+        // TODO(Mocha): create preDrip Ix
+        ixs.push(...swapIxs)
+        // TODO(Mocha): create postDrip Ix
+        return ixs
+    }
+
+    private async createLookupTables(
         dripIxs: TransactionInstruction[]
-    ): Promise<AddressLookupTableAccount[]> {
+    ): Promise<{
+        txSigs: string[]
+        luts: AddressLookupTableAccount[]
+    }> {
         const accounts = dedupeInstructionsPublicKeys(dripIxs)
 
         // each row represents the instructions for a tx
@@ -120,7 +166,7 @@ export abstract class DripHandlerBase {
             this.provider.publicKey,
             ixsForTxs
         )
-        await this.provider.sendAll(
+        const txSigs = await this.provider.sendAll(
             txs.map((tx) => ({ tx }), DEFAULT_CONFIRM_OPTIONS)
         )
         const luts = await Promise.all(
@@ -128,13 +174,18 @@ export abstract class DripHandlerBase {
                 this.connection.getAddressLookupTable(lutAddress)
             )
         )
-        return luts.map((lut) => {
-            assert(lut.value, new Error('TODO'))
-            return lut.value
-        })
+        return {
+            txSigs,
+            luts: luts.map((lut) => {
+                assert(lut.value, new Error('TODO'))
+                return lut.value
+            }),
+        }
     }
 
-    async closeLookupTables(luts: AddressLookupTableAccount[]): Promise<void> {
+    private async closeLookupTables(
+        luts: AddressLookupTableAccount[]
+    ): Promise<string> {
         const closeLutIxs = luts.map((lut) =>
             AddressLookupTableProgram.closeLookupTable({
                 lookupTable: lut.key,
@@ -149,6 +200,10 @@ export abstract class DripHandlerBase {
             luts
         )
         assert(tx, new Error('TODO'))
-        await this.provider.sendAndConfirm(tx, [], DEFAULT_CONFIRM_OPTIONS)
+        return await this.provider.sendAndConfirm(
+            tx,
+            [],
+            DEFAULT_CONFIRM_OPTIONS
+        )
     }
 }

@@ -1,21 +1,23 @@
 import { Accounts } from '@dcaf/drip-types'
-import { TransactionInstruction } from '@solana/web3.js'
-import Provider from '@coral-xyz/anchor/dist/cjs/provider'
+import { Signer, TransactionInstruction } from '@solana/web3.js'
 
 export type SwapQuote = {
     inputAmount: bigint
     outputAmount: bigint
 }
 
-export type SwapQuoteWithInstructions = SwapQuote & {
-    instructions: TransactionInstruction[]
+export type SwapQuoteWithInstructions = SwapQuote & DripInstructions
+
+export type DripInstructions = {
+    preSwapInstructions: TransactionInstruction[]
+    preSigners: Signer[]
+    swapInstructions: TransactionInstruction[]
+    postSwapInstructions: TransactionInstruction[]
+    postSigners: Signer[]
 }
 
 export interface IDripHandler {
-    dripPosition(
-        provider: Provider,
-        position: Accounts.DripPosition
-    ): Promise<string>
+    drip(): Promise<string>
 }
 
 export interface ITokenSwapHandler {

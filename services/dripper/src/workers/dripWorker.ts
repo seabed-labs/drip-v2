@@ -1,14 +1,15 @@
 import { IWorker } from './index'
 import { Connection } from '@solana/web3.js'
 import { IPositionsFetcher } from '../positions'
-import Provider from '@coral-xyz/anchor/dist/cjs/provider'
+import { AnchorProvider } from '@coral-xyz/anchor'
+
 export class DripWorker implements IWorker {
     private enabled: boolean
     private workerPromise: Promise<void>
 
     constructor(
         private readonly connection: Connection,
-        private readonly provider: Provider,
+        private readonly provider: AnchorProvider,
         private readonly positions: IPositionsFetcher
     ) {
         this.enabled = false
@@ -39,9 +40,9 @@ export class DripWorker implements IWorker {
             const positions = await this.positions.find()
             const dripTxSigs = await Promise.all(
                 positions.map((position) =>
-                    this.positions
-                        .getDripHandler(position)
-                        .dripPosition(this.provider, position)
+                    position
+                        .getDripHandler(this.provider, this.connection)
+                        .drip()
                 )
             )
             // TODO(mocha): send to api server to queue for fetcher
