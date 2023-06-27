@@ -5,13 +5,16 @@ import {
     Connection,
     PublicKey,
     TransactionInstruction,
-    TransactionMessage,
-    VersionedTransaction,
 } from '@solana/web3.js'
-import {dedupeInstructionsPublicKeys, DEFAULT_CONFIRM_OPTIONS, paginate} from '../utils'
+import {
+    dedupeInstructionsPublicKeys,
+    DEFAULT_CONFIRM_OPTIONS,
+    paginate,
+} from '../utils'
 import Provider from '@coral-xyz/anchor/dist/cjs/provider'
 import assert from 'assert'
 import { AnchorProvider } from '@coral-xyz/anchor'
+import { createVersionedTransactions } from '../solana'
 
 const MAX_ACCOUNTS_PER_TX = 20
 const ACCOUNTS_PER_LUT = 256
@@ -54,7 +57,12 @@ export abstract class DripHandlerBase {
     ): Promise<string> {
         const dripIxs = await this.createDripInstructions(position)
         const luts = await this.createLookupTables(dripIxs)
-        const [dripTx] = await this.createVersionedTransactions([dripIxs], luts)
+        const [dripTx] = await createVersionedTransactions(
+            this.connection,
+            this.provider.publicKey,
+            [dripIxs],
+            luts
+        )
         assert(dripTx, new Error('TODO'))
         const txSig = await this.provider.sendAndConfirm(
             dripTx,
@@ -107,7 +115,11 @@ export abstract class DripHandlerBase {
             ACCOUNTS_PER_LUT
         )
 
-        const txs = await this.createVersionedTransactions(ixsForTxs)
+        const txs = await createVersionedTransactions(
+            this.connection,
+            this.provider.publicKey,
+            ixsForTxs
+        )
         await this.provider.sendAll(
             txs.map((tx) => ({ tx }), DEFAULT_CONFIRM_OPTIONS)
         )
@@ -130,25 +142,13 @@ export abstract class DripHandlerBase {
                 recipient: this.provider.publicKey,
             })
         )
-        const [tx] = await this.createVersionedTransactions([closeLutIxs], luts)
+        const [tx] = await createVersionedTransactions(
+            this.connection,
+            this.provider.publicKey,
+            [closeLutIxs],
+            luts
+        )
         assert(tx, new Error('TODO'))
         await this.provider.sendAndConfirm(tx, [], DEFAULT_CONFIRM_OPTIONS)
-    }
-
-    private async createVersionedTransactions(
-        instructionsForTxs: TransactionInstruction[][],
-        addressLookupTableAccounts?: AddressLookupTableAccount[]
-    ): Promise<VersionedTransaction[]> {
-        const recentBlockhash = await this.connection
-            .getLatestBlockhash()
-            .then((lb) => lb.blockhash)
-        return instructionsForTxs.map((instructions) => {
-            const messageV0 = new TransactionMessage({
-                payerKey: this.provider.publicKey,
-                recentBlockhash,
-                instructions,
-            }).compileToV0Message(addressLookupTableAccounts)
-            return new VersionedTransaction(messageV0)
-        })
     }
 }
