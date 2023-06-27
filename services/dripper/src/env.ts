@@ -9,7 +9,7 @@ export const cluster = process.env.cluster || 'mainnet-beta'
 
 export const rpcUrl: string =
     process.env.DRIPPER_RPC_URL ||
-    'https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e'
+    'https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d'
 
 // TODO(mocha/breve): move this to something like kms
 export const dripperKeypair: Keypair =

@@ -1,4 +1,9 @@
-import {Commitment, ConfirmOptions, PublicKey, TransactionInstruction} from '@solana/web3.js'
+import {
+    Commitment,
+    ConfirmOptions,
+    PublicKey,
+    TransactionInstruction,
+} from '@solana/web3.js'
 
 export const DEFAULT_COMMITMENT: Commitment = 'confirmed'
 export const MAX_TX_RETRY = 3
@@ -34,13 +39,19 @@ export async function paginate<T>(
 }
 
 export function dedupeInstructionsPublicKeys(
-    ixs: TransactionInstruction[],
+    ixs: TransactionInstruction[]
 ): PublicKey[] {
-    const pubKeyMap: Record<string, PublicKey> = {};
+    const pubKeyMap: Record<string, PublicKey> = {}
     ixs.forEach((ix) => {
         ix.keys.forEach((key) => {
             pubKeyMap[key.pubkey.toString()] = key.pubkey
         })
     })
-    return Object.values(pubKeyMap);
+    return Object.values(pubKeyMap)
+}
+
+export function notEmpty<TValue>(
+    value: TValue | null | undefined
+): value is TValue {
+    return value !== null && value !== undefined
 }
