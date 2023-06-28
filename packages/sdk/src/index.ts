@@ -5,93 +5,63 @@ import {
     SystemProgram,
     Transaction,
 } from '@solana/web3.js'
-import * as anchor from '@coral-xyz/anchor'
 import { DripV2, IDL } from '@dcaf/drip-types'
-import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
-import { AnchorProvider } from '@coral-xyz/anchor'
-
-export interface GlobalConfigAccount {
-    version: bigint
-    superAdmin: PublicKey
-    admins: PublicKey[]
-    adminPermissions: bigint[]
-    defaultDripFeeBps: bigint
-    globalConfigSigner: PublicKey
-}
+import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
+import { Accounts } from '@dcaf/drip-types'
 
 export class Drip {
-    private readonly program
+    private readonly program: Program<DripV2>
 
     public constructor(
         public readonly programId: PublicKey,
-        public readonly providerOrConnection: AnchorProvider | Connection
+        public readonly connection: Connection,
+        provider?: AnchorProvider
     ) {
-        const provider =
-            providerOrConnection instanceof AnchorProvider
-                ? providerOrConnection
-                : new anchor.AnchorProvider(
-                      providerOrConnection,
-                      new NodeWallet(Keypair.generate()),
-                      { commitment: providerOrConnection.commitment }
-                  )
-
-        this.program = new anchor.Program<DripV2>(IDL, this.programId, provider)
+        this.program = new Program<DripV2>(IDL, this.programId, provider)
     }
 
     public async fetchGlobalConfig(
         key: PublicKey
-    ): Promise<GlobalConfigAccount> {
-        const account = await this.program.account.globalConfig.fetch(key)
-
-        return {
-            version: BigInt(account.version.toString()),
-            superAdmin: account.superAdmin,
-            admins: account.admins,
-            adminPermissions: account.adminPermissions.map((permission) =>
-                BigInt(permission.toString())
-            ),
-            defaultDripFeeBps: BigInt(account.defaultDripFeeBps.toString()),
-            globalConfigSigner: account.globalConfigSigner,
+    ): Promise<Accounts.GlobalConfig> {
+        const globalConfig = await Accounts.GlobalConfig.fetch(
+            this.connection,
+            key,
+            this.programId
+        )
+        if (!globalConfig) {
+            throw new Error(`Global config ${key.toString()} not found`)
         }
+        return globalConfig
     }
 
     public async initGlobalConfig(
         superAdmin: PublicKey,
         defaultDripFeeBps: bigint,
-        globalConfigPubkey?: PublicKey,
+        globalConfigKeypair: Keypair = Keypair.generate(),
         payer?: PublicKey
-    ): Promise<{ tx: Transaction; globalConfigPubkey: PublicKey }> {
-        const globalConfigKeypair = Keypair.generate()
-        const _globalConfigPubkey =
-            globalConfigPubkey ?? globalConfigKeypair.publicKey
-
+    ): Promise<{ tx: Transaction; globalConfigKeypair: Keypair }> {
         const [globalConfigSigner] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from('drip-v2-global-signer'),
-                _globalConfigPubkey.toBuffer(),
+                globalConfigKeypair.publicKey.toBuffer(),
             ],
             this.program.programId
         )
-
-        let txBuilder = this.program.methods
+        const txBuilder = this.program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin,
-                defaultDripFeeBps: new anchor.BN(defaultDripFeeBps.toString()),
+                defaultDripFeeBps: new BN(defaultDripFeeBps.toString()),
             })
             .accounts({
                 payer: payer ?? this.program.provider.publicKey,
-                globalConfig: _globalConfigPubkey,
+                globalConfig: globalConfigKeypair.publicKey,
                 systemProgram: SystemProgram.programId,
                 globalConfigSigner,
             })
-
-        if (!globalConfigPubkey) {
-            txBuilder = txBuilder.signers([globalConfigKeypair])
-        }
-
+            .signers([globalConfigKeypair])
         return {
             tx: await txBuilder.transaction(),
-            globalConfigPubkey: _globalConfigPubkey,
+            globalConfigKeypair,
         }
     }
 }

@@ -1,12 +1,16 @@
+import '../setup'
 import * as anchor from '@coral-xyz/anchor'
 import { Drip } from '@dcaf/drip'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { expect } from 'chai'
 import { DripV2 } from '@dcaf/drip-types'
 import { AnchorProvider } from '@coral-xyz/anchor'
-import '../setup'
 
 describe('SDK - initGlobalConfig', () => {
+    // TODO: for debugging with yarn run localnet
+    // process.env.ANCHOR_PROVIDER_URL="http://localhost:8899"
+    // process.env.ANCHOR_WALLET="./local.json"
+
     anchor.setProvider(anchor.AnchorProvider.env())
     const program = anchor.workspace.DripV2 as anchor.Program<DripV2>
 
@@ -23,20 +27,24 @@ describe('SDK - initGlobalConfig', () => {
             )
         )
 
-        const { tx, globalConfigPubkey } = await drip.initGlobalConfig(
+        const { tx } = await drip.initGlobalConfig(
             superAdmin.publicKey,
             BigInt(100),
-            globalConfigKeypair.publicKey,
+            globalConfigKeypair,
             provider.publicKey
         )
 
-        await provider.sendAndConfirm(tx, [globalConfigKeypair])
+        await provider.sendAndConfirm(tx, [globalConfigKeypair], {
+            skipPreflight: true,
+        })
 
         const globalConfigAccountDirect =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(
+                globalConfigKeypair.publicKey
+            )
 
         const globalConfigAccountSdk = await drip.fetchGlobalConfig(
-            globalConfigPubkey
+            globalConfigKeypair.publicKey
         )
 
         for (const globalConfigAccount of [
