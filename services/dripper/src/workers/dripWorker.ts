@@ -39,9 +39,7 @@ export class DripWorker implements IWorker {
         while (this.enabled) {
             const positions = await this.positions.getPositionsPendingDrip()
             const dripTxSigs = await Promise.all(
-                positions.map((position) =>
-                    position.drip()
-                )
+                positions.map((position) => position.drip())
             )
             // TODO(mocha): send to api server to queue for fetcher
             console.log(dripTxSigs)
