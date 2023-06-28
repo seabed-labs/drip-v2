@@ -65,3 +65,43 @@ WIP
 ### Run (xNFT)
 
 </details>
+
+## Setting up dummy drip positions
+
+<details>
+<summary>Expand for details</summary>
+
+### Setup on-chain stuff
+
+1. Navigate to `solana-programs`
+2. Start up the node (Retry after running `yarn` if you have problems)
+
+```bash
+yarn localnet
+```
+
+3. Wait for the logs to say `DONE SETUP`
+4. Open `solana-programs/mocks/setup.json` and you should see a `dripPositions` field. This field holds `positionPubkey` sub-fields that are valid pubkeys for real drip position accounts that have been created in your local node.
+
+### Setup fetcher
+
+1. Naviate to `services/fetcher`
+2. Create a `.env` file with the following contents
+
+```
+FETCHER_RPC_URL=http://localhost:8899
+DRIP_PROGRAM_ID=74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
+```
+
+3. Start the fetcher (Retry after running `yarn` if you have problems)
+
+```bash
+yarn dev
+```
+
+4. Ping the fetcher at `http://localhost:3000` to make sure its running
+5. Fetch an account using `http://localhost:3000/fetch/account/<insert a valid drip position pubkey here>`
+
+### Run (xNFT)
+
+</details>
