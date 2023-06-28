@@ -6,28 +6,29 @@ use crate::errors::DripError;
 #[account]
 #[derive(Default, InitSpace)]
 pub struct DripPosition {
-    pub global_config: Pubkey,
-    pub owner: DripPositionOwner,
-    pub drip_fee_bps: u64,
-    pub drip_position_signer: Pubkey,
-    pub auto_credit_enabled: bool,
-    pub input_token_mint: Pubkey,
-    pub output_token_mint: Pubkey,
-    pub input_token_account: Pubkey,
-    pub output_token_account: Pubkey,
-    pub drip_amount: u64,
-    pub drip_amount_filled: u64,
-    pub frequency_in_seconds: u64,
-    pub total_input_token_dripped: u64,
-    pub total_output_token_received: u64,
+    pub global_config: Pubkey,              // 32
+    pub owner: DripPositionOwner,           // 32
+    pub drip_fee_bps: u64,                  // 8
+    pub drip_position_signer: Pubkey,       // 32
+    pub auto_credit_enabled: bool,          // 1
+    pub input_token_mint: Pubkey,           // 32
+    pub output_token_mint: Pubkey,          // 32
+    pub input_token_account: Pubkey,        // 32
+    pub output_token_account: Pubkey,       // 32
+    pub drip_amount: u64,                   // 8
+    pub drip_amount_filled: u64,            // 8
+    pub frequency_in_seconds: u64,          // 8
+    pub total_input_token_dripped: u64,     // 8
+    pub total_output_token_received: u64,   // 8
     // We store this separately and not inside the owner enum
     // because we want to preserve it between tokenizations
-    pub drip_position_nft_mint: Option<Pubkey>,
-    pub drip_max_jitter: u32, // only used to validate pre-jitter, post-jitter is infinite
-    pub drip_activation_genesis_shift: i64,
-    pub drip_activation_timestamp: i64,
+    pub drip_position_nft_mint: Option<Pubkey>, // 1 + 32
+    // only used to validate pre-jitter, post-jitter is infinite
+    pub drip_max_jitter: u32,                   //4
+    pub drip_activation_genesis_shift: i64,     // 8
+    pub drip_activation_timestamp: i64,         // 8
     // TODO: Separate ephemeral state to its own ephemeral account
-    pub ephemeral_drip_state: Option<EphemeralDripState>,
+    pub ephemeral_drip_state: Option<EphemeralDripState>, // 1 + 24
 }
 
 impl DripPosition {
@@ -112,9 +113,9 @@ impl DripPosition {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, InitSpace, Clone)]
 pub struct EphemeralDripState {
-    pub output_token_account_balance_pre_drip_snapshot: u64,
-    pub current_pre_fees_partial_drip_amount: u64,
-    pub minimum_output_expected: u64,
+    pub output_token_account_balance_pre_drip_snapshot: u64, // 8
+    pub current_pre_fees_partial_drip_amount: u64, // 8
+    pub minimum_output_expected: u64, // 8
 }
 
 impl DripPosition {

@@ -1,17 +1,12 @@
 import { IDripHandler } from '../dripHandler'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import { Connection } from '../solana'
-import { Position } from './onchain'
 import { Accounts } from '@dcaf/drip-types'
 
 export interface IPositionsFetcher {
-    find(): Promise<Position[]>
+    getPositionsPendingDrip(limit?: number): Promise<IPosition[]>
 }
 
 export interface IPosition {
-    get(): Accounts.DripPosition
-    getDripHandler(
-        provider: AnchorProvider,
-        connection: Connection
-    ): IDripHandler
+    drip(): Promise<string>
 }

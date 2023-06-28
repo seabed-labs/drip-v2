@@ -43,6 +43,7 @@
     "@prism-hq/prism-ag": "^0.2.40",
     "@solana/web3.js": "1.77.3",
     "bn.js": "^5.2.1",
+    "bs58": "^5.0.0",
     "decimal.js": "^10.3.1",
     "dotenv": "^16.3.1",
     "jsbi": "4.3.0",
