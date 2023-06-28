@@ -5,6 +5,12 @@ import { DripV2 } from '@dcaf/drip-types'
 import { spawn } from 'node:child_process'
 import fs from 'fs/promises'
 import fetch from 'node-fetch'
+import {
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    createMint,
+} from '@solana/spl-token'
+import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token'
 
 const localnet = spawn('anchor', ['localnet'])
 
@@ -23,7 +29,7 @@ async function getRawAccountInfo(address: string) {
     const response = await fetch('http://localhost:8899', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: stringifyJSON({
             jsonrpc: '2.0',
             id: '1',
             method: 'getAccountInfo',
@@ -43,7 +49,7 @@ async function getRawTransaction(txSig: string) {
     const response = await fetch('http://localhost:8899', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: stringifyJSON({
             jsonrpc: '2.0',
             id: '1',
             method: 'getTransaction',
@@ -62,9 +68,20 @@ async function getRawTransaction(txSig: string) {
 async function setup() {
     const program = anchor.workspace.DripV2 as Program<DripV2>
     const provider = anchor.getProvider()
+    const providerPubkey = provider.publicKey!
+
+    const superAdmin = new Keypair()
+    const fundSuperAdminIx = SystemProgram.transfer({
+        fromPubkey: providerPubkey,
+        toPubkey: superAdmin.publicKey,
+        lamports: 100e9, // 100 SOL
+    })
+
+    await provider.sendAndConfirm?.(
+        new anchor.web3.Transaction().add(fundSuperAdminIx)
+    )
 
     const globalConfigKeypair = new Keypair()
-    const superAdmin = new Keypair()
     const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
         [
             Buffer.from('drip-v2-global-signer'),
@@ -86,34 +103,134 @@ async function setup() {
         .signers([globalConfigKeypair])
         .rpc()
 
+    const inputTokenMintKeypair = new Keypair()
+    const inputTokenMint = await createMint(
+        provider.connection,
+        superAdmin,
+        superAdmin.publicKey,
+        null,
+        6,
+        inputTokenMintKeypair,
+        {
+            commitment: 'confirmed',
+        }
+    )
+
+    const outputTokenMintKeypair = new Keypair()
+    const outputTokenMint = await createMint(
+        provider.connection,
+        superAdmin,
+        superAdmin.publicKey,
+        null,
+        6,
+        outputTokenMintKeypair,
+        {
+            commitment: 'confirmed',
+        }
+    )
+
+    const [pairConfigPubkey] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from('drip-v2-pair-config'),
+            globalConfigKeypair.publicKey.toBuffer(),
+            inputTokenMint.toBuffer(),
+            outputTokenMint.toBuffer(),
+        ],
+        program.programId
+    )
+
+    const initPairConfigTxSig = await program.methods
+        .initPairConfig()
+        .accounts({
+            payer: provider.publicKey,
+            globalConfig: globalConfigKeypair.publicKey,
+            inputTokenMint,
+            outputTokenMint,
+            pairConfig: pairConfigPubkey,
+            systemProgram: SystemProgram.programId,
+        })
+        .rpc()
+
+    const dripPositions: { initTx: string; positionPubkey: string }[] = []
+
+    for (let i = 0; i < 10; i++) {
+        const dripPositionOwnerKeypair = new Keypair()
+        const dripPositionKeypair = new Keypair()
+
+        const [dripPositionSignerPubkey] = PublicKey.findProgramAddressSync(
+            [
+                Buffer.from('drip-v2-drip-position-signer'),
+                dripPositionKeypair.publicKey.toBuffer(),
+            ],
+            program.programId
+        )
+
+        const initDripPositionTxSig = await program.methods
+            .initDripPosition({
+                dripAmount: new anchor.BN(100),
+                frequencyInSeconds: new anchor.BN(3600),
+            })
+            .accounts({
+                payer: providerPubkey,
+                owner: dripPositionOwnerKeypair.publicKey,
+                globalConfig: globalConfigKeypair.publicKey,
+                pairConfig: pairConfigPubkey,
+                inputTokenMint,
+                outputTokenMint,
+                inputTokenAccount: associatedAddress({
+                    mint: inputTokenMint,
+                    owner: dripPositionSignerPubkey,
+                }),
+                outputTokenAccount: associatedAddress({
+                    mint: outputTokenMint,
+                    owner: dripPositionSignerPubkey,
+                }),
+                dripPosition: dripPositionKeypair.publicKey,
+                dripPositionSigner: dripPositionSignerPubkey,
+                systemProgram: SystemProgram.programId,
+                tokenProgram: TOKEN_PROGRAM_ID,
+                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            })
+            .signers([dripPositionOwnerKeypair, dripPositionKeypair])
+            .rpc()
+
+        dripPositions.push({
+            initTx: initDripPositionTxSig,
+            positionPubkey: dripPositionKeypair.publicKey.toString(),
+        })
+    }
+
     await fs.writeFile(
         'mocks/setup.json',
-        JSON.stringify({
+        stringifyJSON({
             superAdmin: keyPairToObject(superAdmin),
             globalConfigKeypair: keyPairToObject(globalConfigKeypair),
             globalSignerPubkey: globalSignerPubkey.toString(),
+            pairConfigPubkey: pairConfigPubkey.toString(),
+            dripPositions,
             initGlobalConfigTxSig,
+            initPairConfigTxSig,
         })
     )
 
     await delay(500)
     await fs.writeFile(
         'mocks/globalConfigAccountInfo.json',
-        JSON.stringify(
+        stringifyJSON(
             await getRawAccountInfo(globalConfigKeypair.publicKey.toString())
         )
     )
     await fs.writeFile(
         'mocks/globalSignerAccountInfo.json',
-        JSON.stringify(await getRawAccountInfo(globalSignerPubkey.toString()))
+        stringifyJSON(await getRawAccountInfo(globalSignerPubkey.toString()))
     )
     await fs.writeFile(
         'mocks/initGlobalConfig.json',
-        JSON.stringify(await getRawTransaction(initGlobalConfigTxSig))
+        stringifyJSON(await getRawTransaction(initGlobalConfigTxSig))
     )
     await fs.writeFile(
         'mocks/missingAccountInfo.json',
-        JSON.stringify(
+        stringifyJSON(
             await getRawAccountInfo(
                 'sHXA3HojCdXz9tupED61S8dnfHRqx9DaVSYv1mBqn6h'
             )
@@ -146,3 +263,7 @@ localnet.stderr.on('data', (data: any) => {
 localnet.on('close', (code: any) => {
     console.log(`child process exited with code ${code}`)
 })
+
+function stringifyJSON(obj: object): string {
+    return JSON.stringify(obj, null, 2)
+}

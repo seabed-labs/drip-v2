@@ -1,1 +1,11 @@
-{"jsonrpc":"2.0","result":{"context":{"apiVersion":"1.14.17","slot":4},"value":null},"id":"1"}
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "context": {
+      "apiVersion": "1.14.17",
+      "slot": 17
+    },
+    "value": null
+  },
+  "id": "1"
+}
