@@ -14,7 +14,6 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
 }
 
 export class Position implements IPosition {
-
     constructor(private readonly dripPosition: Accounts.DripPosition) {}
 
     getDripHandler(
@@ -33,6 +32,6 @@ export class Position implements IPosition {
     }
 
     get(): Accounts.DripPosition {
-        return this.dripPosition;
+        return this.dripPosition
     }
 }
