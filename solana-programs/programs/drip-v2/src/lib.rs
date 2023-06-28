@@ -28,6 +28,7 @@ declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 // TODO: Slippage Bps (use override mechanism position -> pair -> global)
 // TODO: ONLY ALLOW SUPER ADMIN TO UPDATE ORACLES AFTER THEY ARE SET (i.e. NOT UNAVAILABLE)
 //       ADMIN PERMS FOR ORACLES SHOULD ONLY ALLOW SETTING AND NOT UNSETTING/UPDATING
+// TODO: Make sure all fields in all accounts' init IXs are set (eg: jitter isn't set properly rn in init_drip_position)
 
 #[program]
 pub mod drip_v2 {
