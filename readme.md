@@ -80,7 +80,7 @@ WIP
 yarn localnet
 ```
 
-3. Wait for the logs to say `DONE SETUP`
+3. Wait for the logs to say `DONE SETUP` (DO NOT KILL THE PROCESS, THIS IS THE BLOCKCHAIN NODE - LEAVE IT RUNNING)
 4. Open `solana-programs/mocks/setup.json` and you should see a `dripPositions` field. This field holds `positionPubkey` sub-fields that are valid pubkeys for real drip position accounts that have been created in your local node.
 
 ### Setup fetcher
