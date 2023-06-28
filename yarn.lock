@@ -5715,7 +5715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@solana/spl-token@npm:^0.3.4, @solana/spl-token@npm:^0.3.5, @solana/spl-token@npm:^0.3.6, @solana/spl-token@npm:^0.3.7":
+"@solana/spl-token@npm:^0.3.4, @solana/spl-token@npm:^0.3.5, @solana/spl-token@npm:^0.3.6, @solana/spl-token@npm:^0.3.7, @solana/spl-token@npm:^0.3.8":
   version: 0.3.8
   resolution: "@solana/spl-token@npm:0.3.8"
   dependencies:
@@ -20115,6 +20115,8 @@ download-git-repo@latest:
 "root-workspace-0b6124@workspace:.":
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
+  dependencies:
+    "@solana/spl-token": ^0.3.8
   languageName: unknown
   linkType: soft
 
