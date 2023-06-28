@@ -102,6 +102,4 @@ yarn dev
 4. Ping the fetcher at `http://localhost:3000` to make sure its running
 5. Fetch an account using `http://localhost:3000/fetch/account/<insert a valid drip position pubkey here>`
 
-### Run (xNFT)
-
 </details>
