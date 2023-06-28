@@ -34,19 +34,3 @@ CREATE TABLE dcaf."drip_positions" (
   CONSTRAINT "drip_position_pk" PRIMARY KEY ("id"),
   CONSTRAINT "unique_public_key" UNIQUE ("public_key"),
 );
-
-CREATE TABLE dcaf."pair_configs" (
-  "id" bigserial NOT NULL,
-  "public_key" VARCHAR(44) NOT NULL,
-  "version" number NOT NULL,
-  "global_config" text NOT NULL,
-  "input_token_mint" text NOT NULL,
-  "output_token_mint" text NOT NULL,
-  "bump" number NOT NULL,
-  "default_pair_drip_fee_bps" bigint NOT NULL,
-  "input_token_drip_fee_portion_bps" bigint NOT NULL,
-  "input_token_price_oracle_id" bigint NOT NULL,
-  "output_token_price_oracle" bigint NOT NULL,
-  CONSTRAINT "pair_configs_pk" PRIMARY KEY ("id"),
-  CONSTRAINT "unique_public_key" UNIQUE ("public_key"),
-)
