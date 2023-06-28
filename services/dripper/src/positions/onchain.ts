@@ -18,10 +18,6 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                 dataSlice: { offset: 0, length: 0 },
                 filters: [
                     {
-                        // padding + struct size
-                        dataSize: 351,
-                    },
-                    {
                         memcmp: {
                             /** offset into program account data to start comparison */
                             offset: 0,
