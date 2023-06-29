@@ -105,6 +105,34 @@ async function setup() {
         .signers([globalConfigKeypair])
         .rpc()
 
+    const addProviderAsAdminTxSig = await program.methods
+        .updateAdmin({
+            adminIndex: new anchor.BN(0),
+            adminChange: {
+                setAdminAndResetPermissions: [providerPubkey],
+            },
+        })
+        .accounts({
+            signer: superAdmin.publicKey,
+            globalConfig: globalConfigKeypair.publicKey,
+        })
+        .signers([superAdmin])
+        .rpc()
+
+    const setProviderPermToDripperTxSig = await program.methods
+        .updateAdmin({
+            adminIndex: new anchor.BN(0),
+            adminChange: {
+                addPermission: [{ drip: {} }],
+            },
+        })
+        .accounts({
+            signer: superAdmin.publicKey,
+            globalConfig: globalConfigKeypair.publicKey,
+        })
+        .signers([superAdmin])
+        .rpc()
+
     const inputTokenMintKeypair = new Keypair()
     const inputTokenMint = await createMint(
         provider.connection,
@@ -122,7 +150,7 @@ async function setup() {
     const outputTokenMint = await createMint(
         provider.connection,
         superAdmin,
-        superAdmin.publicKey,
+        providerPubkey,
         null,
         6,
         outputTokenMintKeypair,
@@ -269,6 +297,8 @@ async function setup() {
             dripPositions,
             initGlobalConfigTxSig,
             initPairConfigTxSig,
+            addProviderAsAdminTxSig,
+            setProviderPermToDripperTxSig,
         })
     )
 
