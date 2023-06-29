@@ -8,7 +8,9 @@ import fetch from 'node-fetch'
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
+    createAssociatedTokenAccountIdempotent,
     createMint,
+    mintTo,
 } from '@solana/spl-token'
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token'
 
@@ -151,9 +153,14 @@ async function setup() {
         })
         .rpc()
 
-    const dripPositions: { initTx: string; positionPubkey: string }[] = []
+    const dripPositions: {
+        initTx: string
+        positionPubkey: string
+        depositTx: string
+    }[] = []
 
     for (let i = 0; i < 10; i++) {
+        console.log('Processing position ', i)
         const dripPositionOwnerKeypair = new Keypair()
         const dripPositionKeypair = new Keypair()
 
@@ -194,9 +201,61 @@ async function setup() {
             .signers([dripPositionOwnerKeypair, dripPositionKeypair])
             .rpc()
 
+        let depositTx: string
+        if (i % 2 === 0) {
+            // if even deposit directly
+            depositTx = await mintTo(
+                provider.connection,
+                superAdmin,
+                inputTokenMint,
+                associatedAddress({
+                    mint: inputTokenMint,
+                    owner: dripPositionSignerPubkey,
+                }),
+                superAdmin,
+                2000e6
+            )
+        } else {
+            // else deposit via drip-v2 program
+            const dripPositionOwnerInputTokenAccount =
+                await createAssociatedTokenAccountIdempotent(
+                    provider.connection,
+                    superAdmin,
+                    inputTokenMint,
+                    dripPositionOwnerKeypair.publicKey
+                )
+
+            await mintTo(
+                provider.connection,
+                superAdmin,
+                inputTokenMint,
+                dripPositionOwnerInputTokenAccount,
+                superAdmin,
+                2000e6
+            )
+
+            depositTx = await program.methods
+                .deposit({
+                    depositAmount: new anchor.BN(1000e6),
+                })
+                .accounts({
+                    signer: dripPositionOwnerKeypair.publicKey,
+                    sourceInputTokenAccount: dripPositionOwnerInputTokenAccount,
+                    dripPositionInputTokenAccount: associatedAddress({
+                        mint: inputTokenMint,
+                        owner: dripPositionSignerPubkey,
+                    }),
+                    dripPosition: dripPositionKeypair.publicKey,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                })
+                .signers([dripPositionOwnerKeypair])
+                .rpc()
+        }
+
         dripPositions.push({
             initTx: initDripPositionTxSig,
             positionPubkey: dripPositionKeypair.publicKey.toString(),
+            depositTx,
         })
     }
 
