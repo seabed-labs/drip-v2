@@ -122,6 +122,7 @@ pub fn handle_init_drip_position(
     drip_position.input_token_account = ctx.accounts.input_token_account.key();
     drip_position.output_token_account = ctx.accounts.output_token_account.key();
     drip_position.drip_amount = params.drip_amount;
+    drip_position.pair_config = ctx.accounts.pair_config.key();
     drip_position.frequency_in_seconds = params.frequency_in_seconds;
     drip_position.total_input_token_dripped = 0;
     drip_position.total_output_token_received = 0;

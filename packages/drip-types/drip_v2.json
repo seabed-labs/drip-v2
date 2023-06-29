@@ -1081,6 +1081,10 @@
             "type": "bool"
           },
           {
+            "name": "pairConfig",
+            "type": "publicKey"
+          },
+          {
             "name": "inputTokenMint",
             "type": "publicKey"
           },

@@ -1,66 +1,68 @@
 {
   "superAdmin": {
-    "pub": "55a6sXLMtYLjq7RmLnPsqjFnS21ASHo5jmMGbJQ8b6Xh",
-    "priv": "159,215,176,123,98,210,54,247,161,86,155,218,227,199,181,195,122,254,157,188,31,252,39,104,2,162,157,193,193,182,233,2,60,154,127,165,90,122,212,76,129,93,244,12,178,145,85,160,249,165,216,196,24,226,2,111,160,245,119,153,163,159,117,8"
+    "pub": "6yvr92kUbKuuj6MLUea9Ym9vSK24LGC4woHtB5u8v9xf",
+    "priv": "69,34,199,95,124,104,157,156,6,172,172,172,41,41,179,83,103,36,136,4,174,169,171,65,9,136,11,232,234,248,102,244,88,223,216,93,178,107,98,53,94,162,54,175,251,184,157,0,255,21,52,135,242,252,122,143,12,219,89,0,98,2,12,244"
   },
   "globalConfigKeypair": {
-    "pub": "5825mpvpu8Dasm88gnm7mhuMYBCSdd3sbTi4GEfudk7s",
-    "priv": "229,93,86,195,55,156,73,55,27,4,60,135,179,146,122,87,96,246,120,204,213,111,175,2,42,113,16,127,87,89,36,218,61,59,9,128,162,190,212,112,191,137,139,147,170,78,226,141,238,217,103,38,117,127,246,206,234,142,73,177,165,188,52,250"
+    "pub": "L3fS3ekazf7eo3EzNFWTA88Qz4DEEjNpMjsin9hs1yp",
+    "priv": "238,21,180,152,181,130,0,0,40,104,143,137,130,47,215,51,70,83,251,26,119,165,210,60,26,146,18,148,19,226,35,236,4,225,11,198,231,78,228,99,30,254,130,51,166,37,90,244,15,83,210,199,145,220,217,168,237,54,22,158,174,78,149,239"
   },
-  "globalSignerPubkey": "FJ5jVjGvND5FxoJYNZN15NBsVT52yzLgbkKjNA5cpqxS",
-  "pairConfigPubkey": "FQHviMcGysuYKenwR8b5KWAVWPPf8FrLkAwVuaRtZaSy",
+  "globalSignerPubkey": "8QstdX91YULtMoEqDo36JnNuZxbx2eNkcCFEPXw7swaF",
+  "pairConfigPubkey": "H7NqY7UD9LpPQC7YhjvLyHzHFgc8AoDsRRcu8aRCZznR",
   "dripPositions": [
     {
-      "initTx": "rtsMupuPb87YkJU9f5HycXrXjabFd6DKmqitMWfNkDnDF7zWDPaUDM7wL8o15N6g3rdTo6M8HHNp6HrHP3kFfES",
-      "positionPubkey": "HuWk14JRPVr4SyfTPmAEesMp3AXnbZouYieS9U87JMjH",
-      "depositTx": "5QaYVEyJ28yVeaiDwj4HgEyZ1uJN6EfsMp7o9zx9nRCcpSFkeieCSk9Vt5thdmRrcdnPyRS58apid1Bj2RVPvEsr"
+      "initTx": "2Ltpdh2tGo5sm4irYoQUaKc6c8EPG8WJBRof8kh9if3fWDPziR1DYj9hcLcpsmgQZVxXYX7anTXoEiVVRjLwPV9K",
+      "positionPubkey": "HY6ZNueqNciKpxZw7EMQm6uH7RR9RqjY1gtPMiawsSHQ",
+      "depositTx": "36MyRLfBUzwq112mF3r9hsiSbkraYyKqU5MGfj51WeMqHWoG5EZ5ETQSkTTerxSC4iwwj7Ukupqcbqh8iT24ZbGC"
     },
     {
-      "initTx": "p4T7zj9Ck3Fdko54wU3yTCVJwKLNZAWxFWzCJ29QEdmj5Sbg1or4CWL1Hu43yqytciWPgiNL3S9c5WyNpfovETd",
-      "positionPubkey": "5e3EkSDaAHfsPHtyoNQ6fNJYJqLoQdadTpoCN944QXWY",
-      "depositTx": "3DsjCneFMfYd22dEFsrsMwXzxLCGDcAph3Q48EBpGnthCdeQ5VL9p9ub7MVtcD4VVsrHwDpVnLdUudPPFexKthMg"
+      "initTx": "2vvvFAC8r1YmzzycPamPMrtZMjiNGqHPFiR5TBw3A13fZ88LPfjvdrDAowhRaU9kPZHeE3zdiQCH5KCa2QQ8KhLt",
+      "positionPubkey": "C7oofEtcQ8Pxfk9fuiL3vw6GohoNXZrAEeM8M6bfBB83",
+      "depositTx": "2JmBpT9E3jNrm3TGzCJTS1nLTHk9KtDz6WyzsTGq1FqqUdnFU6jA9LJd51hKC4rENhto6r31NmzW9iPCY6K5GwXC"
     },
     {
-      "initTx": "5qWGLSCL7rAkiDgdE5zA8kJj3yRXBZbgkHAcYLngS4sFhM17XnrX8D6hz4vpCFEXNYbB8Ygg9ih1vJoRj5jeu4bq",
-      "positionPubkey": "CjTgcW1BNUrrFg7dutihpKXXGtPCWuodaPHUsU8gjVAr",
-      "depositTx": "4u9XWBnwqLiaWrtEe3LzVpBjeAAbkr9mtoCttzA2ixpSXAkZPT13mqSwMpQy5Exy3B9wyA2qPqu3ZAzTZpxJH9FH"
+      "initTx": "5oPpsXtjvgjMfRN2U5wvGmqgMw2YQsj8c9zFhwLQqu1KEUBMRwunrSFCCq81N3r2bsfhLeSTEvyjm4FJQPxDsLQw",
+      "positionPubkey": "3t5G22q67qcczzqEERKCtSZZsCfEAhj6qqgWHtaswANZ",
+      "depositTx": "5YFKEpBZ4T2sAPZXhYXfNztmND5Qmvj8oQy3REVGrspvVjAP4vwRooZQy47nrLJ6JwZHyYARPTVtD7cN25sz1qJW"
     },
     {
-      "initTx": "2wH2XA26zbBLtLoNXcL7NRRJsJG7kucp8aacMj7Dn7tcVUh7UJ7CDFtkd93PVBxnoutMgLUw1cB1uzRxEnAt8pbN",
-      "positionPubkey": "Abs4hM3KkVKhMU7iNw9VtKM5FPUdjw9ibiyDu7HN6yhp",
-      "depositTx": "3UXi55yNutjnaDxoAgreyiHsboMQzmmrw9Y1Nm58QzE94eMSUWvGpV3JYDcB1D3GsJLxfz6EgZtSuzCVg4cgvMiM"
+      "initTx": "4rdyTEgti6kWWrQJ963VqJHH9NfrpZV4AQZJNcKbVFtkh7sfdvz4d5TGyEV1ysXYwMedQ2M3JmkM4Ei41uAk2wE3",
+      "positionPubkey": "5ZNiPnGFiPvYKb8XwfwxyFkkYYsgnQKgSvYex7cXSGNZ",
+      "depositTx": "3r8rLALwH6cXJjdposXaaq2HbBtSsmvLiWBvCWAKUjw144Rbwynoxq7grwsi8K1xfYtiQQswRcmDWMqBKJFpLiUz"
     },
     {
-      "initTx": "5bJAukJvhobiWHrsxU1r3biCQBy9QR5B6V21VqNsSupMqhfKXqmD3UGL8CKLKvCBne4oDMN1VBmU7BVPFpkptfd4",
-      "positionPubkey": "AwTY9MEsjB24QMdbqAQrkQvdf8fPk1wjMPi87kfeHM6K",
-      "depositTx": "5XYvmsM7p5LeggEXK99Y5y35yNDvVhCJaHhLFNQhrMQ5yq8oT9aoNqrgkPfdSHgrfvqeRHBbppWVVy4gkLZj59G3"
+      "initTx": "5u1jt9yUiopHBZiUGg1XQUFL993kT2mW8MD3Zp3PZup3xJuHae1dPDiEaBSgZxDwLLfTJAQQtomXXFJRHxDTo7Ek",
+      "positionPubkey": "9jrwG9itf5ULfWhhujLD85hyv8Zi9iV4KWNinWY61MqP",
+      "depositTx": "4D27CJwRSnJtwSbg6cKC74dnyfr8KtMQUXoduD5hFUmWF8QwBs553Ub7abvWPav1oZHfg7JZ2ovwrD5KssjHBBUk"
     },
     {
-      "initTx": "3EZjVUo544YN7ft9BD72c69Gqbr1P131aN5Jr3SK1rtEDk5ygF5sRCnhJS9xyRzXb8bXYqv6makYBMM7FeXTGmNY",
-      "positionPubkey": "Go3KrXsUCayzPeGor9SEA9vdrtNzDgAoMsmhsfGeitfg",
-      "depositTx": "3xc8YbW58jjVFthAaBLfpRGi1Z2ojLsoti6Spx5EwJCsrcoseR6WP9RwHojubRq7268uWQoWdLjBHwm8GaXPZdh9"
+      "initTx": "2LCvjBrn7W4pp3H9jjhwGedh9UsBqSwPmCyP4pD8ZGYCJP8VrX5m3e22psTMzWgebptEFahcqtUv2tnr5FsYu72m",
+      "positionPubkey": "Cn35uMAp4pporiYyYY1LrmioR6SJdreh1njmBW48wGKK",
+      "depositTx": "51AKg7XkgSZkWW8rmSyzdEoxgznpPGRvkfF3ugMWC71MpkmR3Suh8X7X1891fX9oT1Q43sBsUFKZLv9X3sAgZMam"
     },
     {
-      "initTx": "2rkEW1fjWDvqGBhxv9QAWCxBjbB8SBswD8pVdaSvNHDBXPRqTDV8ifC9AJm1VtuaFh81RJM1wR3hoKyFBq2i7iPi",
-      "positionPubkey": "F26Rhj4D1fvKr6EvfmLnungu4mvQ1UyT4GXXCHWJfWb9",
-      "depositTx": "zypHeD7B13hm5XvQXsGNXhSgNf5EMBGfx6XukRYyV2EYajACntMPYRE1bFebPAbdSsnQXoCHVBL4eUN4SGMpQqq"
+      "initTx": "4SQzaz1vhhayYc1JTmCSukaqMBjWEgTuMM2MU6PUo1rx3qR4Z2QZj389NXVL83tE4XGeXFyTpdbGm7rsnTbGaxkt",
+      "positionPubkey": "6jcDEAbEV8HtZvspYMLJX2sfLoKAyyEPUQmj3y3Ui5C1",
+      "depositTx": "5DzyUCoCEemsvrsHj1So7g7KEQS4P7bufsE2jfq333QdKY4T4SrGcjtB4w6NrL6XMthTsqHVCEPVRQp6zzBC4FDt"
     },
     {
-      "initTx": "3AwBbiWvrKggoEKpRmZ26m9LEnVqX6PUi8YbBbkb7mj23sSMZERHLgBGPwgL7rqE5HbCLBJuGwgAZHJPuMNkYNLc",
-      "positionPubkey": "BRLQYxsuurGFU5DNa1V6XKWvbGYAXQ8pr6aHEDXzgA1h",
-      "depositTx": "23Eu1VY5pbJ4aLd8nLLTuJmXsB5ihywaTeQgebTrh13a9U486QK1bqxSKwwGJVfA17y6ephK2edECq65v4mhhEfN"
+      "initTx": "B1ambzTucnVwPjKuknJ9veyRgGcdJN9kqW6zHKGmAR5sdpyh93aJ1k3djKUs7wzrKewXBrB53jKqZf1m2tZf8P3",
+      "positionPubkey": "HPqam9Zvqj5XSJ2YfLNAqiHzy88d24nRjMbYSv9ypJS7",
+      "depositTx": "2SV2EBxcD2utwCXmzbYMUTvXe4joi5qAmLbGbWVRGUQqQk5s4XNVUmsYmSu2pdp8ZaUHXu5qjbpjeRujmt2vtwWs"
     },
     {
-      "initTx": "5qhEozRzqB3v7wnB2mZLd7CKnQ1MgeeEcKSkfG3Wws6DBMpTonfYbxuhmChEWUQNLR4SJ2im36HVRyf3YXjit5Cj",
-      "positionPubkey": "CtYjWmBgV5R7QMpW2szAKT7ZAp6PYamKNH6SqmnbXTdB",
-      "depositTx": "jpxPtkbWW2brNSDZKrNCKF3rMEoQ16kFiCkm6VjsZTnFEWPqrXTk4g4uFLVNPg6v6sAUK5dzLBkJCpg84i86kkg"
+      "initTx": "4V6RZRV8BkRM26diLt2nST9PepXNXuMDsHkTrdp8QqedyfxcnxMgSS5WUkfL7zXDByH4QiMBhvyJoi5HPQrYgGCD",
+      "positionPubkey": "DabtNH43cz2nYL1hzGTkPiiREtfTNTdftcJZotsSz9mT",
+      "depositTx": "4Szr1vbwJK234BRqRBeMsaQwzcoYRuXjj1ShoVki233Q4MGRXez7ytgteLXkuCgTnU1nduiaCx76rhTuU91yFoa"
     },
     {
-      "initTx": "4TV8bPW13xXQtydZvXPXmCx6HZBi5Yq6sSMYmdTHbeuxWLx12gurB1Ukj6VsAAJgqQ5AhDDGgHUJijCKC5MXvSiQ",
-      "positionPubkey": "7e2U6BBcUrBBWq9LhXfTuAUp78B1mcHSZ1jV1aJGxZhs",
-      "depositTx": "28dd7HWXNAfieMCjfgkRym2UNYCciBhGMgYd1fQLB5J61ZU9YpcNX2Ym2jQVk9112jczTkP4RckLLLQqyRjSTa3N"
+      "initTx": "4UGGEU59D9Y1x2Jr16M5o6ZJk4Ytnn4FqWGQt3MF9pfMuP9JcejxeqRSbH5v5KquRj9kmuW8RYQqjHVq5hauohZU",
+      "positionPubkey": "8j7nKiFs6ZaD9GArmV9fRw68gZqM8Y92CRYPgF5x4kho",
+      "depositTx": "3x1aY8htAYGYUoKrS5rQhQNVE1sfP2B97r9Ch3ohjS3rAZSKwo39ykB7tKqC3c8diiMtmfDopjUWvkUpTRVCVpuR"
     }
   ],
-  "initGlobalConfigTxSig": "62iU5dY3FMLDVybgt1Nv297X87ZakJ5XMrrJeMbiz58ES1KriTuKQnxUZkBWVZChGwVcxET8LFKNGQthKkJGMPsh",
-  "initPairConfigTxSig": "5KJi2KQHRAzWWzSq951xmHi7f2iR5StAJBxvegrbEtYnRvxgSEpBDNh7cP6X46Ro8xBJrPmHEsq7vsifhSsB9Lc9"
+  "initGlobalConfigTxSig": "SdQYFkuoPrLaPYstPvZuNN83Y2HqhdumujeCceZt2PUSHzn55LdVpkeGQmuwi4ikW97geHCVzYpWK46GtXidZ6r",
+  "initPairConfigTxSig": "3vpcVCcbgkFi951xTd9NFB3KLBhZs4TiQkudYWT94vjXK8wa9FmUpMj2kWSDTuWZzuzKg2U3kzU5oCDb98e82Zci",
+  "addProviderAsAdminTxSig": "2sa43EpDnX7RecpjQoMWPu56W67geMV7x93RNrsMuJAXXrsaWRqGBcer7KHPbVDEbePSYoTVjoyAfkVkJHCGuYYt",
+  "setProviderPermToDripperTxSig": "5BzG3hfWEAnKjA8TT5qQBNBNir7Gsqdrs8hm3eyWHiwtPqH4TDD8VVuRcSrPJpiLcQRXUpdFMdF5PYCsFtKThBSL"
 }
