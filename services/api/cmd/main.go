@@ -3,15 +3,16 @@ package main
 import (
 	"go.uber.org/zap"
 
+	"github.com/dcaf-labs/drip-v2/services/api/gen/fetcher"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/cache"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/config"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/handler"
+	"github.com/dcaf-labs/drip-v2/services/api/internal/http/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/jupiter"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/queue"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/runnable"
-	"github.com/dcaf-labs/drip-v2/services/api/internal/server"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/translator"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
@@ -32,9 +33,9 @@ func main() {
 	)
 	defer t.Close()
 
-	if err := t.Migrate("./modeler/migrations"); err != nil {
+	if err := t.MigrateUp("./modeler/migrations"); err != nil {
 		log.Fatal(
-			"failed to migrate",
+			"failed to migrate up",
 			zap.Error(err),
 		)
 	}
@@ -54,17 +55,23 @@ func main() {
 	)
 	defer rq.Close()
 
-	rq.DeclareQueue(app.QueueAccount, app.QueueTransaction)
+	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
-	app := app.NewApp(t, jup, rc, rq)
 
-	h := handler.NewHandler(app)
+	f := fetcher.NewAPIClient(&fetcher.Configuration{
+		Host:      "localhost:3000",
+		Scheme:    "http",
+		UserAgent: "drip-api",
+		Servers:   fetcher.NewConfiguration().Servers,
+	})
+
+	a := app.NewApp(t, jup, rc, rq)
 
 	runnable.NewRunner(
-		server.NewHTTPServer(20000, h),
+		server.NewHTTPServer(20000, handler.NewHandler(a)),
 		runnable.NewTokenCacheSyncer(rc, jup),
-		runnable.NewTransactionFetcher(rq, t),
-		runnable.NewAccountFetcher(rq, t),
+		runnable.NewAccountConsumer(rq, t, f),
+		runnable.NewTransactionConsumer(rq, t, f),
 	).Run().ThenStop()
 }

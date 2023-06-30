@@ -62,6 +62,12 @@ func NewRedisCache(host string, port int64, opts ...redisOptionFunc) *redis {
 		)
 	}
 
+	log.Info(
+		"connected to redis",
+		zap.String("host", host),
+		zap.Int64("port", port),
+	)
+
 	return &redis{
 		log:     log,
 		address: address,

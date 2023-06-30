@@ -11,7 +11,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type appTranslatorInterface interface{}
+type appTranslatorInterface interface {
+	GetDripPositions(ctx context.Context, publicKey string) ([]*DripPosition, error)
+}
 
 type appCacheInterface interface {
 	GetToken(ctx context.Context, key string) (*jupiter.Token, error)
@@ -20,7 +22,7 @@ type appCacheInterface interface {
 }
 
 type appQueueInterface interface {
-	Publish(queueName, contentType string, body string) error
+	Publish(queue Queue, contentType string, body string) error
 }
 
 type app struct {
@@ -103,12 +105,12 @@ func (a *app) PublishAccount(c echo.Context, payload []byte) error {
 		return c.String(http.StatusInternalServerError, errMsg)
 	}
 
-	err = a.queue.Publish(QueueAccount, "text/plain", string(acc.PublicKey))
+	err = a.queue.Publish(AccountQueue, "text/plain", string(acc.PublicKey))
 	if err != nil {
 		errMsg := "failed to publish account"
 		a.log.Error(
 			errMsg,
-			zap.String("queue", QueueTransaction),
+			zap.String("queue", string(AccountQueue)),
 			zap.String("account_publickey", string(acc.PublicKey)),
 			zap.Error(err),
 		)
@@ -131,12 +133,12 @@ func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
 		return c.String(http.StatusInternalServerError, errMsg)
 	}
 
-	err = a.queue.Publish(QueueTransaction, "text/plain", string(tx.Signature))
+	err = a.queue.Publish(TransactionQueue, "text/plain", string(tx.Signature))
 	if err != nil {
 		errMsg := "failed to publish transaction"
 		a.log.Error(
 			errMsg,
-			zap.String("queue", QueueTransaction),
+			zap.String("queue", string(TransactionQueue)),
 			zap.String("transaction_signature", string(tx.Signature)),
 			zap.Error(err),
 		)
@@ -147,4 +149,20 @@ func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
 	return c.JSON(http.StatusAccepted, "published transaction")
 }
 
-func (a *app) GetPositions(ctx echo.Context) error { return nil }
+func (a *app) GetDripPositions(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	w := c.Param("public_key")
+	ps, err := a.translator.GetDripPositions(ctx, w)
+	if err != nil {
+		a.log.Warn(
+			"failed to get drip positions for wallet",
+			zap.String("wallet_public_key", w),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusNotFound, "positions not found")
+	}
+
+	return c.JSON(http.StatusOK, ps)
+}

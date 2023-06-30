@@ -1,13 +1,13 @@
 package jupiter
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 
+	c "github.com/dcaf-labs/drip-v2/services/api/internal/http/client"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"go.uber.org/zap"
 )
@@ -17,22 +17,23 @@ type ClientInterface interface {
 }
 
 type client struct {
-	log     *zap.Logger
-	address string
-	client  *http.Client
+	log    *zap.Logger
+	base   string
+	client *c.HTTPClient
 }
 
 func NewClient() *client {
+	log := logger.NewZapLogger("jupiter_client")
 	return &client{
-		log:     logger.NewZapLogger("jupiter_client"),
-		address: "https://token.jup.ag",
-		client:  http.DefaultClient,
+		log:    log,
+		base:   "https://token.jup.ag",
+		client: c.NewHTTPClient(c.WithLogger(log)),
 	}
 }
 
 func (c *client) GetTokens(ctx context.Context) ([]*Token, error) {
-	url := fmt.Sprintf("%s/all", c.address)
-	resp, err := c.do(ctx, http.MethodGet, url, nil)
+	url := fmt.Sprintf("%s/all", c.base)
+	resp, err := c.client.Do(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -60,25 +61,4 @@ func (c *client) GetTokens(ctx context.Context) ([]*Token, error) {
 	var ts []*Token
 
 	return ts, json.Unmarshal(b, &ts)
-}
-
-func (c *client) do(ctx context.Context, method, url string, payload interface{}) (*http.Response, error) {
-	var (
-		jsonPayload []byte
-		err         error
-	)
-
-	if payload != nil {
-		jsonPayload, err = json.Marshal(payload)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return nil, err
-	}
-
-	return c.client.Do(req)
 }

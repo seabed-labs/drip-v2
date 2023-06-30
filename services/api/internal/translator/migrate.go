@@ -35,7 +35,7 @@ func WithStatementTimeout(timeout time.Duration) Option {
 	}
 }
 
-func (t *Translator) Migrate(dirpath string, opts ...Option) error {
+func (t *Translator) MigrateUp(dirpath string, opts ...Option) error {
 	var c config
 	for _, opt := range opts {
 		opt(&c)
@@ -60,7 +60,7 @@ func (t *Translator) Migrate(dirpath string, opts ...Option) error {
 		return err
 	}
 
-	t.log.Info("migrating database up")
+	t.log.Info("performing up migration on the database")
 	if err := m.Up(); errors.Is(err, migrate.ErrNoChange) {
 		v, d, err := m.Version()
 		if err != nil {
@@ -73,7 +73,7 @@ func (t *Translator) Migrate(dirpath string, opts ...Option) error {
 			zap.Bool("dirty", d),
 		)
 	} else if err != nil {
-		return fmt.Errorf("migration failed: %w", err)
+		return err
 	} else {
 		v, d, err := m.Version()
 		if err != nil {

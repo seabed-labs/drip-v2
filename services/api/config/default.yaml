@@ -1,10 +1,10 @@
 postgres:
-    database: 'micro'
-    host: 'localhost'
-    port: 5432
-    user: 'docker'
-    password: 'docker'
-    sslmode: disable
+  database: "micro"
+  host: "localhost"
+  port: 5432
+  user: "docker"
+  password: "docker"
+  sslmode: "disable"
 
 redis:
     host: 'localhost'
@@ -12,7 +12,7 @@ redis:
     password: 'docker'
 
 rabbitmq:
-    host: 'localhost'
-    port: 5672
-    user: 'docker'
-    password: 'docker'
+  host: "localhost"
+  port: 5672
+  user: "docker"
+  password: "docker"

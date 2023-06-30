@@ -51,7 +51,7 @@ func NewTranslator(driverName, name, host string, port int64, opts ...translator
 
 	log := logger.NewZapLogger("translator")
 	log.Info(
-		"connecting to database",
+		"connecting to the database",
 		zap.String("name", name),
 		zap.String("host", host),
 		zap.Int64("port", port),
@@ -70,7 +70,9 @@ func NewTranslator(driverName, name, host string, port int64, opts ...translator
 	if err != nil {
 		log.Fatal(
 			"failed to connect to the database",
-			zap.String("address", address),
+			zap.String("name", name),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
@@ -78,10 +80,19 @@ func NewTranslator(driverName, name, host string, port int64, opts ...translator
 	if err = db.Ping(); err != nil {
 		log.Fatal(
 			"failed to ping the database",
-			zap.String("address", address),
+			zap.String("name", name),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
+
+	log.Info(
+		"connected to the database",
+		zap.String("name", name),
+		zap.String("host", host),
+		zap.Int64("port", port),
+	)
 
 	return &Translator{
 		log:     log,

@@ -1,12 +1,12 @@
 HDI := $(shell docker run --net=host --rm codenvy/che-ip:4.7.2)
 
-build:
+build: gen
 	@echo "==== RUNNING BUILD ===="
 	@docker build \
 		--tag dcaf-api:latest \
 		--file cmd/Dockerfile ./
 
-run: build up
+run: build appliances
 	@sleep 2
 	@go run ./...
 
@@ -15,11 +15,11 @@ create-migration:
 	@./scripts/create_migration_files.sh
 
 migrate:
-	@$(MAKE) -s up
+	@$(MAKE) -s appliances
 	@sleep 2
 	@$(MAKE) -s migrate-up
 	@$(MAKE) -s migrate-down
-	@$(MAKE) -s down
+	@$(MAKE) -s appliances-down
 
 
 migrate-up: gen
@@ -43,7 +43,7 @@ migrate-down:
 			down -all
 
 #### Code Gen ####
-gen: gen-sql
+gen: gen-sql gen-fetcher
 
 gen-sql: sqlc
 	@docker run --rm \
@@ -52,6 +52,21 @@ gen-sql: sqlc
 		--user $(shell id -u):$(shell id -g) \
 		dcaf-sqlc:1.18.0 \
 			sqlc generate
+
+gen-fetcher:
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		--volume $(shell dirname "$(CURDIR)"):/services \
+		openapitools/openapi-generator-cli generate \
+			-i /services/fetcher/swaggerApi.yaml \
+			-g go \
+			-o /services/api/gen/fetcher \
+			--additional-properties=packageName=fetcher
+	@rm \
+		$(CURDIR)/gen/fetcher/go.mod \
+		$(CURDIR)/gen/fetcher/go.sum \
+		$(CURDIR)/gen/fetcher/git_push.sh \
+		$(CURDIR)/gen/fetcher/test/* \
 
 #### Code Lint ####
 lint: lint-go lint-sql
@@ -84,12 +99,14 @@ fix-sql:
 		sqlfluff/sqlfluff:2.1.1 \
 			fix model.sql queries migrations --force
 
-#### Docker ####
-up: down
+#### Appliances ####
+appliances: appliances-down appliances-up
+
+appliances-up:
 	@echo "==== BRINING UP APPLIANCES ===="
 	@docker-compose up --detach
 
-down:
+appliances-down:
 	@docker-compose down
 
 sqlc:
@@ -109,6 +126,9 @@ sqlc:
 .PHONY: lint
 .PHONY: lint-go
 .PHONY: lint-sql
-.PHONY: up
-.PHONY: down
+.PHONY: lint-fix
+.PHONY: fix-sql
+.PHONY: appliances
+.PHONY: appliances-up
+.PHONY: appliances-down
 .PHONY: sqlc

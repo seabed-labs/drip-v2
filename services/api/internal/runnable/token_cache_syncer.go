@@ -33,7 +33,7 @@ func NewTokenCacheSyncer(cache tokenCacheSyncerCacheInterface, jupiter jupiter.C
 func (c *tokenCacheSyncer) Run() error {
 	ctx := context.Background()
 
-	ticker := time.NewTicker(time.Second * 5)
+	ticker := time.NewTicker(time.Minute * 5)
 	for {
 		select {
 		case <-c.doneC:
@@ -41,9 +41,8 @@ func (c *tokenCacheSyncer) Run() error {
 		case <-ticker.C:
 			ts, err := c.jupiter.GetTokens(ctx)
 			if err != nil {
-				errMsg := "failed to get tokens"
 				c.log.Error(
-					errMsg,
+					"failed to get tokens",
 					zap.Error(err),
 				)
 

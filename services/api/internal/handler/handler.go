@@ -13,7 +13,7 @@ import (
 type handlerAppInterface interface {
 	GetToken(ctx echo.Context) error
 	GetTokens(ctx echo.Context) error
-	GetPositions(ctx echo.Context) error
+	GetDripPositions(ctx echo.Context) error
 	PublishAccount(ctx echo.Context, payload []byte) error
 	PublishTransaction(ctx echo.Context, payload []byte) error
 }
@@ -113,7 +113,15 @@ func (h *handler) registerRoutes() {
 		return err
 	})
 
-	h.handler.GET("/users/:wallet_address/positions", func(ctx echo.Context) error {
-		return echo.ErrNotImplemented
+	h.handler.GET("/wallet/:public_key/positions", func(ctx echo.Context) error {
+		err := h.app.GetDripPositions(ctx)
+		if err != nil {
+			h.log.Error(
+				"failed to handle app.GetPositions GET request",
+				zap.Error(err),
+			)
+		}
+
+		return err
 	})
 }

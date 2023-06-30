@@ -3,6 +3,7 @@ package queue
 import (
 	"fmt"
 
+	"github.com/dcaf-labs/drip-v2/services/api/internal/app"
 	"github.com/dcaf-labs/drip-v2/services/api/internal/logger"
 	"github.com/streadway/amqp"
 	"go.uber.org/zap"
@@ -53,12 +54,12 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 	)
 
 	address := fmt.Sprintf("amqp://%s:%s@%s:%d", o.user, o.password, host, port)
-
 	conn, err := amqp.Dial(address)
 	if err != nil {
 		log.Fatal(
 			"failed to connect to rabbitMQ",
-			zap.String("address", address),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
@@ -67,7 +68,8 @@ func NewRabbitMQ(host string, port int64, opts ...rabbitMQOptionFunc) *rabbitMQ 
 	if err != nil {
 		log.Fatal(
 			"failed to open rabbitMQ channel",
-			zap.String("address", address),
+			zap.String("host", host),
+			zap.Int64("port", port),
 			zap.Error(err),
 		)
 	}
@@ -98,20 +100,20 @@ func (q *rabbitMQ) Close() {
 	}
 }
 
-func (q *rabbitMQ) DeclareQueue(names ...string) {
-	for _, name := range names {
-		if _, err := q.channel.QueueDeclare(name, true, false, false, false, nil); err != nil {
+func (q *rabbitMQ) DeclareQueue(queues ...app.Queue) {
+	for _, queue := range queues {
+		if _, err := q.channel.QueueDeclare(string(queue), true, false, false, false, nil); err != nil {
 			q.log.Fatal(
 				"failed to create queue",
-				zap.String("name", name),
+				zap.String("name", string(queue)),
 				zap.Error(err),
 			)
 		}
 	}
 }
 
-func (q *rabbitMQ) Publish(queueName, contentType, body string) error {
-	return q.channel.Publish("", queueName, false, false,
+func (q *rabbitMQ) Publish(queue app.Queue, contentType, body string) error {
+	return q.channel.Publish("", string(queue), false, false,
 		amqp.Publishing{ // nolint: exhaustruct
 			ContentType: contentType,
 			Body:        []byte(body),
@@ -119,6 +121,6 @@ func (q *rabbitMQ) Publish(queueName, contentType, body string) error {
 	)
 }
 
-func (q *rabbitMQ) Consume(name, consumer string) (<-chan amqp.Delivery, error) {
-	return q.channel.Consume(name, consumer, true, false, false, false, nil)
+func (q *rabbitMQ) Consume(queue app.Queue, consumer string) (<-chan amqp.Delivery, error) {
+	return q.channel.Consume(string(queue), consumer, true, false, false, false, nil)
 }
