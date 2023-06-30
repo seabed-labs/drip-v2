@@ -3,3 +3,6 @@ node_modules
 target
 mocks
 !./**/.gitkeep
+
+upgrade-authority.json
+drip_v2-keypair.json
