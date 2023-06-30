@@ -5,6 +5,9 @@ import { Connection } from './solana'
 import { Wallet } from './wallet'
 import { DEFAULT_CONFIRM_OPTIONS } from './utils'
 import { OnChainPositionsFetcher } from './positions/onchain'
+import { PublicKey } from '@solana/web3.js'
+import { programId } from './env'
+import { getPositionHandler } from './dripHandler'
 
 async function exitHandler(signal: string, worker: IWorker) {
     await worker.stop()
@@ -20,7 +23,12 @@ async function main() {
         wallet,
         DEFAULT_CONFIRM_OPTIONS
     )
-    const positionFetcher = new OnChainPositionsFetcher()
+
+    const positionFetcher = new OnChainPositionsFetcher(
+        new PublicKey(programId!),
+        connection,
+        getPositionHandler(provider, connection)
+    )
     const worker = new DripWorker(connection, provider, positionFetcher)
 
     process.on('SIGINT', async () => {
