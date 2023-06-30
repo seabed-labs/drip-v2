@@ -1,0 +1,11 @@
+postgres:
+  host: "postgres"
+
+redis:
+    host: "redis"
+
+rabbitmq:
+  host: "rabbitmq"
+
+fetcher:
+  host: "fetcher"
