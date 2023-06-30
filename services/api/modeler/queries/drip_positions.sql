@@ -6,6 +6,7 @@ INSERT INTO dcaf."drip_positions" (
   "owner_type",
   "drip_position_signer",
   "auto_credit_enabled",
+  "pair_config",
   "input_token_mint",
   "output_token_mint",
   "input_token_account",
@@ -21,7 +22,7 @@ INSERT INTO dcaf."drip_positions" (
   "drip_activation_timestamp",
   "drip_position_nft_mint"
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
 );
 
 -- name: GetDripPositionByWalletPublicKey :many
@@ -48,7 +49,7 @@ SELECT
   p."drip_activation_genesis_shift",
   p."drip_activation_timestamp",
   p."drip_position_nft_mint"
-FROM dcaf."drip_positions" p
-  JOIN dcaf."wallets" w
+FROM dcaf."drip_positions" AS p
+INNER JOIN dcaf."wallets" AS w
   ON p."owner" = w."public_key"
 WHERE w."public_key" = $1;

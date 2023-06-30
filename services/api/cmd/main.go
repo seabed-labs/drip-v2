@@ -58,7 +58,13 @@ func main() {
 	rq.DeclareQueue(app.AccountQueue, app.TransactionQueue)
 
 	jup := jupiter.NewClient()
-	f := fetcher.NewAPIClient(&fetcher.Configuration{Host: "http://localhost:3000"})
+
+	f := fetcher.NewAPIClient(&fetcher.Configuration{
+		Host:      "localhost:3000",
+		Scheme:    "http",
+		UserAgent: "drip-api",
+		Servers:   fetcher.NewConfiguration().Servers,
+	})
 
 	a := app.NewApp(t, jup, rc, rq)
 

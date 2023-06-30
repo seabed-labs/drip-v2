@@ -56,8 +56,8 @@ func (c *accountConsumer) Run() error {
 	if err != nil {
 		c.log.Error(
 			"failed to consume",
-			zap.String("queue name", string(c.qName)),
-			zap.String("consumer name", c.name),
+			zap.String("queue_name", string(c.qName)),
+			zap.String("consumer_name", c.name),
 			zap.Error(err),
 		)
 
@@ -69,21 +69,14 @@ func (c *accountConsumer) Run() error {
 		case <-c.doneC:
 			return nil
 		case msg := <-msgs:
-			ping, resp, err := c.fetcher.DefaultAPI.PingExecute(c.fetcher.DefaultAPI.Ping(ctx))
-			if err != nil || resp.StatusCode != http.StatusOK || ping == nil {
-				c.log.Fatal("failed to ping fetcher")
-
-				continue
-			}
-
 			accPubKey := string(msg.Body)
 			acc, resp, err := c.fetcher.DefaultAPI.ParseAccountExecute(c.fetcher.DefaultAPI.ParseAccount(ctx, string(msg.Body)))
 			if err != nil || resp.StatusCode != http.StatusOK || acc == nil {
 				c.log.Error(
 					"failed to get parsed account",
-					zap.String("queue name", string(c.qName)),
-					zap.String("consumer name", c.name),
-					zap.String("account public key", accPubKey),
+					zap.String("queue_name", string(c.qName)),
+					zap.String("consumer_name", c.name),
+					zap.String("account_public_key", accPubKey),
 					zap.Error(err),
 				)
 
@@ -100,7 +93,12 @@ func (c *accountConsumer) Run() error {
 					)
 				}
 
-				c.translator.InsertDripPosition(ctx, p)
+				if err = c.translator.InsertDripPosition(ctx, p); err != nil {
+					c.log.Error(
+						"failed to insert DripPosition",
+						zap.Error(err),
+					)
+				}
 			case acc.ParsedDripPositionNftMapping != nil:
 			case acc.ParsedDripPositionSigner != nil:
 			case acc.ParsedGlobalConfig != nil:
@@ -109,9 +107,9 @@ func (c *accountConsumer) Run() error {
 			default:
 				c.log.Error(
 					"account not supported",
-					zap.String("queue name", string(c.qName)),
-					zap.String("consumer name", c.name),
-					zap.String("account public key", accPubKey),
+					zap.String("queue_name", string(c.qName)),
+					zap.String("consumer_name", c.name),
+					zap.String("account_public_key", accPubKey),
 					zap.Error(err),
 				)
 			}

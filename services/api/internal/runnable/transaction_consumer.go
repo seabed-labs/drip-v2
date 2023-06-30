@@ -54,8 +54,8 @@ func (c *transactionConsumer) Run() error {
 	if err != nil {
 		c.log.Error(
 			"failed to consume",
-			zap.String("queue name", string(c.qName)),
-			zap.String("consumer name", c.name),
+			zap.String("queue_name", string(c.qName)),
+			zap.String("consumer_name", c.name),
 			zap.Error(err),
 		)
 
@@ -72,9 +72,9 @@ func (c *transactionConsumer) Run() error {
 			if err != nil || resp.StatusCode != http.StatusOK || txs == nil {
 				c.log.Error(
 					"failed to get parsed account",
-					zap.String("queue name", string(c.qName)),
-					zap.String("consumer name", c.name),
-					zap.String("transaction signature", txSig),
+					zap.String("queue_name", string(c.qName)),
+					zap.String("consumer_name", c.name),
+					zap.String("transaction_signature", txSig),
 					zap.Error(err),
 				)
 
@@ -99,9 +99,9 @@ func (c *transactionConsumer) Run() error {
 				default:
 					c.log.Error(
 						"instruction not supported",
-						zap.String("queue name", string(c.qName)),
-						zap.String("consumer name", c.name),
-						zap.String("transaction signature", txSig),
+						zap.String("queue_name", string(c.qName)),
+						zap.String("consumer_name", c.name),
+						zap.String("transaction_signature", txSig),
 					)
 				}
 			}

@@ -11,7 +11,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type appTranslatorInterface interface{}
+type appTranslatorInterface interface {
+	GetDripPositions(ctx context.Context, publicKey string) ([]*DripPosition, error)
+}
 
 type appCacheInterface interface {
 	GetToken(ctx context.Context, key string) (*jupiter.Token, error)
@@ -147,4 +149,20 @@ func (a *app) PublishTransaction(c echo.Context, payload []byte) error {
 	return c.JSON(http.StatusAccepted, "published transaction")
 }
 
-func (a *app) GetPositions(ctx echo.Context) error { return nil }
+func (a *app) GetDripPositions(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	w := c.Param("public_key")
+	ps, err := a.translator.GetDripPositions(ctx, w)
+	if err != nil {
+		a.log.Warn(
+			"failed to get drip positions for wallet",
+			zap.String("wallet_public_key", w),
+			zap.Error(err),
+		)
+
+		return c.String(http.StatusNotFound, "positions not found")
+	}
+
+	return c.JSON(http.StatusOK, ps)
+}

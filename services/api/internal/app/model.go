@@ -33,6 +33,7 @@ type DripPosition struct {
 	OwnerType                  string `json:"owner_type,omitempty"`
 	DripPositionSigner         string `json:"drip_position_signer,omitempty"`
 	AutoCreditEnabled          bool   `json:"auto_credit_enabled,omitempty"`
+	PairConfig                 string `json:"pair_config,omitempty"`
 	InputTokenMint             string `json:"input_token_mint,omitempty"`
 	OutputTokenMint            string `json:"output_token_mint,omitempty"`
 	InputTokenAccount          string `json:"input_token_account,omitempty"`

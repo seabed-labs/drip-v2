@@ -14,6 +14,9 @@ CREATE TABLE dcaf."drip_positions_enums" (
   CONSTRAINT "unique_value" UNIQUE ("value")
 );
 
+INSERT INTO dcaf."drip_positions_enums" ("value")
+VALUES ('Direct'), ('Tokenized');
+
 CREATE TABLE dcaf."drip_positions" (
   "id" BIGSERIAL NOT NULL,
   "public_key" VARCHAR(44) NOT NULL,

@@ -1,6 +1,6 @@
 HDI := $(shell docker run --net=host --rm codenvy/che-ip:4.7.2)
 
-build:
+build: gen
 	@echo "==== RUNNING BUILD ===="
 	@docker build \
 		--tag dcaf-api:latest \
@@ -43,7 +43,7 @@ migrate-down:
 			down -all
 
 #### Code Gen ####
-gen: gen-sql
+gen: gen-sql gen-fetcher
 
 gen-sql: sqlc
 	@docker run --rm \

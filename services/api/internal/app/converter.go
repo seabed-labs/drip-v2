@@ -75,6 +75,7 @@ func ConvFetcherToAppDripPosition(publicKey string, p *fetcher.DripPositionJSONW
 		OwnerType:                  p.GetOwnerType(),
 		DripPositionSigner:         p.GetDripPositionSigner(),
 		AutoCreditEnabled:          p.GetAutoCreditEnabled(),
+		PairConfig:                 p.GetPairConfig(),
 		InputTokenMint:             p.GetInputTokenMint(),
 		OutputTokenMint:            p.GetOutputTokenMint(),
 		InputTokenAccount:          p.GetInputTokenAccount(),

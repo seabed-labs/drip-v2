@@ -27,17 +27,18 @@ func (t *Translator) InsertDripPosition(ctx context.Context, p *app.DripPosition
 		}
 
 		if !ok {
-			t.InsertWallet(ctx, p.OwnerType)
+			t.InsertWallet(ctx, p.Owner)
 		}
 	}
 
-	t.query.InsertDripPosition(ctx, store.InsertDripPositionParams{
+	return t.query.InsertDripPosition(ctx, store.InsertDripPositionParams{
 		PublicKey:                  p.PublicKey,
 		GlobalConfig:               p.GlobalConfig,
 		Owner:                      sql.NullString{String: p.Owner, Valid: true},
 		OwnerType:                  int64(ownerType),
 		DripPositionSigner:         p.DripPositionSigner,
 		AutoCreditEnabled:          p.AutoCreditEnabled,
+		PairConfig:                 p.PairConfig,
 		InputTokenMint:             p.InputTokenMint,
 		OutputTokenMint:            p.OutputTokenMint,
 		InputTokenAccount:          p.InputTokenAccount,
@@ -53,29 +54,27 @@ func (t *Translator) InsertDripPosition(ctx context.Context, p *app.DripPosition
 		DripActivationTimestamp:    p.DripActivationTimestamp,
 		DripPositionNftMint:        sql.NullString{String: p.DripPositionNftMint, Valid: true},
 	})
-
-	return nil
 }
 
-func (t *Translator) GetDripPositions(ctx context.Context, publicKey string) ([]*app.DripPosition, bool, error) {
+func (t *Translator) GetDripPositions(ctx context.Context, publicKey string) ([]*app.DripPosition, error) {
 	ps, err := t.query.GetDripPositionByWalletPublicKey(ctx, publicKey)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, false, nil
+		return nil, nil
 	}
 
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 
 	var retPs []*app.DripPosition
 	for _, p := range ps {
 		e, err := t.query.GetEnumByID(ctx, p.OwnerType)
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, false, nil
+			return nil, fmt.Errorf("owner type not found: %d", p.OwnerType)
 		}
 
 		if err != nil {
-			return nil, false, err
+			return nil, err
 		}
 
 		var (
@@ -97,6 +96,7 @@ func (t *Translator) GetDripPositions(ctx context.Context, publicKey string) ([]
 			OwnerType:                  e.Value,
 			DripPositionSigner:         p.DripPositionSigner,
 			AutoCreditEnabled:          p.AutoCreditEnabled,
+			PairConfig:                 p.PairConfig,
 			InputTokenMint:             p.InputTokenMint,
 			OutputTokenMint:            p.OutputTokenMint,
 			InputTokenAccount:          p.InputTokenAccount,
@@ -114,5 +114,5 @@ func (t *Translator) GetDripPositions(ctx context.Context, publicKey string) ([]
 		})
 	}
 
-	return retPs, true, nil
+	return retPs, nil
 }
