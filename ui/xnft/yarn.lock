@@ -1671,6 +1671,47 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dcaf/drip-xnft@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@dcaf/drip-xnft@workspace:."
+  dependencies:
+    "@babel/core": ^7.21.3
+    "@coral-xyz/anchor": ^0.27.0
+    "@coral-xyz/common-public": ^0.2.0-latest.3375
+    "@expo-google-fonts/dev": "*"
+    "@expo/vector-icons": ^13.0.0
+    "@expo/webpack-config": ^18.0.1
+    "@react-navigation/bottom-tabs": 6.3.1
+    "@react-navigation/native": 6.0.10
+    "@react-navigation/native-stack": 6.6.1
+    "@react-navigation/stack": 6.2.1
+    "@solana/web3.js": ^1.73.0
+    "@types/react": ~18.0.28
+    "@types/react-native": ~0.71.3
+    commander: ^9.4.1
+    expo: ~48.0.7
+    expo-constants: ~14.2.1
+    expo-linking: ~4.0.1
+    expo-status-bar: ~1.4.4
+    fast-glob: ^3.2.12
+    glob: ^8.0.3
+    jszip: ^3.10.1
+    react: 18.2.0
+    react-dom: 18.2.0
+    react-error-overlay: 6.0.11
+    react-native: 0.71.3
+    react-native-gesture-handler: ~2.9.0
+    react-native-safe-area-context: 4.5.0
+    react-native-screens: ~3.20.0
+    react-native-web: ~0.18.12
+    recoil: "*"
+    twrnc: "*"
+    typescript: ^4.9.5
+    uuid: "*"
+    xnft: latest
+  languageName: unknown
+  linkType: soft
+
 "@egjs/hammerjs@npm:^2.0.17":
   version: 2.0.17
   resolution: "@egjs/hammerjs@npm:2.0.17"
@@ -15190,47 +15231,6 @@ download-git-repo@latest:
   checksum: 3db4dfe5c793f40ac7e0be689a1f75d05e6f2ca0c66189aeb62adab8c436b857ab4420a419251ee60370d41d957a55698fc5e23ab1e1b41715f33217bc4bb558
   languageName: node
   linkType: hard
-
-"root-workspace-0b6124@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "root-workspace-0b6124@workspace:."
-  dependencies:
-    "@babel/core": ^7.21.3
-    "@coral-xyz/anchor": ^0.27.0
-    "@coral-xyz/common-public": ^0.2.0-latest.3375
-    "@expo-google-fonts/dev": "*"
-    "@expo/vector-icons": ^13.0.0
-    "@expo/webpack-config": ^18.0.1
-    "@react-navigation/bottom-tabs": 6.3.1
-    "@react-navigation/native": 6.0.10
-    "@react-navigation/native-stack": 6.6.1
-    "@react-navigation/stack": 6.2.1
-    "@solana/web3.js": ^1.73.0
-    "@types/react": ~18.0.28
-    "@types/react-native": ~0.71.3
-    commander: ^9.4.1
-    expo: ~48.0.7
-    expo-constants: ~14.2.1
-    expo-linking: ~4.0.1
-    expo-status-bar: ~1.4.4
-    fast-glob: ^3.2.12
-    glob: ^8.0.3
-    jszip: ^3.10.1
-    react: 18.2.0
-    react-dom: 18.2.0
-    react-error-overlay: 6.0.11
-    react-native: 0.71.3
-    react-native-gesture-handler: ~2.9.0
-    react-native-safe-area-context: 4.5.0
-    react-native-screens: ~3.20.0
-    react-native-web: ~0.18.12
-    recoil: "*"
-    twrnc: "*"
-    typescript: ^4.9.5
-    uuid: "*"
-    xnft: latest
-  languageName: unknown
-  linkType: soft
 
 "rpc-websockets@npm:^7.5.1":
   version: 7.5.1
