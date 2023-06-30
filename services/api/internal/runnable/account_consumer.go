@@ -17,7 +17,7 @@ type accountConsumerQueueInterface interface {
 }
 
 type accountConsumerTranslatorInterface interface {
-	InsertDripPosition(ctx context.Context, publicKey string, position *fetcher.DripPositionJSONWrapper) error
+	InsertDripPosition(ctx context.Context, p *app.DripPosition) error
 }
 
 type accountConsumer struct {
@@ -69,26 +69,38 @@ func (c *accountConsumer) Run() error {
 		case <-c.doneC:
 			return nil
 		case msg := <-msgs:
-			c.log.Info(
-				"received message",
-				zap.String("queue name", string(c.qName)),
-				zap.String("consumer name", c.name),
-				zap.String("message", string(msg.Body)),
-			)
+			ping, resp, err := c.fetcher.DefaultAPI.PingExecute(c.fetcher.DefaultAPI.Ping(ctx))
+			if err != nil || resp.StatusCode != http.StatusOK || ping == nil {
+				c.log.Fatal("failed to ping fetcher")
 
-			acc, resp, err := c.fetcher.DefaultAPI.ParseAccount(ctx, string(msg.Body)).Execute()
-			if err != nil || resp.StatusCode != http.StatusOK {
+				continue
+			}
+
+			accPubKey := string(msg.Body)
+			acc, resp, err := c.fetcher.DefaultAPI.ParseAccountExecute(c.fetcher.DefaultAPI.ParseAccount(ctx, string(msg.Body)))
+			if err != nil || resp.StatusCode != http.StatusOK || acc == nil {
 				c.log.Error(
 					"failed to get parsed account",
 					zap.String("queue name", string(c.qName)),
 					zap.String("consumer name", c.name),
-					zap.String("message", string(msg.Body)),
+					zap.String("account public key", accPubKey),
+					zap.Error(err),
 				)
+
+				continue
 			}
 
 			switch {
 			case acc.ParsedDripPosition != nil:
-				c.translator.InsertDripPosition(ctx, acc.PublicKey, acc.ParsedDripPosition)
+				p, err := app.ConvFetcherToAppDripPosition(acc.PublicKey, acc.ParsedDripPosition)
+				if err != nil {
+					c.log.Error(
+						"failed to convert fetcher to app DripPosition",
+						zap.Error(err),
+					)
+				}
+
+				c.translator.InsertDripPosition(ctx, p)
 			case acc.ParsedDripPositionNftMapping != nil:
 			case acc.ParsedDripPositionSigner != nil:
 			case acc.ParsedGlobalConfig != nil:
@@ -99,7 +111,8 @@ func (c *accountConsumer) Run() error {
 					"account not supported",
 					zap.String("queue name", string(c.qName)),
 					zap.String("consumer name", c.name),
-					zap.String("message", string(msg.Body)),
+					zap.String("account public key", accPubKey),
+					zap.Error(err),
 				)
 			}
 		}

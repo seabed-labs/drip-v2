@@ -67,21 +67,18 @@ func (c *transactionConsumer) Run() error {
 		case <-c.doneC:
 			return nil
 		case msg := <-msgs:
-			c.log.Debug(
-				"received message",
-				zap.String("queue name", string(c.qName)),
-				zap.String("consumer name", c.name),
-				zap.String("message", string(msg.Body)),
-			)
-
-			txs, resp, err := c.fetcher.DefaultAPI.ParseTx(ctx, string(msg.Body)).Execute()
-			if err != nil || resp.StatusCode != http.StatusOK {
+			txSig := string(msg.Body)
+			txs, resp, err := c.fetcher.DefaultAPI.ParseTx(ctx, txSig).Execute()
+			if err != nil || resp.StatusCode != http.StatusOK || txs == nil {
 				c.log.Error(
 					"failed to get parsed account",
 					zap.String("queue name", string(c.qName)),
 					zap.String("consumer name", c.name),
-					zap.String("message", string(msg.Body)),
+					zap.String("transaction signature", txSig),
+					zap.Error(err),
 				)
+
+				continue
 			}
 
 			for _, ix := range txs.Instructions {
@@ -101,10 +98,10 @@ func (c *transactionConsumer) Run() error {
 				case ix.ParsedUpdateSuperAdmin != nil:
 				default:
 					c.log.Error(
-						"transaction not supported",
+						"instruction not supported",
 						zap.String("queue name", string(c.qName)),
 						zap.String("consumer name", c.name),
-						zap.String("message", string(msg.Body)),
+						zap.String("transaction signature", txSig),
 					)
 				}
 			}
