@@ -34,8 +34,8 @@ echo "Upgrade Authority"
 echo $UPGRADE_AUTH
 
 # --provider.cluster https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d 
-# anchor upgrade --program-id ${PROGRAM_ID} --provider.cluster https://api.devnet.solana.com --provider.wallet ./upgrade-authority.json ./target/deploy/drip.so
+anchor upgrade --program-id="${PROGRAM_ID}" --provider.cluster="https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d" --provider.wallet="./upgrade-authority.json" ./target/deploy/drip_v2.so
 # anchor idl upgrade --provider.cluster https://api.devnet.solana.com --provider.wallet ./upgrade-authority.json --filepath target/idl/drip.json F1NyoZsUhJzcpGyoEqpDNbUMKVvCnSXcCki1nN3ycAeo
 # anchor deploy --program-name drip_v2 --provider.cluster https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e --provider.wallet ./upgrade-authority.json
-solana program deploy --keypair ./upgrade-authority.json --upgrade-authority ./upgrade-authority.json --program-id ./target/deploy/drip_v2-keypair.json ./target/deploy/drip_v2.so
-anchor idl init --provider.wallet ./upgrade-authority.json --filepath ./target/idl/drip_v2.json $PROGRAM_ID --provider.cluster https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e
+#solana program deploy --keypair ./upgrade-authority.json --upgrade-authority ./upgrade-authority.json --program-id ./target/deploy/drip_v2-keypair.json ./target/deploy/drip_v2.so
+#anchor idl init --provider.wallet ./upgrade-authority.json --filepath ./target/idl/drip_v2.json $PROGRAM_ID --provider.cluster https://quick-dark-dust.solana-mainnet.discover.quiknode.pro/67c6e7fd9430ec7c3cf355ce177b058d653a416e
