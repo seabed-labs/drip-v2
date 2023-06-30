@@ -652,6 +652,8 @@ components:
                     type: string
                 autoCreditEnabled:
                     type: boolean
+                pairConfig:
+                    type: string
                 inputTokenMint:
                     type: string
                 outputTokenMint:
@@ -690,6 +692,7 @@ components:
                 - dripFeeBps
                 - dripPositionSigner
                 - autoCreditEnabled
+                - pairConfig
                 - inputTokenMint
                 - outputTokenMint
                 - inputTokenAccount
