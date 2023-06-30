@@ -5,7 +5,7 @@ import {
     GlobalConfigJSON,
     GlobalConfigSignerJSON,
     PairConfigJSON,
-} from '../generated/anchor/accounts'
+} from '../generated/anchor/accounts';
 import {
     DepositAccountsJSON,
     DepositFieldsJSON,
@@ -26,7 +26,7 @@ import {
     UpdateDefaultDripFeesFieldsJSON,
     UpdatePythPriceFeedAccountsJSON,
     UpdateSuperAdminAccountsJSON,
-} from '../generated/anchor/instructions'
+} from '../generated/anchor/instructions';
 
 ////////////////////////////////////////////////////////////////
 // Errors
@@ -34,30 +34,30 @@ import {
 
 export class RestError extends Error {
     constructor(readonly status: number, readonly message: string) {
-        super(`${status}: ${message ?? ''}`)
+        super(`${status}: ${message ?? ''}`);
     }
 
     static invalid(message: string): RestError {
-        return new RestError(400, message)
+        return new RestError(400, message);
     }
 
     static notFound(message: string): RestError {
-        return new RestError(404, message)
+        return new RestError(404, message);
     }
 
     static unprocessable(message: string): RestError {
-        return new RestError(422, message)
+        return new RestError(422, message);
     }
 
     static internal(message: string): RestError {
-        return new RestError(500, message)
+        return new RestError(500, message);
     }
 
     toJSON() {
         return {
             status: this.status,
             message: this.message,
-        }
+        };
     }
 }
 
@@ -65,15 +65,15 @@ export class RestError extends Error {
 // Parameters
 ////////////////////////////////////////////////////////////////
 
-export type Commitment = 'confirmed' | 'finalized'
+export type Commitment = 'confirmed' | 'finalized';
 
 ////////////////////////////////////////////////////////////////
 // Responses
 ////////////////////////////////////////////////////////////////
 
 export type PingResponse = {
-    message: string
-}
+    message: string;
+};
 
 export type ParsedAccountResponse = {
     // name:
@@ -90,114 +90,114 @@ export type ParsedAccountResponse = {
     //     | GlobalConfigJSON
     //     | GlobalConfigSignerJSON
     //     | PairConfigJSON
-    publicKey: string
-    name: string
-    parsedDripPosition?: DripPositionJSONWrapper
-    parsedDripPositionNftMapping?: DripPositionNftMappingJSON
-    parsedDripPositionSigner?: DripPositionSignerJSON
-    parsedGlobalConfig?: GlobalConfigJSON
-    parsedGlobalConfigSigner?: GlobalConfigSignerJSON
-    parsedPairConfig?: PairConfigJSONWrapper
-}
+    publicKey: string;
+    name: string;
+    parsedDripPosition?: DripPositionJSONWrapper;
+    parsedDripPositionNftMapping?: DripPositionNftMappingJSON;
+    parsedDripPositionSigner?: DripPositionSignerJSON;
+    parsedGlobalConfig?: GlobalConfigJSON;
+    parsedGlobalConfigSigner?: GlobalConfigSignerJSON;
+    parsedPairConfig?: PairConfigJSONWrapper;
+};
 
 export type ParsedTxResponse = {
-    signature: string
-    instructions: ParsedDripIxWithIndex[]
-}
+    signature: string;
+    instructions: ParsedDripIxWithIndex[];
+};
 
 ////////////////////////////////////////////////////////////////
 // Misc
 ////////////////////////////////////////////////////////////////
 
 export type PriceOracleJSON = {
-    priceOracleJsonIsUnavailable: boolean
-    priceOracleJsonIsPyth: boolean
-}
+    priceOracleJsonIsUnavailable: boolean;
+    priceOracleJsonIsPyth: boolean;
+};
 export type PairConfigJSONWrapper = Omit<
     PairConfigJSON,
     'inputTokenPriceOracle' | 'outputTokenPriceOracle'
 > & {
-    inputTokenPriceOracle: PriceOracleJSON
-    outputTokenPriceOracle: PriceOracleJSON
-}
+    inputTokenPriceOracle: PriceOracleJSON;
+    outputTokenPriceOracle: PriceOracleJSON;
+};
 
 export type DripPositionJSONWrapper = Omit<DripPositionJSON, 'owner'> & {
-    ownerType: 'Direct' | 'Tokenized'
-    owner: string | undefined
-}
+    ownerType: 'Direct' | 'Tokenized';
+    owner: string | undefined;
+};
 
 export type ParsedDeposit = {
-    name: DripV2InstructionNames.deposit
-    accounts: DepositAccountsJSON
-    data: DepositFieldsJSON
-}
+    name: DripV2InstructionNames.deposit;
+    accounts: DepositAccountsJSON;
+    data: DepositFieldsJSON;
+};
 
 export type ParsedDetokenizeDripPosition = {
-    name: DripV2InstructionNames.detokenizeDripPosition
-    accounts: DetokenizeDripPositionAccountsJSON
-}
+    name: DripV2InstructionNames.detokenizeDripPosition;
+    accounts: DetokenizeDripPositionAccountsJSON;
+};
 
 export type ParsedInitDripPosition = {
-    name: DripV2InstructionNames.initDripPosition
-    accounts: InitDripPositionAccountsJSON
-    data: InitDripPositionFieldsJSON
-}
+    name: DripV2InstructionNames.initDripPosition;
+    accounts: InitDripPositionAccountsJSON;
+    data: InitDripPositionFieldsJSON;
+};
 
 export type ParsedInitDripPositionNft = {
-    name: DripV2InstructionNames.initDripPositionNft
-    accounts: InitDripPositionNftAccountsJSON
-}
+    name: DripV2InstructionNames.initDripPositionNft;
+    accounts: InitDripPositionNftAccountsJSON;
+};
 
 export type ParsedInitGlobalConfig = {
-    name: DripV2InstructionNames.initGlobalConfig
-    accounts: InitGlobalConfigAccountsJSON
-    data: InitGlobalConfigFieldsJSON
-}
+    name: DripV2InstructionNames.initGlobalConfig;
+    accounts: InitGlobalConfigAccountsJSON;
+    data: InitGlobalConfigFieldsJSON;
+};
 
 export type ParsedInitPairConfig = {
-    name: DripV2InstructionNames.initPairConfig
-    accounts: InitPairConfigAccountsJSON
-}
+    name: DripV2InstructionNames.initPairConfig;
+    accounts: InitPairConfigAccountsJSON;
+};
 
 export type ParsedToggleAutoCredit = {
-    name: DripV2InstructionNames.toggleAutoCredit
-    accounts: ToggleAutoCreditAccountsJSON
-}
+    name: DripV2InstructionNames.toggleAutoCredit;
+    accounts: ToggleAutoCreditAccountsJSON;
+};
 
 export type ParsedTokenizeDripPosition = {
-    name: DripV2InstructionNames.tokenizeDripPosition
-    accounts: TokenizeDripPositionAccountsJSON
-}
+    name: DripV2InstructionNames.tokenizeDripPosition;
+    accounts: TokenizeDripPositionAccountsJSON;
+};
 
 export type ParsedUpdateAdmin = {
-    name: DripV2InstructionNames.updateAdmin
-    accounts: UpdateAdminAccountsJSON
+    name: DripV2InstructionNames.updateAdmin;
+    accounts: UpdateAdminAccountsJSON;
     // Note: openapi does not have support for tuples!
-    data: unknown
-}
+    data: unknown;
+};
 
 export type ParsedUpdateDefaultDripFees = {
-    name: DripV2InstructionNames.updateDefaultDripFees
-    accounts: UpdateDefaultDripFeesAccountsJSON
-    data: UpdateDefaultDripFeesFieldsJSON
-}
+    name: DripV2InstructionNames.updateDefaultDripFees;
+    accounts: UpdateDefaultDripFeesAccountsJSON;
+    data: UpdateDefaultDripFeesFieldsJSON;
+};
 
 export type ParsedUpdateDefaultPairDripFees = {
-    name: DripV2InstructionNames.updateDefaultPairDripFees
+    name: DripV2InstructionNames.updateDefaultPairDripFees;
 
-    accounts: UpdateDefaultPairDripFeesAccountsJSON
-    data: UpdateDefaultPairDripFeesFieldsJSON
-}
+    accounts: UpdateDefaultPairDripFeesAccountsJSON;
+    data: UpdateDefaultPairDripFeesFieldsJSON;
+};
 
 export type ParsedUpdatePythPriceFeed = {
-    name: DripV2InstructionNames.updatePythPriceFeed
-    accounts: UpdatePythPriceFeedAccountsJSON
-}
+    name: DripV2InstructionNames.updatePythPriceFeed;
+    accounts: UpdatePythPriceFeedAccountsJSON;
+};
 
 export type ParsedUpdateSuperAdmin = {
-    name: DripV2InstructionNames.updateSuperAdmin
-    accounts: UpdateSuperAdminAccountsJSON
-}
+    name: DripV2InstructionNames.updateSuperAdmin;
+    accounts: UpdateSuperAdminAccountsJSON;
+};
 
 // export type ParsedDripIx =
 //     | ParsedDeposit
@@ -215,21 +215,21 @@ export type ParsedUpdateSuperAdmin = {
 //     | ParsedUpdateSuperAdmin
 
 export type ParsedDripIxWithIndex = {
-    index: number
-} & ParsedDripIx
+    index: number;
+} & ParsedDripIx;
 
 export type ParsedDripIx = {
-    parsedDeposit?: ParsedDeposit
-    parsedDetokenizeDripPosition?: ParsedDetokenizeDripPosition
-    parsedInitDripPosition?: ParsedInitDripPosition
-    parsedInitDripPositionNft?: ParsedInitDripPositionNft
-    parsedInitGlobalConfig?: ParsedInitGlobalConfig
-    parsedInitPairConfig?: ParsedInitPairConfig
-    parsedToggleAutoCredit?: ParsedToggleAutoCredit
-    parsedTokenizeDripPosition?: ParsedTokenizeDripPosition
-    parsedUpdateAdmin?: ParsedUpdateAdmin
-    parsedUpdateDefaultDripFees?: ParsedUpdateDefaultDripFees
-    parsedUpdateDefaultPairDripFees?: ParsedUpdateDefaultPairDripFees
-    parsedUpdatePythPriceFeed?: ParsedUpdatePythPriceFeed
-    parsedUpdateSuperAdmin?: ParsedUpdateSuperAdmin
-}
+    parsedDeposit?: ParsedDeposit;
+    parsedDetokenizeDripPosition?: ParsedDetokenizeDripPosition;
+    parsedInitDripPosition?: ParsedInitDripPosition;
+    parsedInitDripPositionNft?: ParsedInitDripPositionNft;
+    parsedInitGlobalConfig?: ParsedInitGlobalConfig;
+    parsedInitPairConfig?: ParsedInitPairConfig;
+    parsedToggleAutoCredit?: ParsedToggleAutoCredit;
+    parsedTokenizeDripPosition?: ParsedTokenizeDripPosition;
+    parsedUpdateAdmin?: ParsedUpdateAdmin;
+    parsedUpdateDefaultDripFees?: ParsedUpdateDefaultDripFees;
+    parsedUpdateDefaultPairDripFees?: ParsedUpdateDefaultPairDripFees;
+    parsedUpdatePythPriceFeed?: ParsedUpdatePythPriceFeed;
+    parsedUpdateSuperAdmin?: ParsedUpdateSuperAdmin;
+};

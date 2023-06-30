@@ -1,7 +1,7 @@
 export interface IPositionsFetcher {
-    getPositionsPendingDrip(limit?: number): Promise<IPosition[]>
+    getPositionsPendingDrip(limit?: number): Promise<IPosition[]>;
 }
 
 export interface IPosition {
-    drip(): Promise<string>
+    drip(): Promise<string>;
 }

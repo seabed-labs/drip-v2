@@ -4,20 +4,20 @@ import {
     PublicKey,
     SystemProgram,
     Transaction,
-} from '@solana/web3.js'
-import { DripV2, IDL } from '@dcaf/drip-types'
-import { AnchorProvider, BN, Program } from '@coral-xyz/anchor'
-import { Accounts } from '@dcaf/drip-types'
+} from '@solana/web3.js';
+import { DripV2, IDL } from '@dcaf/drip-types';
+import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
+import { Accounts } from '@dcaf/drip-types';
 
 export class Drip {
-    private readonly program: Program<DripV2>
+    private readonly program: Program<DripV2>;
 
     public constructor(
         public readonly programId: PublicKey,
         public readonly connection: Connection,
         provider?: AnchorProvider
     ) {
-        this.program = new Program<DripV2>(IDL, this.programId, provider)
+        this.program = new Program<DripV2>(IDL, this.programId, provider);
     }
 
     public async fetchGlobalConfig(
@@ -27,11 +27,11 @@ export class Drip {
             this.connection,
             key,
             this.programId
-        )
+        );
         if (!globalConfig) {
-            throw new Error(`Global config ${key.toString()} not found`)
+            throw new Error(`Global config ${key.toString()} not found`);
         }
-        return globalConfig
+        return globalConfig;
     }
 
     public async initGlobalConfig(
@@ -46,7 +46,7 @@ export class Drip {
                 globalConfigKeypair.publicKey.toBuffer(),
             ],
             this.program.programId
-        )
+        );
         const txBuilder = this.program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin,
@@ -58,10 +58,10 @@ export class Drip {
                 systemProgram: SystemProgram.programId,
                 globalConfigSigner,
             })
-            .signers([globalConfigKeypair])
+            .signers([globalConfigKeypair]);
         return {
             tx: await txBuilder.transaction(),
             globalConfigKeypair,
-        }
+        };
     }
 }

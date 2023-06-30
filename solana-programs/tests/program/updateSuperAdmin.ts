@@ -1,19 +1,19 @@
-import * as anchor from '@coral-xyz/anchor'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
-import { DripV2 } from '@dcaf/drip-types'
-import { expect } from 'chai'
-import '../setup'
+import * as anchor from '@coral-xyz/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { expect } from 'chai';
+import '../setup';
 
 describe('Program - updateSuperAdmin', () => {
-    anchor.setProvider(anchor.AnchorProvider.env())
-    const program = anchor.workspace.DripV2 as Program<DripV2>
+    anchor.setProvider(anchor.AnchorProvider.env());
+    const program = anchor.workspace.DripV2 as Program<DripV2>;
 
     it('updates the super admin', async () => {
-        const globalConfigKeypair = new Keypair()
-        const superAdmin1 = Keypair.generate()
-        const superAdmin2 = Keypair.generate()
-        const provider = program.provider
+        const globalConfigKeypair = new Keypair();
+        const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
+        const provider = program.provider;
 
         await program.methods
             .initGlobalConfig({
@@ -26,12 +26,12 @@ describe('Program - updateSuperAdmin', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountBefore =
             await program.account.globalConfig.fetch(
                 globalConfigKeypair.publicKey
-            )
+            );
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -52,7 +52,7 @@ describe('Program - updateSuperAdmin', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await program.methods
             .updateSuperAdmin()
@@ -62,12 +62,12 @@ describe('Program - updateSuperAdmin', () => {
                 newSuperAdmin: superAdmin2.publicKey,
             })
             .signers([superAdmin1, superAdmin2])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountAfter =
             await program.account.globalConfig.fetch(
                 globalConfigKeypair.publicKey
-            )
+            );
 
         expect({
             version: globalConfigAccountAfter.version.toString(),
@@ -88,14 +88,14 @@ describe('Program - updateSuperAdmin', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
-    })
+        });
+    });
 
     it('errors out if neither old nor new super admins sign', async () => {
-        const globalConfigKeypair = new Keypair()
-        const superAdmin1 = Keypair.generate()
-        const superAdmin2 = Keypair.generate()
-        const provider = program.provider
+        const globalConfigKeypair = new Keypair();
+        const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
+        const provider = program.provider;
 
         await program.methods
             .initGlobalConfig({
@@ -108,7 +108,7 @@ describe('Program - updateSuperAdmin', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
         const asyncTx3 = program.methods
             .updateSuperAdmin()
@@ -117,18 +117,18 @@ describe('Program - updateSuperAdmin', () => {
                 globalConfig: globalConfigKeypair.publicKey,
                 newSuperAdmin: superAdmin2.publicKey,
             })
-            .rpc()
+            .rpc();
 
         await expect(asyncTx3).to.eventually.be.rejectedWith(
             /Signature verification failed/
-        )
-    })
+        );
+    });
 
     it('errors out if only old super admin signs', async () => {
-        const globalConfigKeypair = new Keypair()
-        const superAdmin1 = Keypair.generate()
-        const superAdmin2 = Keypair.generate()
-        const provider = program.provider
+        const globalConfigKeypair = new Keypair();
+        const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
+        const provider = program.provider;
 
         await program.methods
             .initGlobalConfig({
@@ -141,7 +141,7 @@ describe('Program - updateSuperAdmin', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
         const asyncTx3 = program.methods
             .updateSuperAdmin()
@@ -151,18 +151,18 @@ describe('Program - updateSuperAdmin', () => {
                 newSuperAdmin: superAdmin2.publicKey,
             })
             .signers([superAdmin1])
-            .rpc()
+            .rpc();
 
         await expect(asyncTx3).to.eventually.be.rejectedWith(
             /Signature verification failed/
-        )
-    })
+        );
+    });
 
     it('errors out if only new super admin signs', async () => {
-        const globalConfigKeypair = new Keypair()
-        const superAdmin1 = Keypair.generate()
-        const superAdmin2 = Keypair.generate()
-        const provider = program.provider
+        const globalConfigKeypair = new Keypair();
+        const superAdmin1 = Keypair.generate();
+        const superAdmin2 = Keypair.generate();
+        const provider = program.provider;
 
         await program.methods
             .initGlobalConfig({
@@ -175,7 +175,7 @@ describe('Program - updateSuperAdmin', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
         const asyncTx3 = program.methods
             .updateSuperAdmin()
@@ -185,10 +185,10 @@ describe('Program - updateSuperAdmin', () => {
                 newSuperAdmin: superAdmin2.publicKey,
             })
             .signers([superAdmin2])
-            .rpc()
+            .rpc();
 
         await expect(asyncTx3).to.eventually.be.rejectedWith(
             /Signature verification failed/
-        )
-    })
-})
+        );
+    });
+});

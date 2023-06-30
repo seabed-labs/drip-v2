@@ -1,55 +1,55 @@
-import { Accounts } from '@dcaf/drip-types'
+import { Accounts } from '@dcaf/drip-types';
 import {
     DripPositionJSONWrapper,
     PairConfigJSONWrapper,
     RestError,
-} from './types'
+} from './types';
 
 // note: we use drip-types here on purpose
 // if the types in drip-types and the duplicated types in this generated/anchor diverge,
 // it will result in a compilation error
 export type DripAccountDecodeResponse =
     | {
-          name: 'DripPosition'
-          parsedDripPosition: DripPositionJSONWrapper
+          name: 'DripPosition';
+          parsedDripPosition: DripPositionJSONWrapper;
       }
     | {
-          name: 'DripPositionNftMapping'
-          parsedDripPositionNftMapping: Accounts.DripPositionNftMappingJSON
+          name: 'DripPositionNftMapping';
+          parsedDripPositionNftMapping: Accounts.DripPositionNftMappingJSON;
       }
     | {
-          name: 'DripPositionSigner'
-          parsedDripPositionSigner: Accounts.DripPositionSignerJSON
+          name: 'DripPositionSigner';
+          parsedDripPositionSigner: Accounts.DripPositionSignerJSON;
       }
     | {
-          name: 'GlobalConfig'
-          parsedGlobalConfig: Accounts.GlobalConfigJSON
+          name: 'GlobalConfig';
+          parsedGlobalConfig: Accounts.GlobalConfigJSON;
       }
     | {
-          name: 'GlobalConfigSigner'
-          parsedGlobalConfigSigner: Accounts.GlobalConfigSignerJSON
+          name: 'GlobalConfigSigner';
+          parsedGlobalConfigSigner: Accounts.GlobalConfigSignerJSON;
       }
     | {
-          name: 'PairConfig'
-          parsedPairConfig: PairConfigJSONWrapper
-      }
+          name: 'PairConfig';
+          parsedPairConfig: PairConfigJSONWrapper;
+      };
 
 export function tryDecodeToParsedDripAccount(
     data: Buffer
 ): DripAccountDecodeResponse {
-    const discriminator = data.slice(0, 8)
+    const discriminator = data.slice(0, 8);
     if (discriminator.equals(Accounts.DripPosition.discriminator)) {
-        const decodedData = Accounts.DripPosition.decode(data).toJSON()
+        const decodedData = Accounts.DripPosition.decode(data).toJSON();
         const owner =
             decodedData.owner.kind === 'Direct'
                 ? decodedData.owner.value.owner
                 : decodedData.owner.kind === 'Tokenized'
                 ? undefined
-                : null
+                : null;
         if (owner === null) {
             throw RestError.internal(
                 `DripPosition owner value unexpected for kind ${decodedData.owner.kind}`
-            )
+            );
         }
         return {
             name: 'DripPosition',
@@ -58,7 +58,7 @@ export function tryDecodeToParsedDripAccount(
                 owner,
                 ownerType: decodedData.owner.kind,
             },
-        }
+        };
     } else if (
         discriminator.equals(Accounts.DripPositionNftMapping.discriminator)
     ) {
@@ -66,7 +66,7 @@ export function tryDecodeToParsedDripAccount(
             name: 'DripPositionNftMapping',
             parsedDripPositionNftMapping:
                 Accounts.DripPositionNftMapping.decode(data).toJSON(),
-        }
+        };
     } else if (
         discriminator.equals(Accounts.DripPositionSigner.discriminator)
     ) {
@@ -74,12 +74,12 @@ export function tryDecodeToParsedDripAccount(
             name: 'DripPositionSigner',
             parsedDripPositionSigner:
                 Accounts.DripPositionSigner.decode(data).toJSON(),
-        }
+        };
     } else if (discriminator.equals(Accounts.GlobalConfig.discriminator)) {
         return {
             name: 'GlobalConfig',
             parsedGlobalConfig: Accounts.GlobalConfig.decode(data).toJSON(),
-        }
+        };
     } else if (
         discriminator.equals(Accounts.GlobalConfigSigner.discriminator)
     ) {
@@ -87,9 +87,9 @@ export function tryDecodeToParsedDripAccount(
             name: 'GlobalConfigSigner',
             parsedGlobalConfigSigner:
                 Accounts.GlobalConfigSigner.decode(data).toJSON(),
-        }
+        };
     } else if (discriminator.equals(Accounts.PairConfig.discriminator)) {
-        const decodedData = Accounts.PairConfig.decode(data).toJSON()
+        const decodedData = Accounts.PairConfig.decode(data).toJSON();
         return {
             name: 'PairConfig',
             parsedPairConfig: {
@@ -111,9 +111,9 @@ export function tryDecodeToParsedDripAccount(
                         'Unavailable',
                 },
             },
-        }
+        };
     }
     throw RestError.invalid(
         `unknown discriminator ${discriminator.toString('hex')}`
-    )
+    );
 }

@@ -5,13 +5,13 @@ import {
     TransactionInstruction,
     TransactionMessage,
     VersionedTransaction,
-} from '@solana/web3.js'
-import { rpcUrl } from '../env'
-import { DEFAULT_COMMITMENT } from '../utils'
+} from '@solana/web3.js';
+import { rpcUrl } from '../env';
+import { DEFAULT_COMMITMENT } from '../utils';
 
 export class Connection extends Web3Conn {
     constructor() {
-        super(rpcUrl, DEFAULT_COMMITMENT)
+        super(rpcUrl, DEFAULT_COMMITMENT);
     }
 }
 
@@ -23,13 +23,13 @@ export async function createVersionedTransactions(
 ): Promise<VersionedTransaction[]> {
     const recentBlockhash = await connection
         .getLatestBlockhash()
-        .then((lb) => lb.blockhash)
+        .then((lb) => lb.blockhash);
     return instructionsForTxs.map((instructions) => {
         const messageV0 = new TransactionMessage({
             payerKey,
             recentBlockhash,
             instructions,
-        }).compileToV0Message(addressLookupTableAccounts)
-        return new VersionedTransaction(messageV0)
-    })
+        }).compileToV0Message(addressLookupTableAccounts);
+        return new VersionedTransaction(messageV0);
+    });
 }

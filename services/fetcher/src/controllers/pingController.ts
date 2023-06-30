@@ -1,5 +1,5 @@
-import { Controller, Get, Route } from 'tsoa'
-import { PingResponse } from '../service/types'
+import { Controller, Get, Route } from 'tsoa';
+import { PingResponse } from '../service/types';
 
 @Route('/')
 export class PingController extends Controller {
@@ -7,6 +7,6 @@ export class PingController extends Controller {
     public async ping(): Promise<PingResponse> {
         return {
             message: 'Pong',
-        }
+        };
     }
 }

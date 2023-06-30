@@ -1,18 +1,18 @@
-import * as anchor from '@coral-xyz/anchor'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
-import { DripV2 } from '@dcaf/drip-types'
-import { expect } from 'chai'
-import '../setup'
+import * as anchor from '@coral-xyz/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { expect } from 'chai';
+import '../setup';
 
 describe('Program - initGlobalConfig', () => {
-    anchor.setProvider(anchor.AnchorProvider.env())
-    const program = anchor.workspace.DripV2 as Program<DripV2>
+    anchor.setProvider(anchor.AnchorProvider.env());
+    const program = anchor.workspace.DripV2 as Program<DripV2>;
 
     it('initializes the GlobalConfig account', async () => {
-        const globalConfigKeypair = new Keypair()
-        const superAdmin = new Keypair()
-        const provider = anchor.getProvider()
+        const globalConfigKeypair = new Keypair();
+        const superAdmin = new Keypair();
+        const provider = anchor.getProvider();
 
         const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
             [
@@ -20,7 +20,7 @@ describe('Program - initGlobalConfig', () => {
                 globalConfigKeypair.publicKey.toBuffer(),
             ],
             program.programId
-        )
+        );
 
         await program.methods
             .initGlobalConfig({
@@ -34,14 +34,14 @@ describe('Program - initGlobalConfig', () => {
                 globalConfigSigner: globalSignerPubkey,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccount = await program.account.globalConfig.fetch(
             globalConfigKeypair.publicKey
-        )
+        );
 
         const feeCollectorAccount =
-            await program.account.globalConfigSigner.fetch(globalSignerPubkey)
+            await program.account.globalConfigSigner.fetch(globalSignerPubkey);
 
         expect({
             version: globalConfigAccount.version.toString(),
@@ -62,12 +62,12 @@ describe('Program - initGlobalConfig', () => {
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
             globalConfigSigner: globalSignerPubkey.toBase58(),
-        })
+        });
 
         expect({
             globalConfig: feeCollectorAccount.globalConfig.toString(),
         }).to.deep.equal({
             globalConfig: globalConfigKeypair.publicKey.toBase58(),
-        })
-    })
-})
+        });
+    });
+});

@@ -1,30 +1,30 @@
-import * as anchor from '@coral-xyz/anchor'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
-import { DripV2 } from '@dcaf/drip-types'
-import { spawn } from 'node:child_process'
-import fs from 'fs/promises'
-import fetch from 'node-fetch'
+import * as anchor from '@coral-xyz/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { spawn } from 'node:child_process';
+import fs from 'fs/promises';
+import fetch from 'node-fetch';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     createAssociatedTokenAccountIdempotent,
     createMint,
     mintTo,
-} from '@solana/spl-token'
-import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token'
+} from '@solana/spl-token';
+import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
 
-const localnet = spawn('anchor', ['localnet'])
+const localnet = spawn('anchor', ['localnet']);
 
 function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function keyPairToObject(key: Keypair) {
     return {
         pub: key.publicKey.toString(),
         priv: key.secretKey.toString(),
-    }
+    };
 }
 
 async function getRawAccountInfo(address: string) {
@@ -43,8 +43,8 @@ async function getRawAccountInfo(address: string) {
                 },
             ],
         }),
-    })
-    return await response.json()
+    });
+    return await response.json();
 }
 
 async function getRawTransaction(txSig: string) {
@@ -63,34 +63,34 @@ async function getRawTransaction(txSig: string) {
                 },
             ],
         }),
-    })
-    return await response.json()
+    });
+    return await response.json();
 }
 
 async function setup() {
-    const program = anchor.workspace.DripV2 as Program<DripV2>
-    const provider = anchor.getProvider()
-    const providerPubkey = provider.publicKey!
+    const program = anchor.workspace.DripV2 as Program<DripV2>;
+    const provider = anchor.getProvider();
+    const providerPubkey = provider.publicKey!;
 
-    const superAdmin = new Keypair()
+    const superAdmin = new Keypair();
     const fundSuperAdminIx = SystemProgram.transfer({
         fromPubkey: providerPubkey,
         toPubkey: superAdmin.publicKey,
         lamports: 100e9, // 100 SOL
-    })
+    });
 
     await provider.sendAndConfirm?.(
         new anchor.web3.Transaction().add(fundSuperAdminIx)
-    )
+    );
 
-    const globalConfigKeypair = new Keypair()
+    const globalConfigKeypair = new Keypair();
     const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
         [
             Buffer.from('drip-v2-global-signer'),
             globalConfigKeypair.publicKey.toBuffer(),
         ],
         program.programId
-    )
+    );
     const initGlobalConfigTxSig = await program.methods
         .initGlobalConfig({
             superAdmin: superAdmin.publicKey,
@@ -103,7 +103,7 @@ async function setup() {
             globalConfigSigner: globalSignerPubkey,
         })
         .signers([globalConfigKeypair])
-        .rpc()
+        .rpc();
 
     const addProviderAsAdminTxSig = await program.methods
         .updateAdmin({
@@ -117,7 +117,7 @@ async function setup() {
             globalConfig: globalConfigKeypair.publicKey,
         })
         .signers([superAdmin])
-        .rpc()
+        .rpc();
 
     const setProviderPermToDripperTxSig = await program.methods
         .updateAdmin({
@@ -131,9 +131,9 @@ async function setup() {
             globalConfig: globalConfigKeypair.publicKey,
         })
         .signers([superAdmin])
-        .rpc()
+        .rpc();
 
-    const inputTokenMintKeypair = new Keypair()
+    const inputTokenMintKeypair = new Keypair();
     const inputTokenMint = await createMint(
         provider.connection,
         superAdmin,
@@ -144,9 +144,9 @@ async function setup() {
         {
             commitment: 'confirmed',
         }
-    )
+    );
 
-    const outputTokenMintKeypair = new Keypair()
+    const outputTokenMintKeypair = new Keypair();
     const outputTokenMint = await createMint(
         provider.connection,
         superAdmin,
@@ -157,7 +157,7 @@ async function setup() {
         {
             commitment: 'confirmed',
         }
-    )
+    );
 
     const [pairConfigPubkey] = PublicKey.findProgramAddressSync(
         [
@@ -167,7 +167,7 @@ async function setup() {
             outputTokenMint.toBuffer(),
         ],
         program.programId
-    )
+    );
 
     const initPairConfigTxSig = await program.methods
         .initPairConfig()
@@ -179,18 +179,18 @@ async function setup() {
             pairConfig: pairConfigPubkey,
             systemProgram: SystemProgram.programId,
         })
-        .rpc()
+        .rpc();
 
     const dripPositions: {
-        initTx: string
-        positionPubkey: string
-        depositTx: string
-    }[] = []
+        initTx: string;
+        positionPubkey: string;
+        depositTx: string;
+    }[] = [];
 
     for (let i = 0; i < 10; i++) {
-        console.log('Processing position ', i)
-        const dripPositionOwnerKeypair = new Keypair()
-        const dripPositionKeypair = new Keypair()
+        console.log('Processing position ', i);
+        const dripPositionOwnerKeypair = new Keypair();
+        const dripPositionKeypair = new Keypair();
 
         const [dripPositionSignerPubkey] = PublicKey.findProgramAddressSync(
             [
@@ -198,7 +198,7 @@ async function setup() {
                 dripPositionKeypair.publicKey.toBuffer(),
             ],
             program.programId
-        )
+        );
 
         const initDripPositionTxSig = await program.methods
             .initDripPosition({
@@ -227,9 +227,9 @@ async function setup() {
                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             })
             .signers([dripPositionOwnerKeypair, dripPositionKeypair])
-            .rpc()
+            .rpc();
 
-        let depositTx: string
+        let depositTx: string;
         if (i % 2 === 0) {
             // if even deposit directly
             depositTx = await mintTo(
@@ -242,7 +242,7 @@ async function setup() {
                 }),
                 superAdmin,
                 2000e6
-            )
+            );
         } else {
             // else deposit via drip-v2 program
             const dripPositionOwnerInputTokenAccount =
@@ -251,7 +251,7 @@ async function setup() {
                     superAdmin,
                     inputTokenMint,
                     dripPositionOwnerKeypair.publicKey
-                )
+                );
 
             await mintTo(
                 provider.connection,
@@ -260,7 +260,7 @@ async function setup() {
                 dripPositionOwnerInputTokenAccount,
                 superAdmin,
                 2000e6
-            )
+            );
 
             depositTx = await program.methods
                 .deposit({
@@ -277,14 +277,14 @@ async function setup() {
                     tokenProgram: TOKEN_PROGRAM_ID,
                 })
                 .signers([dripPositionOwnerKeypair])
-                .rpc()
+                .rpc();
         }
 
         dripPositions.push({
             initTx: initDripPositionTxSig,
             positionPubkey: dripPositionKeypair.publicKey.toString(),
             depositTx,
-        })
+        });
     }
 
     await fs.writeFile(
@@ -300,23 +300,23 @@ async function setup() {
             addProviderAsAdminTxSig,
             setProviderPermToDripperTxSig,
         })
-    )
+    );
 
-    await delay(500)
+    await delay(500);
     await fs.writeFile(
         'mocks/globalConfigAccountInfo.json',
         stringifyJSON(
             await getRawAccountInfo(globalConfigKeypair.publicKey.toString())
         )
-    )
+    );
     await fs.writeFile(
         'mocks/globalSignerAccountInfo.json',
         stringifyJSON(await getRawAccountInfo(globalSignerPubkey.toString()))
-    )
+    );
     await fs.writeFile(
         'mocks/initGlobalConfig.json',
         stringifyJSON(await getRawTransaction(initGlobalConfigTxSig))
-    )
+    );
     await fs.writeFile(
         'mocks/missingAccountInfo.json',
         stringifyJSON(
@@ -324,35 +324,35 @@ async function setup() {
                 'sHXA3HojCdXz9tupED61S8dnfHRqx9DaVSYv1mBqn6h'
             )
         )
-    )
-    console.log('Setup data written to mocks/')
+    );
+    console.log('Setup data written to mocks/');
 }
 
 // Propagate SIGINT to the child process
 process.on('SIGINT', () => {
-    localnet.kill('SIGINT')
-})
+    localnet.kill('SIGINT');
+});
 
 localnet.stdout.on('data', (data: any) => {
-    const logData = `${data}`
+    const logData = `${data}`;
     if (logData && !logData.includes('Processed Slot')) {
-        console.log(logData)
+        console.log(logData);
     }
     if (logData?.includes('JSON RPC URL')) {
         setup().then(() => {
-            console.log('DONE SETUP')
-        })
+            console.log('DONE SETUP');
+        });
     }
-})
+});
 
 localnet.stderr.on('data', (data: any) => {
-    console.error(`${data}`)
-})
+    console.error(`${data}`);
+});
 
 localnet.on('close', (code: any) => {
-    console.log(`child process exited with code ${code}`)
-})
+    console.log(`child process exited with code ${code}`);
+});
 
 function stringifyJSON(obj: object): string {
-    return JSON.stringify(obj, null, 2)
+    return JSON.stringify(obj, null, 2);
 }

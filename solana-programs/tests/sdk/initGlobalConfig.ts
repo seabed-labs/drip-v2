@@ -1,23 +1,23 @@
-import '../setup'
-import * as anchor from '@coral-xyz/anchor'
-import { Drip } from '@dcaf/drip'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { expect } from 'chai'
-import { DripV2 } from '@dcaf/drip-types'
-import { AnchorProvider } from '@coral-xyz/anchor'
+import '../setup';
+import * as anchor from '@coral-xyz/anchor';
+import { Drip } from '@dcaf/drip';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { expect } from 'chai';
+import { DripV2 } from '@dcaf/drip-types';
+import { AnchorProvider } from '@coral-xyz/anchor';
 
 describe('SDK - initGlobalConfig', () => {
     // TODO: for debugging with yarn run localnet
     // process.env.ANCHOR_PROVIDER_URL="http://localhost:8899"
     // process.env.ANCHOR_WALLET="./local.json"
 
-    anchor.setProvider(anchor.AnchorProvider.env())
-    const program = anchor.workspace.DripV2 as anchor.Program<DripV2>
+    anchor.setProvider(anchor.AnchorProvider.env());
+    const program = anchor.workspace.DripV2 as anchor.Program<DripV2>;
 
     it('initializes the GlobalConfig account', async () => {
-        const superAdmin = Keypair.generate()
-        const globalConfigKeypair = Keypair.generate()
-        const provider = anchor.getProvider() as AnchorProvider
+        const superAdmin = Keypair.generate();
+        const globalConfigKeypair = Keypair.generate();
+        const provider = anchor.getProvider() as AnchorProvider;
 
         const drip = new Drip(
             program.programId,
@@ -25,27 +25,27 @@ describe('SDK - initGlobalConfig', () => {
                 provider.connection.rpcEndpoint,
                 provider.connection.commitment
             )
-        )
+        );
 
         const { tx } = await drip.initGlobalConfig(
             superAdmin.publicKey,
             BigInt(100),
             globalConfigKeypair,
             provider.publicKey
-        )
+        );
 
         await provider.sendAndConfirm(tx, [globalConfigKeypair], {
             skipPreflight: true,
-        })
+        });
 
         const globalConfigAccountDirect =
             await program.account.globalConfig.fetch(
                 globalConfigKeypair.publicKey
-            )
+            );
 
         const globalConfigAccountSdk = await drip.fetchGlobalConfig(
             globalConfigKeypair.publicKey
-        )
+        );
 
         for (const globalConfigAccount of [
             globalConfigAccountDirect,
@@ -70,7 +70,7 @@ describe('SDK - initGlobalConfig', () => {
                     .map((key) => key.toString()),
                 adminPermissions: Array(20).fill('0'),
                 defaultDripFeeBps: '100',
-            })
+            });
         }
-    })
-})
+    });
+});

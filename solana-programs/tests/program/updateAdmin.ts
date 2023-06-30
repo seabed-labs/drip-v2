@@ -1,22 +1,22 @@
-import * as anchor from '@coral-xyz/anchor'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
-import { DripV2 } from '@dcaf/drip-types'
-import { expect } from 'chai'
-import '../setup'
+import * as anchor from '@coral-xyz/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { expect } from 'chai';
+import '../setup';
 
 // TODO: These tests are not exhaustive at all yet
 
 describe('Program - updateAdmin', () => {
-    anchor.setProvider(anchor.AnchorProvider.env())
-    const program = anchor.workspace.DripV2 as Program<DripV2>
+    anchor.setProvider(anchor.AnchorProvider.env());
+    const program = anchor.workspace.DripV2 as Program<DripV2>;
 
-    let globalConfigPubkey: PublicKey
-    let superAdminKeypair: Keypair
+    let globalConfigPubkey: PublicKey;
+    let superAdminKeypair: Keypair;
 
     beforeEach(async () => {
-        const globalConfigKeypair = new Keypair()
-        superAdminKeypair = new Keypair()
+        const globalConfigKeypair = new Keypair();
+        superAdminKeypair = new Keypair();
 
         await program.methods
             .initGlobalConfig({
@@ -29,10 +29,10 @@ describe('Program - updateAdmin', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
+            .rpc();
 
-        globalConfigPubkey = globalConfigKeypair.publicKey
-    })
+        globalConfigPubkey = globalConfigKeypair.publicKey;
+    });
 
     it("doesn't allow non-super admin to update admins", async () => {
         await expect(
@@ -49,14 +49,14 @@ describe('Program - updateAdmin', () => {
                 })
                 .signers([superAdminKeypair])
                 .rpc()
-        ).to.eventually.be.rejectedWith(/AdminPubkeyCannotBeDefault.*6002/)
-    })
+        ).to.eventually.be.rejectedWith(/AdminPubkeyCannotBeDefault.*6002/);
+    });
 
     it('can add a new admin', async () => {
-        const newAdminPubkey = PublicKey.unique()
+        const newAdminPubkey = PublicKey.unique();
 
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -77,7 +77,7 @@ describe('Program - updateAdmin', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await program.methods
             .updateAdmin({
@@ -93,10 +93,10 @@ describe('Program - updateAdmin', () => {
                 globalConfig: globalConfigPubkey,
             })
             .signers([superAdminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountAfter =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountAfter.version.toString(),
@@ -119,14 +119,14 @@ describe('Program - updateAdmin', () => {
             ),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
-    })
+        });
+    });
 
     it('can give drip permissions to an existing admin', async () => {
-        const newAdminPubkey = PublicKey.unique()
+        const newAdminPubkey = PublicKey.unique();
 
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -147,7 +147,7 @@ describe('Program - updateAdmin', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
+        });
 
         let tx = await program.methods
             .updateAdmin({
@@ -160,7 +160,7 @@ describe('Program - updateAdmin', () => {
                 signer: superAdminKeypair.publicKey,
                 globalConfig: globalConfigPubkey,
             })
-            .transaction()
+            .transaction();
 
         const giveAdminInitPairConfigPermissionIX = await program.methods
             .updateAdmin({
@@ -173,19 +173,19 @@ describe('Program - updateAdmin', () => {
                 signer: superAdminKeypair.publicKey,
                 globalConfig: globalConfigPubkey,
             })
-            .instruction()
+            .instruction();
 
-        tx = tx.add(giveAdminInitPairConfigPermissionIX)
+        tx = tx.add(giveAdminInitPairConfigPermissionIX);
         tx.recentBlockhash = (
             await program.provider.connection.getLatestBlockhash()
-        ).blockhash
-        tx.feePayer = anchor.getProvider().publicKey
-        tx.partialSign(superAdminKeypair)
+        ).blockhash;
+        tx.feePayer = anchor.getProvider().publicKey;
+        tx.partialSign(superAdminKeypair);
 
-        await anchor.getProvider().sendAndConfirm(tx)
+        await anchor.getProvider().sendAndConfirm(tx);
 
         const globalConfigAccountAfter =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountAfter.version.toString(),
@@ -208,6 +208,6 @@ describe('Program - updateAdmin', () => {
             ),
             adminPermissions: ['1'].concat(Array(19).fill('0')),
             defaultDripFeeBps: '100',
-        })
-    })
-})
+        });
+    });
+});

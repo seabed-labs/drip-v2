@@ -6,28 +6,28 @@ import {
     Query,
     Route,
     SuccessResponse,
-} from 'tsoa'
+} from 'tsoa';
 import {
     ParsedAccountResponse,
     Commitment,
     ParsedTxResponse,
     RestError,
     ParsedDripIxWithIndex,
-} from '../service/types'
-import { Connection } from '../service/solana'
-import { tryDecodeToParsedDripAccount } from '../service/accountParser'
-import { programId } from '../service/env'
-import { PublicKey } from '@solana/web3.js'
-import { tryDecodeIx } from '../service/ixParser'
-import { translateAddress } from '@coral-xyz/anchor'
+} from '../service/types';
+import { Connection } from '../service/solana';
+import { tryDecodeToParsedDripAccount } from '../service/accountParser';
+import { programId } from '../service/env';
+import { PublicKey } from '@solana/web3.js';
+import { tryDecodeIx } from '../service/ixParser';
+import { translateAddress } from '@coral-xyz/anchor';
 
 @Route('fetch')
 export class FetchController extends Controller {
-    private readonly connection: Connection
+    private readonly connection: Connection;
 
     constructor() {
-        super()
-        this.connection = new Connection()
+        super();
+        this.connection = new Connection();
     }
 
     @Response<RestError>(400)
@@ -40,23 +40,23 @@ export class FetchController extends Controller {
         @Path() signature: string,
         @Query() commitment: Commitment = 'finalized'
     ): Promise<ParsedTxResponse> {
-        const instructions: ParsedDripIxWithIndex[] = []
+        const instructions: ParsedDripIxWithIndex[] = [];
         const tx = await this.connection.getNonNullableTransaction(
             signature,
             commitment
-        )
-        const accountKeys = tx.transaction.message.getAccountKeys()
+        );
+        const accountKeys = tx.transaction.message.getAccountKeys();
         tx.transaction.message.compiledInstructions.forEach((ix, i) => {
-            const parsedIx = tryDecodeIx(tx, accountKeys, ix) ?? {}
+            const parsedIx = tryDecodeIx(tx, accountKeys, ix) ?? {};
             instructions.push({
                 index: i,
                 ...parsedIx,
-            })
-        })
+            });
+        });
         return {
             signature,
             instructions,
-        }
+        };
     }
 
     @Response<RestError>(400)
@@ -68,24 +68,24 @@ export class FetchController extends Controller {
         @Path('accountPublicKey') accountPublicKeyStr: string,
         @Query() commitment: Commitment = 'finalized'
     ): Promise<ParsedAccountResponse> {
-        let accountPublicKey: PublicKey
+        let accountPublicKey: PublicKey;
         try {
-            accountPublicKey = translateAddress(accountPublicKeyStr)
+            accountPublicKey = translateAddress(accountPublicKeyStr);
         } catch (e) {
             throw RestError.invalid(
                 `public key ${accountPublicKeyStr} is not valid`
-            )
+            );
         }
         const accountInfo = await this.connection.getNonNullableAccountInfo(
             accountPublicKey,
             commitment,
             programId ? new PublicKey(programId) : undefined
-        )
-        const parsedAccount = tryDecodeToParsedDripAccount(accountInfo.data)
-        this.setStatus(200)
+        );
+        const parsedAccount = tryDecodeToParsedDripAccount(accountInfo.data);
+        this.setStatus(200);
         return {
             publicKey: accountPublicKey.toString(),
             ...parsedAccount,
-        }
+        };
     }
 }

@@ -1,8 +1,8 @@
-import { IPosition, IPositionsFetcher } from './index'
-import { Accounts } from '@dcaf/drip-types'
-import { GetPositionHandler, IDripHandler } from '../dripHandler'
-import { Connection, PublicKey } from '@solana/web3.js'
-import * as bs58 from 'bs58'
+import { IPosition, IPositionsFetcher } from './index';
+import { Accounts } from '@dcaf/drip-types';
+import { GetPositionHandler, IDripHandler } from '../dripHandler';
+import { Connection, PublicKey } from '@solana/web3.js';
+import * as bs58 from 'bs58';
 export class OnChainPositionsFetcher implements IPositionsFetcher {
     constructor(
         private readonly programId: PublicKey,
@@ -11,7 +11,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
     ) {}
 
     async getPositionsPendingDrip(limit = 20): Promise<IPosition[]> {
-        const res: IPosition[] = []
+        const res: IPosition[] = [];
         const accounts = await this.connection.getProgramAccounts(
             this.programId,
             {
@@ -29,16 +29,16 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                     },
                 ],
             }
-        )
-        const positionKeys = accounts.map((account) => account.pubkey)
-        let i = 0
+        );
+        const positionKeys = accounts.map((account) => account.pubkey);
+        let i = 0;
         while (i < positionKeys.length && res.length < limit) {
-            const positionKey = positionKeys[i]
+            const positionKey = positionKeys[i];
             const dripPosition = await Accounts.DripPosition.fetch(
                 this.connection,
                 positionKey,
                 this.programId
-            )
+            );
             if (dripPosition) {
                 if (
                     Date.now() >
@@ -49,12 +49,12 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                             dripPosition,
                             await this.getPositionHandler(dripPosition)
                         )
-                    )
+                    );
                 }
             }
-            i += 1
+            i += 1;
         }
-        return res
+        return res;
     }
 }
 
@@ -65,10 +65,10 @@ export class Position implements IPosition {
     ) {}
 
     async drip(): Promise<string> {
-        return this.handler.drip()
+        return this.handler.drip();
     }
 
     toJSON(): Accounts.DripPositionJSON {
-        return this.value.toJSON()
+        return this.value.toJSON();
     }
 }

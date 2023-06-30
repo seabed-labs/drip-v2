@@ -1,21 +1,21 @@
-import * as anchor from '@coral-xyz/anchor'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
-import { DripV2 } from '@dcaf/drip-types'
-import { expect } from 'chai'
-import '../setup'
+import * as anchor from '@coral-xyz/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { expect } from 'chai';
+import '../setup';
 
 describe('Program - updateDefaultDripFees', () => {
-    anchor.setProvider(anchor.AnchorProvider.env())
-    const program = anchor.workspace.DripV2 as Program<DripV2>
+    anchor.setProvider(anchor.AnchorProvider.env());
+    const program = anchor.workspace.DripV2 as Program<DripV2>;
 
-    let superAdminKeypair: Keypair
-    let globalConfigPubkey: PublicKey
+    let superAdminKeypair: Keypair;
+    let globalConfigPubkey: PublicKey;
 
     beforeEach(async () => {
-        superAdminKeypair = Keypair.generate()
-        const globalConfigKeypair = Keypair.generate()
-        globalConfigPubkey = globalConfigKeypair.publicKey
+        superAdminKeypair = Keypair.generate();
+        const globalConfigKeypair = Keypair.generate();
+        globalConfigPubkey = globalConfigKeypair.publicKey;
 
         await program.methods
             .initGlobalConfig({
@@ -28,12 +28,12 @@ describe('Program - updateDefaultDripFees', () => {
                 systemProgram: SystemProgram.programId,
             })
             .signers([globalConfigKeypair])
-            .rpc()
-    })
+            .rpc();
+    });
 
     it('updates the default drip fees as super admin', async () => {
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -54,7 +54,7 @@ describe('Program - updateDefaultDripFees', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await program.methods
             .updateDefaultDripFees({
@@ -65,10 +65,10 @@ describe('Program - updateDefaultDripFees', () => {
                 globalConfig: globalConfigPubkey,
             })
             .signers([superAdminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountAfter =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountAfter.version.toString(),
@@ -89,11 +89,11 @@ describe('Program - updateDefaultDripFees', () => {
                 .map((key) => key.toString()),
             adminPermissions: Array(20).fill('0'),
             defaultDripFeeBps: '50',
-        })
-    })
+        });
+    });
 
     it('updates the default drip fees as admin with appropriate permissions', async () => {
-        const adminKeypair = Keypair.generate()
+        const adminKeypair = Keypair.generate();
 
         await program.methods
             .updateAdmin({
@@ -127,10 +127,10 @@ describe('Program - updateDefaultDripFees', () => {
                     .instruction(),
             ])
             .signers([superAdminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -153,7 +153,7 @@ describe('Program - updateDefaultDripFees', () => {
             ),
             adminPermissions: ['2'].concat(Array(19).fill('0')),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await program.methods
             .updateDefaultDripFees({
@@ -164,10 +164,10 @@ describe('Program - updateDefaultDripFees', () => {
                 globalConfig: globalConfigPubkey,
             })
             .signers([adminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountAfter =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountAfter.version.toString(),
@@ -190,11 +190,11 @@ describe('Program - updateDefaultDripFees', () => {
             ),
             adminPermissions: ['2'].concat(Array(19).fill('0')),
             defaultDripFeeBps: '50',
-        })
-    })
+        });
+    });
 
     it('does not update the default drip fees as admin without appropriate permissions', async () => {
-        const adminKeypair = Keypair.generate()
+        const adminKeypair = Keypair.generate();
 
         await program.methods
             .updateAdmin({
@@ -228,10 +228,10 @@ describe('Program - updateDefaultDripFees', () => {
                     .instruction(),
             ])
             .signers([superAdminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -254,7 +254,7 @@ describe('Program - updateDefaultDripFees', () => {
             ),
             adminPermissions: ['1'].concat(Array(19).fill('0')),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await expect(
             program.methods
@@ -267,12 +267,12 @@ describe('Program - updateDefaultDripFees', () => {
                 })
                 .signers([adminKeypair])
                 .rpc()
-        ).to.eventually.be.rejectedWith(/OperationUnauthorized.*6004/)
-    })
+        ).to.eventually.be.rejectedWith(/OperationUnauthorized.*6004/);
+    });
 
     it('does not update the default drip fees as non-admin and non-super admin', async () => {
-        const adminKeypair = Keypair.generate()
-        const nonAdminKeypair = Keypair.generate()
+        const adminKeypair = Keypair.generate();
+        const nonAdminKeypair = Keypair.generate();
 
         await program.methods
             .updateAdmin({
@@ -306,10 +306,10 @@ describe('Program - updateDefaultDripFees', () => {
                     .instruction(),
             ])
             .signers([superAdminKeypair])
-            .rpc()
+            .rpc();
 
         const globalConfigAccountBefore =
-            await program.account.globalConfig.fetch(globalConfigPubkey)
+            await program.account.globalConfig.fetch(globalConfigPubkey);
 
         expect({
             version: globalConfigAccountBefore.version.toString(),
@@ -332,7 +332,7 @@ describe('Program - updateDefaultDripFees', () => {
             ),
             adminPermissions: ['1'].concat(Array(19).fill('0')),
             defaultDripFeeBps: '100',
-        })
+        });
 
         await expect(
             program.methods
@@ -345,6 +345,6 @@ describe('Program - updateDefaultDripFees', () => {
                 })
                 .signers([nonAdminKeypair])
                 .rpc()
-        ).to.eventually.be.rejectedWith(/OperationUnauthorized.*6004/)
-    })
-})
+        ).to.eventually.be.rejectedWith(/OperationUnauthorized.*6004/);
+    });
+});
