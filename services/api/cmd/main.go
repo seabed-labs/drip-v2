@@ -61,7 +61,7 @@ func main() {
 
 	jup := jupiter.NewClient()
 
-	f := fetcher.NewAPIClient(&fetcher.Configuration{
+	f := fetcher.NewAPIClient(&fetcher.Configuration{ // nolint: exhaustruct
 		Host: fmt.Sprintf("%s:%s",
 			viper.GetString("fetcher.host"),
 			viper.GetString("fetcher.port"),

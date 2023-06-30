@@ -70,7 +70,9 @@ func (c *accountConsumer) Run() error {
 			return nil
 		case msg := <-msgs:
 			accPubKey := string(msg.Body)
-			acc, resp, err := c.fetcher.DefaultAPI.ParseAccountExecute(c.fetcher.DefaultAPI.ParseAccount(ctx, string(msg.Body)))
+			acc, resp, err := c.fetcher.DefaultAPI.ParseAccount(ctx, accPubKey).Execute()
+			defer resp.Body.Close()
+
 			if err != nil || resp.StatusCode != http.StatusOK || acc == nil {
 				c.log.Error(
 					"failed to get parsed account",

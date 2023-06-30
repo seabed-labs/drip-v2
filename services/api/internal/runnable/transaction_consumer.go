@@ -69,6 +69,8 @@ func (c *transactionConsumer) Run() error {
 		case msg := <-msgs:
 			txSig := string(msg.Body)
 			txs, resp, err := c.fetcher.DefaultAPI.ParseTx(ctx, txSig).Execute()
+			defer resp.Body.Close()
+
 			if err != nil || resp.StatusCode != http.StatusOK || txs == nil {
 				c.log.Error(
 					"failed to get parsed account",

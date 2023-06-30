@@ -55,7 +55,7 @@ func (c *HTTPClient) WithOptions(opts ...Option) *HTTPClient {
 func NewHTTPClient(opts ...Option) *HTTPClient {
 	c := &HTTPClient{
 		log:    logger.NewZapLogger("http_client"),
-		client: &http.Client{},
+		client: &http.Client{}, // nolint: exhaustruct
 	}
 
 	return c.WithOptions(opts...)
