@@ -1,5 +1,5 @@
-CREATE DROP dcaf."drip_positions"
+DROP TABLE dcaf."drip_positions"
 
-CREATE DROP dcaf."drip_position_enums"
+DROP TABLE dcaf."drip_positions_enums"
 
-CREATE DROP dcaf."wallet"
+DROP TABLE dcaf."wallets"

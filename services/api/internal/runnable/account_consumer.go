@@ -16,7 +16,9 @@ type accountConsumerQueueInterface interface {
 	Consume(queue app.Queue, consumer string) (<-chan amqp.Delivery, error)
 }
 
-type accountConsumerTranslatorInterface interface{}
+type accountConsumerTranslatorInterface interface {
+	InsertDripPosition(ctx context.Context, publicKey string, position *fetcher.DripPositionJSONWrapper) error
+}
 
 type accountConsumer struct {
 	doneC      chan struct{}
@@ -86,14 +88,20 @@ func (c *accountConsumer) Run() error {
 
 			switch {
 			case acc.ParsedDripPosition != nil:
+				c.translator.InsertDripPosition(ctx, acc.PublicKey, acc.ParsedDripPosition)
 			case acc.ParsedDripPositionNftMapping != nil:
 			case acc.ParsedDripPositionSigner != nil:
 			case acc.ParsedGlobalConfig != nil:
 			case acc.ParsedGlobalConfigSigner != nil:
 			case acc.ParsedPairConfig != nil:
+			default:
+				c.log.Error(
+					"account not supported",
+					zap.String("queue name", string(c.qName)),
+					zap.String("consumer name", c.name),
+					zap.String("message", string(msg.Body)),
+				)
 			}
-
-			//c.translator.CreateAccount(acc)
 		}
 	}
 }

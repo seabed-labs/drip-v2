@@ -99,10 +99,15 @@ func (c *transactionConsumer) Run() error {
 				case ix.ParsedUpdateDefaultPairDripFees != nil:
 				case ix.ParsedUpdatePythPriceFeed != nil:
 				case ix.ParsedUpdateSuperAdmin != nil:
+				default:
+					c.log.Error(
+						"transaction not supported",
+						zap.String("queue name", string(c.qName)),
+						zap.String("consumer name", c.name),
+						zap.String("message", string(msg.Body)),
+					)
 				}
 			}
-
-			//c.translator.CreateTransaction(tx)
 		}
 	}
 }

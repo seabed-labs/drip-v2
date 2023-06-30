@@ -66,6 +66,7 @@ gen-fetcher:
 		$(CURDIR)/gen/fetcher/go.mod \
 		$(CURDIR)/gen/fetcher/go.sum \
 		$(CURDIR)/gen/fetcher/git_push.sh \
+		$(CURDIR)/gen/fetcher/test/* \
 
 #### Code Lint ####
 lint: lint-go lint-sql
