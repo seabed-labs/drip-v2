@@ -12,7 +12,6 @@ use anchor_spl::{
 pub struct InitDripPosition<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-    pub owner: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
@@ -73,6 +72,7 @@ pub struct InitDripPosition<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitDripPositionParams {
+    pub owner: Pubkey,
     pub drip_amount: u64,
     pub frequency_in_seconds: u64,
 }
@@ -109,7 +109,7 @@ pub fn handle_init_drip_position(
     let drip_position = &mut ctx.accounts.drip_position;
     drip_position.global_config = ctx.accounts.global_config.key();
     drip_position.owner = DripPositionOwner::Direct {
-        owner: ctx.accounts.owner.key(),
+        owner: params.owner,
     };
 
     drip_position.drip_fee_bps = ctx.accounts.pair_config.default_pair_drip_fee_bps;

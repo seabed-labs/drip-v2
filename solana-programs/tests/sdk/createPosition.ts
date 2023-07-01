@@ -83,8 +83,6 @@ describe('SDK - createPosition', () => {
             outputMint,
             dripAmount: BigInt(100),
             dripFrequencyInSeconds: 3600,
-            // TODO: Remove requirement for owners to sign during position creation
-            signers: [positionOwner],
         });
 
         assert(isTxSuccessful(txResult), 'Expected TX to be successful');

@@ -241,13 +241,13 @@ export class DripClient implements IDripClient {
         const initDripPositionIx = new Instructions.InitDripPosition(
             {
                 params: {
+                    owner,
                     dripAmount,
                     frequencyInSeconds: BigInt(dripFrequencyInSeconds),
                 },
             },
             {
                 payer,
-                owner,
                 globalConfig: this.globalConfig,
                 pairConfig: pairConfigPubkey,
                 inputTokenMint: inputMint,
