@@ -36,7 +36,7 @@ echo "Upgrade Authority"
 echo $UPGRADE_AUTH
 
 anchor upgrade --program-id="$PROGRAM_ID" --provider.cluster="https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d" --provider.wallet="./upgrade-authority.json" ./target/deploy/drip_v2.so
-anchor idl upgrade --provider.cluster="https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d" --provider.wallet="./upgrade-authority.json" --filepath="./target/idl/drip.json" $PROGRAM_ID
+anchor idl upgrade --provider.cluster="https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d" --provider.wallet="./upgrade-authority.json" --filepath="./target/idl/drip_v2.json" $PROGRAM_ID
 
 #solana program deploy --keypair ./upgrade-authority.json --upgrade-authority ./upgrade-authority.json --program-id ./target/deploy/drip_v2-keypair.json ./target/deploy/drip_v2.so
 #anchor idl init --provider.cluster="https://mainnet.helius-rpc.com/?api-key=7a4bbcd8-5147-4a6b-b087-7be92b65170d" --provider.wallet="./upgrade-authority.json" --filepath="./target/idl/drip_v2.json" $PROGRAM_ID
