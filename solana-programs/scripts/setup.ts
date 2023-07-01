@@ -4,7 +4,7 @@ dotenv.config({
 });
 
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
-import { DripV2, IDL } from '@dcaf/drip-types';
+import { DripV2, IDL, Accounts } from '@dcaf/drip-types';
 import {
     Connection,
     Keypair,
@@ -13,7 +13,6 @@ import {
     TransactionInstruction,
 } from '@solana/web3.js';
 import fs from 'fs/promises';
-import { Accounts } from '@dcaf/drip-types';
 import * as anchor from '@coral-xyz/anchor';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import {
@@ -112,8 +111,12 @@ export async function createPosition(
     globalConfig: PublicKey,
     inputTokenMint: PublicKey,
     outputTokenMint: PublicKey,
-    positionOwner: Keypair
+    positionOwner: PublicKey
 ): Promise<void> {
+    const { address: ownerInputTa, instruction: initOwnerInputTa } =
+        await maybeInitAta(provider, inputTokenMint, positionOwner);
+    const { address: ownerOutputTa, instruction: initOwnerOutputTa } =
+        await maybeInitAta(provider, outputTokenMint, positionOwner);
     const { address: pairConfig, instruction: initPairConfigIx } =
         await maybeInitPairConfig(
             provider,
@@ -122,19 +125,15 @@ export async function createPosition(
             inputTokenMint,
             outputTokenMint
         );
-    const { address: ownerInputTa, instruction: initOwnerInputTa } =
-        await maybeInitAta(provider, inputTokenMint, positionOwner.publicKey);
-    const { address: ownerOutputTa, instruction: initOwnerOutputTa } =
-        await maybeInitAta(provider, outputTokenMint, positionOwner.publicKey);
     const preInstructions: TransactionInstruction[] = [];
-    if (initPairConfigIx) {
-        preInstructions.push(initPairConfigIx);
-    }
     if (initOwnerInputTa) {
         preInstructions.push(initOwnerInputTa);
     }
     if (initOwnerOutputTa) {
         preInstructions.push(initOwnerOutputTa);
+    }
+    if (initPairConfigIx) {
+        preInstructions.push(initPairConfigIx);
     }
     const dripPositionKeypair = new Keypair();
 
@@ -150,10 +149,10 @@ export async function createPosition(
         .initDripPosition({
             dripAmount: new anchor.BN(100),
             frequencyInSeconds: new anchor.BN(3600),
+            owner: positionOwner,
         })
         .accounts({
             payer: provider.publicKey,
-            owner: positionOwner.publicKey,
             globalConfig,
             pairConfig,
             inputTokenMint,
@@ -172,8 +171,8 @@ export async function createPosition(
             tokenProgram: TOKEN_PROGRAM_ID,
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         })
-        .signers([positionOwner, dripPositionKeypair])
         .preInstructions(preInstructions)
+        .signers([dripPositionKeypair])
         .rpc();
     console.log("initDripPositionTxSig", initDripPositionTxSig);
 }
@@ -268,6 +267,17 @@ async function run() {
     const program = new Program(IDL, programId, provider);
     if (cmd === 'setupGlobalConfig') {
         await setupGlobalConfig(provider, program);
+    } else if (cmd === 'createPosition') {
+        if (cmdArgs.length < 4 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
+            console.log('usage: createPosition <globalConfig> <inputTokenMint> <outputTokenMint> <positionOwner>')
+            console.log(`got ${cmdArgs.length} args but expected 4`)
+            return
+        }
+        const globalConfig = new PublicKey(cmdArgs[0])
+        const inputTokenMint = new PublicKey(cmdArgs[1])
+        const outputTokenMint = new PublicKey(cmdArgs[2])
+        const positionOwner = new PublicKey(cmdArgs[3])
+        await createPosition(provider, program, globalConfig, inputTokenMint, outputTokenMint, positionOwner)
     }
 }
 
