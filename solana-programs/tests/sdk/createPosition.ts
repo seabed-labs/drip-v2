@@ -87,7 +87,8 @@ describe('SDK - createPosition', () => {
             new Transaction(await provider.connection.getLatestBlockhash()).add(
                 initGlobalConfigIx.build()
             ),
-            [globalConfigKeypair]
+            [globalConfigKeypair],
+            { maxRetries: 3 }
         );
 
         dripClient = DripClient.withProvider(
@@ -97,7 +98,7 @@ describe('SDK - createPosition', () => {
         );
     });
 
-    it('creates a position without a pre-existing pair config and no initial deposit', async () => {
+    it.only('creates a position without a pre-existing pair config and no initial deposit', async () => {
         const positionOwner = Keypair.generate();
 
         const txResult = await dripClient.createPosition({

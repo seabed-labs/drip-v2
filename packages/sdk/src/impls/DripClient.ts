@@ -113,7 +113,10 @@ export class DripClient implements IDripClient {
         additionalSigners: Signer[] = [],
         feePayerOverride?: Signer,
         commitment: Commitment = 'confirmed',
-        sendOptions: SendOptions = {},
+        sendOptions: SendOptions = {
+            // TODO: arbitrary, should probably make this configurable or something
+            maxRetries: 3,
+        },
         serializeConfig: SerializeConfig = {}
     ): Promise<TransactionSignature> {
         const signer = feePayerOverride ?? this.signer;
