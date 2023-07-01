@@ -8,7 +8,10 @@ import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     createMint,
+    getAccount,
     getAssociatedTokenAddressSync,
+    getOrCreateAssociatedTokenAccount,
+    mintTo,
 } from '@solana/spl-token';
 import { assert, expect } from 'chai';
 import { newTransaction } from './utils';
@@ -200,5 +203,140 @@ describe('SDK - createPosition', () => {
         expect(
             Number(dripPositionAccount?.dripActivationTimestamp)
         ).greaterThan(0);
+    });
+
+    it('creates a position without a pre-existing pair config and with an initial deposit from owner', async () => {
+        const positionOwner = Keypair.generate();
+
+        const positionOwnerInputTokenAccount =
+            await getOrCreateAssociatedTokenAccount(
+                provider.connection,
+                mintAuthorityKeypair,
+                inputMintPubkey,
+                positionOwner.publicKey
+            );
+
+        await mintTo(
+            provider.connection,
+            mintAuthorityKeypair,
+            inputMintPubkey,
+            positionOwnerInputTokenAccount.address,
+            mintAuthorityKeypair,
+            10_000
+        );
+
+        const txResult = await dripClient.createPosition({
+            owner: positionOwner.publicKey,
+            payer: provider.publicKey,
+            inputMint: inputMintPubkey,
+            outputMint: outputMintPubkey,
+            dripAmount: BigInt(1000),
+            dripFrequencyInSeconds: 3600,
+            initialDeposit: {
+                depositor: positionOwner.publicKey,
+                depositorTokenAccount: positionOwnerInputTokenAccount.address,
+                amount: BigInt(10_000),
+            },
+            signers: [positionOwner],
+        });
+
+        assert(isTxSuccessful(txResult), 'Expected TX to be successful');
+        const dripPositionPubkey = txResult.value.pubkey;
+
+        const dripPositionAccount = await Accounts.DripPosition.fetch(
+            provider.connection,
+            dripPositionPubkey,
+            program.programId
+        );
+
+        const expectedDripPositionSignerPubkey =
+            PublicKey.findProgramAddressSync(
+                [
+                    Buffer.from('drip-v2-drip-position-signer'),
+                    dripPositionPubkey.toBuffer(),
+                ],
+                program.programId
+            )[0];
+
+        const expectedDripPositionInputTokenAccount =
+            getAssociatedTokenAddressSync(
+                inputMintPubkey,
+                expectedDripPositionSignerPubkey,
+                true,
+                TOKEN_PROGRAM_ID,
+                ASSOCIATED_TOKEN_PROGRAM_ID
+            );
+
+        const expectedDripPositionOutputTokenAccount =
+            getAssociatedTokenAddressSync(
+                outputMintPubkey,
+                expectedDripPositionSignerPubkey,
+                true,
+                TOKEN_PROGRAM_ID,
+                ASSOCIATED_TOKEN_PROGRAM_ID
+            );
+
+        expect(dripPositionAccount?.toJSON()).to.exist;
+        expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
+            // NOTE: If you update this, also update the actual field check below
+            20
+        );
+        expect(dripPositionAccount?.toJSON()).to.deep.include({
+            globalConfig: globalConfigPubkey.toBase58(),
+            owner: {
+                kind: 'Direct',
+                value: {
+                    owner: positionOwner.publicKey.toBase58(),
+                },
+            },
+            dripFeeBps: '100',
+            dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
+            autoCreditEnabled: false,
+            pairConfig: PublicKey.findProgramAddressSync(
+                [
+                    Buffer.from('drip-v2-pair-config'),
+                    globalConfigPubkey.toBuffer(),
+                    inputMintPubkey.toBuffer(),
+                    outputMintPubkey.toBuffer(),
+                ],
+                program.programId
+            )[0].toBase58(),
+            inputTokenMint: inputMintPubkey.toBase58(),
+            outputTokenMint: outputMintPubkey.toBase58(),
+            inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
+            outputTokenAccount:
+                expectedDripPositionOutputTokenAccount.toBase58(),
+            dripAmount: '1000',
+            dripAmountFilled: '0',
+            frequencyInSeconds: '3600',
+            totalInputTokenDripped: '0',
+            totalOutputTokenReceived: '0',
+            dripPositionNftMint: null,
+            dripMaxJitter: 0,
+            // TODO: Not sure how to check correctly (we need to fake the time somehow)
+            //       For now we should just unit test this instead
+            // dripActivationGenesisShift: '0',
+            // dripActivationTimestamp: '0',
+            ephemeralDripState: null,
+        });
+
+        expect(
+            Number(dripPositionAccount?.dripActivationGenesisShift)
+        ).greaterThanOrEqual(0);
+
+        expect(
+            Number(dripPositionAccount?.dripActivationGenesisShift)
+        ).lessThan(3600);
+
+        expect(
+            Number(dripPositionAccount?.dripActivationTimestamp)
+        ).greaterThan(0);
+
+        const dripInputTokenAccount = await getAccount(
+            provider.connection,
+            expectedDripPositionInputTokenAccount
+        );
+
+        expect(dripInputTokenAccount.amount.toString()).to.eq('10000');
     });
 });
