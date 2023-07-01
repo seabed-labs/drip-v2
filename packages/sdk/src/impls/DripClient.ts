@@ -162,7 +162,7 @@ export class DripClient implements IDripClient {
             signedTx.serialize(serializeConfig),
             sendOptions
         );
-        const blockhash = await this.connection.getLatestBlockhash();
+        const blockhash = await this.connection.getLatestBlockhash('finalized');
         const res = await this.connection.confirmTransaction(
             { signature: txSig, ...blockhash },
             commitment
@@ -293,7 +293,9 @@ export class DripClient implements IDripClient {
         }
 
         // TODO: Abstract the Transaction creation logic since it'll be duplicated in each entrypoint here
-        const latestBlockhash = await this.connection.getLatestBlockhash();
+        const latestBlockhash = await this.connection.getLatestBlockhash(
+            'finalized'
+        );
         const tx = new Transaction(latestBlockhash);
         tx.add(...instructions);
 
