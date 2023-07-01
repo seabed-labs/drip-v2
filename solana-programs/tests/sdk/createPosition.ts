@@ -154,6 +154,10 @@ describe('SDK - createPosition', () => {
             );
 
         expect(dripPositionAccount?.toJSON()).to.exist;
+        expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
+            // NOTE: If you update this, also update the actual field check below
+            20
+        );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
             owner: {
@@ -196,6 +200,10 @@ describe('SDK - createPosition', () => {
         expect(
             Number(dripPositionAccount?.dripActivationGenesisShift)
         ).greaterThanOrEqual(0);
+
+        expect(
+            Number(dripPositionAccount?.dripActivationGenesisShift)
+        ).lessThan(3600);
 
         expect(
             Number(dripPositionAccount?.dripActivationTimestamp)
