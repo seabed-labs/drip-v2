@@ -4,7 +4,7 @@ import {
     CreatePositionParams,
     IDripClient,
     IDripPosition,
-    IDripTxFactory,
+    IDripInstructionsFactory,
     TxResult,
 } from '../types';
 import {
@@ -15,20 +15,11 @@ import {
     SendOptions,
     SerializeConfig,
     Signer,
-    SystemProgram,
     Transaction,
-    TransactionInstruction,
     TransactionSignature,
     VersionedTransaction,
 } from '@solana/web3.js';
-import { DripTxFactory } from './DripTxFactory';
-import { DripPDA } from '../utils';
-import { Accounts, Instructions } from '@dcaf/drip-types';
-import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    getAssociatedTokenAddressSync,
-} from '@solana/spl-token';
+import { DripInstructionsFactory } from './DripInstructionsFactory';
 import { DripPosition } from './DripPosition';
 
 // TODOs:
@@ -40,7 +31,11 @@ export class DripClient implements IDripClient {
         private readonly globalConfig: PublicKey,
         private readonly connection: Connection,
         private readonly signer: Signer | Provider | Wallet | null,
-        public readonly txFactory: IDripTxFactory = new DripTxFactory()
+        public readonly instructionsFactory: IDripInstructionsFactory = new DripInstructionsFactory(
+            programId,
+            globalConfig,
+            connection
+        )
     ) {}
 
     public static withProvider(
@@ -179,118 +174,15 @@ export class DripClient implements IDripClient {
     async createPosition(
         params: CreatePositionParams
     ): Promise<TxResult<IDripPosition>> {
-        // TODO: Move this logic to TX Factory and call it here
-        const {
-            owner,
-            inputMint,
-            outputMint,
-            payer: payerOverride,
-            dripAmount,
-            dripFrequencyInSeconds,
-            initialDeposit,
-            signers,
-        } = params;
-        const payer = payerOverride ?? owner;
-
-        const pairConfigPubkey = DripPDA.derivePairConfig(
-            this.globalConfig,
-            inputMint,
-            outputMint,
-            this.programId
-        );
-
-        const pairConfigAccount = await Accounts.PairConfig.fetch(
-            this.connection,
-            pairConfigPubkey,
-            this.programId
-        );
-
-        const instructions: TransactionInstruction[] = [];
-
-        if (!pairConfigAccount) {
-            const initPairConfigIx = new Instructions.InitPairConfig(
-                {
-                    payer,
-                    globalConfig: this.globalConfig,
-                    inputTokenMint: inputMint,
-                    outputTokenMint: outputMint,
-                    pairConfig: pairConfigPubkey,
-                    systemProgram: SystemProgram.programId,
-                },
-                this.programId
-            );
-
-            instructions.push(initPairConfigIx.build());
-        }
+        const { signers, ...otherParams } = params;
 
         const dripPositionKeypair = Keypair.generate();
 
-        const dripPositionSignerPubkey = DripPDA.deriveDripPositionSigner(
-            dripPositionKeypair.publicKey,
-            this.programId
-        );
-
-        const [dripPositionInputTokenAccount, dripPositionOutputTokenAccount] =
-            [inputMint, outputMint].map((mint) =>
-                getAssociatedTokenAddressSync(
-                    mint,
-                    dripPositionSignerPubkey,
-                    true,
-                    TOKEN_PROGRAM_ID,
-                    ASSOCIATED_TOKEN_PROGRAM_ID
-                )
+        const { instructions, signers: otherSigners } =
+            await this.instructionsFactory.getCreatePositionTransaction(
+                otherParams,
+                dripPositionKeypair
             );
-
-        const initDripPositionIx = new Instructions.InitDripPosition(
-            {
-                params: {
-                    owner,
-                    dripAmount,
-                    frequencyInSeconds: BigInt(dripFrequencyInSeconds),
-                },
-            },
-            {
-                payer,
-                globalConfig: this.globalConfig,
-                pairConfig: pairConfigPubkey,
-                inputTokenMint: inputMint,
-                outputTokenMint: outputMint,
-                inputTokenAccount: dripPositionInputTokenAccount,
-                outputTokenAccount: dripPositionOutputTokenAccount,
-                dripPosition: dripPositionKeypair.publicKey,
-                dripPositionSigner: dripPositionSignerPubkey,
-                systemProgram: SystemProgram.programId,
-                tokenProgram: TOKEN_PROGRAM_ID,
-                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            },
-            this.programId
-        );
-
-        instructions.push(initDripPositionIx.build());
-
-        if (initialDeposit) {
-            // TODO: Support wSOL
-
-            const depositIx = new Instructions.Deposit(
-                {
-                    params: {
-                        depositAmount: initialDeposit.amount,
-                    },
-                },
-                {
-                    signer: initialDeposit.depositor,
-                    sourceInputTokenAccount:
-                        initialDeposit.depositorTokenAccount,
-                    dripPositionInputTokenAccount:
-                        dripPositionInputTokenAccount,
-                    dripPosition: dripPositionKeypair.publicKey,
-                    tokenProgram: TOKEN_PROGRAM_ID,
-                },
-                this.programId
-            );
-
-            instructions.push(depositIx.build());
-        }
 
         // TODO: Abstract the Transaction creation logic since it'll be duplicated in each entrypoint here
         const latestBlockhash = await this.connection.getLatestBlockhash(
@@ -301,7 +193,7 @@ export class DripClient implements IDripClient {
 
         const txSig = await this.signAndSendTx(tx, [
             ...(signers ?? []),
-            dripPositionKeypair,
+            ...otherSigners,
         ]);
 
         return {
