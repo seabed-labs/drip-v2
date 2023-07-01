@@ -27,7 +27,9 @@ func (t *Translator) InsertDripPosition(ctx context.Context, p *app.DripPosition
 		}
 
 		if !ok {
-			t.InsertWallet(ctx, p.Owner)
+			if err = t.InsertWallet(ctx, p.Owner); err != nil {
+				return err
+			}
 		}
 	}
 

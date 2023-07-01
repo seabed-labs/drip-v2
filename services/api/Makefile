@@ -8,7 +8,12 @@ build: gen
 
 run: build appliances
 	@sleep 2
-	@go run ./...
+	@docker run \
+		--rm \
+		--publish 20000:20000 \
+		--env ENV=docker \
+		--network local \
+		dcaf-api:latest
 
 ### Migrate ###
 create-migration:
@@ -24,7 +29,8 @@ migrate:
 
 migrate-up: gen
 	@echo "==== RUNNING DB MIGRATIONS (UP) ===="
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR)/modeler/migrations:/migrations \
 		--add-host localhost:$(HDI) \
 		migrate/migrate:v4.16.2 \
@@ -34,7 +40,8 @@ migrate-up: gen
 
 migrate-down:
 	@echo "==== RUNNING DB MIGRATIONS (DOWN) ===="
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR)/modeler/migrations:/migrations \
 		--add-host localhost:$(HDI) \
 		migrate/migrate:v4.16.2 \
@@ -46,7 +53,8 @@ migrate-down:
 gen: gen-sql gen-fetcher
 
 gen-sql: sqlc
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR):/src \
 		--workdir /src/modeler \
 		--user $(shell id -u):$(shell id -g) \
@@ -54,7 +62,8 @@ gen-sql: sqlc
 			sqlc generate
 
 gen-fetcher:
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--user $(shell id -u):$(shell id -g) \
 		--volume $(shell dirname "$(CURDIR)"):/services \
 		openapitools/openapi-generator-cli generate \
@@ -73,7 +82,8 @@ lint: lint-go lint-sql
 
 lint-go:
 	@echo "==== LINTING GO FILES ===="
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR):/src \
 		--workdir /src \
 		golangci/golangci-lint:v1.53.2 \
@@ -81,7 +91,8 @@ lint-go:
 
 lint-sql:
 	@echo "==== LINTING SQL FILES ===="
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR):/src \
 		--workdir /src/modeler \
 		sqlfluff/sqlfluff:2.1.1 \
@@ -92,7 +103,8 @@ lint-fix: fix-sql
 
 fix-sql:
 	@echo "==== FIXING SQL FILES ===="
-	@docker run --rm \
+	@docker run \
+		--rm \
 		--volume $(CURDIR):/src \
 		--workdir /src/modeler \
 		--user $(shell id -u):$(shell id -g) \

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"go.uber.org/zap"
 
 	"github.com/dcaf-labs/drip-v2/services/api/gen/fetcher"
@@ -59,8 +61,11 @@ func main() {
 
 	jup := jupiter.NewClient()
 
-	f := fetcher.NewAPIClient(&fetcher.Configuration{
-		Host:      "localhost:3000",
+	f := fetcher.NewAPIClient(&fetcher.Configuration{ // nolint: exhaustruct
+		Host: fmt.Sprintf("%s:%s",
+			viper.GetString("fetcher.host"),
+			viper.GetString("fetcher.port"),
+		),
 		Scheme:    "http",
 		UserAgent: "drip-api",
 		Servers:   fetcher.NewConfiguration().Servers,
