@@ -11,6 +11,13 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
     ) {}
 
     async getPositionsPendingDrip(limit = 20): Promise<IPosition[]> {
+        // use on-chain time, not real-world time!
+        const epochInfo = await this.connection.getEpochInfo();
+        const blockInfo = await this.connection.getBlockTime(epochInfo.absoluteSlot)
+        if (!blockInfo) {
+            // TODO: define error
+            throw new Error("failed to get blockInfo")
+        }
         const res: IPosition[] = [];
         const accounts = await this.connection.getProgramAccounts(
             this.programId,
@@ -41,8 +48,8 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
             );
             if (dripPosition) {
                 if (
-                    Date.now() >
-                    dripPosition.dripActivationTimestamp * BigInt(1000)
+                    blockInfo >
+                    BigInt(dripPosition.dripActivationTimestamp) * BigInt(1000)
                 ) {
                     res.push(
                         new Position(
