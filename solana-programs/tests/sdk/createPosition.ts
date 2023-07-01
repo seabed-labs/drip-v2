@@ -71,8 +71,9 @@ describe('SDK - createPosition', () => {
             program.programId
         );
 
+        const latestBlockhash = await provider.connection.getLatestBlockhash();
         await provider.sendAndConfirm(
-            new Transaction().add(initGlobalConfigIx.build()),
+            new Transaction(latestBlockhash).add(initGlobalConfigIx.build()),
             [globalConfigKeypair]
         );
 
