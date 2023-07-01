@@ -60,3 +60,6 @@ dripper-inner:
 test-inner:
 	cd solana-programs && cargo test
 	cd solana-programs && anchor test
+
+testd:
+	cd solana-programs && anchor run testd
