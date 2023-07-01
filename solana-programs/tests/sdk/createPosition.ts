@@ -9,7 +9,12 @@ import {
 } from '@solana/web3.js';
 import { Accounts, DripV2, Instructions } from '@dcaf/drip-types';
 import { AnchorProvider } from '@coral-xyz/anchor';
-import { createMint } from '@solana/spl-token';
+import {
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    createMint,
+    getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
 import { assert, expect } from 'chai';
 
 describe('SDK - createPosition', () => {
@@ -37,9 +42,11 @@ describe('SDK - createPosition', () => {
         });
 
         await provider.sendAndConfirm(
-            new Transaction(await provider.connection.getLatestBlockhash()).add(
-                fundMintAuthorityIx
-            )
+            new Transaction(
+                // TODO: If this reduces flakiness, propagate it everywhere (by "it", I mean using the finalized latest blockhash)
+                //       SDK does not use this at the moment
+                await provider.connection.getLatestBlockhash('finalized')
+            ).add(fundMintAuthorityIx)
         );
 
         inputMintPubkey = await createMint(
@@ -106,7 +113,7 @@ describe('SDK - createPosition', () => {
             payer: provider.publicKey,
             inputMint: inputMintPubkey,
             outputMint: outputMintPubkey,
-            dripAmount: BigInt(100),
+            dripAmount: BigInt(1000),
             dripFrequencyInSeconds: 3600,
         });
 
@@ -119,14 +126,79 @@ describe('SDK - createPosition', () => {
             program.programId
         );
 
-        // TODO: Exhaustive tests
+        const expectedDripPositionSignerPubkey =
+            PublicKey.findProgramAddressSync(
+                [
+                    Buffer.from('drip-v2-drip-position-signer'),
+                    dripPositionPubkey.toBuffer(),
+                ],
+                program.programId
+            )[0];
 
-        expect(dripPositionAccount?.autoCreditEnabled).to.be.false;
-        // TODO: Check correctly
-        expect(dripPositionAccount?.dripActivationGenesisShift.toString()).to
-            .exist;
-        expect(dripPositionAccount?.globalConfig.toBase58()).to.eq(
-            globalConfigPubkey.toBase58()
-        );
+        const expectedDripPositionInputTokenAccount =
+            getAssociatedTokenAddressSync(
+                inputMintPubkey,
+                expectedDripPositionSignerPubkey,
+                true,
+                TOKEN_PROGRAM_ID,
+                ASSOCIATED_TOKEN_PROGRAM_ID
+            );
+
+        const expectedDripPositionOutputTokenAccount =
+            getAssociatedTokenAddressSync(
+                outputMintPubkey,
+                expectedDripPositionSignerPubkey,
+                true,
+                TOKEN_PROGRAM_ID,
+                ASSOCIATED_TOKEN_PROGRAM_ID
+            );
+
+        expect(dripPositionAccount?.toJSON()).to.exist;
+        expect(dripPositionAccount?.toJSON()).to.deep.include({
+            globalConfig: globalConfigPubkey.toBase58(),
+            owner: {
+                kind: 'Direct',
+                value: {
+                    owner: positionOwner.publicKey.toBase58(),
+                },
+            },
+            dripFeeBps: '100',
+            dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
+            autoCreditEnabled: false,
+            pairConfig: PublicKey.findProgramAddressSync(
+                [
+                    Buffer.from('drip-v2-pair-config'),
+                    globalConfigPubkey.toBuffer(),
+                    inputMintPubkey.toBuffer(),
+                    outputMintPubkey.toBuffer(),
+                ],
+                program.programId
+            )[0].toBase58(),
+            inputTokenMint: inputMintPubkey.toBase58(),
+            outputTokenMint: outputMintPubkey.toBase58(),
+            inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
+            outputTokenAccount:
+                expectedDripPositionOutputTokenAccount.toBase58(),
+            dripAmount: '1000',
+            dripAmountFilled: '0',
+            frequencyInSeconds: '3600',
+            totalInputTokenDripped: '0',
+            totalOutputTokenReceived: '0',
+            dripPositionNftMint: null,
+            dripMaxJitter: 0,
+            // TODO: Not sure how to check correctly (we need to fake the time somehow)
+            //       For now we should just unit test this instead
+            // dripActivationGenesisShift: '0',
+            // dripActivationTimestamp: '0',
+            ephemeralDripState: null,
+        });
+
+        expect(
+            Number(dripPositionAccount?.dripActivationGenesisShift)
+        ).greaterThanOrEqual(0);
+
+        expect(
+            Number(dripPositionAccount?.dripActivationTimestamp)
+        ).greaterThan(0);
     });
 });
