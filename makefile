@@ -1,4 +1,5 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner api-inner test-inner lint-fix-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner test-inner lint-fix-inner
+# all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner api-inner test-inner lint-fix-inner
 
 root:
 	yarn
@@ -28,7 +29,7 @@ fetcher: program-inner drip-types-inner sdk-inner fetcher-inner
 
 dripper: program-inner drip-types-inner sdk-inner dripper-inner
 
-api: program-inner drip-types-inner sdk-inner api-inner
+# api: program-inner drip-types-inner sdk-inner api-inner
 
 sdk: program-inner drip-types-inner sdk-inner
 
@@ -53,8 +54,8 @@ fetcher-inner:
 dripper-inner:
 	cd services/dripper && yarn install && yarn build
 
-api-inner:
-	cd services/api && go install ./... && go build ./...
+# api-inner:
+# 	cd services/api && go install ./... && go build ./...
 
 test-inner:
 	cd solana-programs && cargo test
