@@ -1,12 +1,7 @@
 import '../setup';
 import * as anchor from '@coral-xyz/anchor';
 import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
-import {
-    Keypair,
-    PublicKey,
-    SystemProgram,
-    Transaction,
-} from '@solana/web3.js';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { Accounts, DripV2, Instructions } from '@dcaf/drip-types';
 import { AnchorProvider } from '@coral-xyz/anchor';
 import {
@@ -16,6 +11,7 @@ import {
     getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 import { assert, expect } from 'chai';
+import { newTransaction } from './utils';
 
 describe('SDK - createPosition', () => {
     // TODO: for debugging with yarn run localnet
@@ -42,11 +38,7 @@ describe('SDK - createPosition', () => {
         });
 
         await provider.sendAndConfirm(
-            new Transaction(
-                // TODO: If this reduces flakiness, propagate it everywhere (by "it", I mean using the finalized latest blockhash)
-                //       SDK does not use this at the moment
-                await provider.connection.getLatestBlockhash('finalized')
-            ).add(fundMintAuthorityIx)
+            (await newTransaction(provider.connection)).add(fundMintAuthorityIx)
         );
 
         inputMintPubkey = await createMint(
@@ -91,9 +83,9 @@ describe('SDK - createPosition', () => {
         );
 
         await provider.sendAndConfirm(
-            new Transaction(await provider.connection.getLatestBlockhash()).add(
-                initGlobalConfigIx.build()
-            ),
+            (
+                await newTransaction(provider.connection)
+            ).add(initGlobalConfigIx.build()),
             [globalConfigKeypair],
             { maxRetries: 3 }
         );
