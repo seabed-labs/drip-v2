@@ -148,7 +148,7 @@ export async function createPosition(
     const initDripPositionTxSig = await program.methods
         .initDripPosition({
             dripAmount: new anchor.BN(100),
-            frequencyInSeconds: new anchor.BN(3600),
+            frequencyInSeconds: new anchor.BN(30),
             owner: positionOwner,
         })
         .accounts({
