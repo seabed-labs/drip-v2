@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { DripWorker } from './workers/dripWorker';
 import { IWorker } from './workers';
 import { AnchorProvider } from '@coral-xyz/anchor';
