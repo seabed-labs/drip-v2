@@ -72,15 +72,19 @@ async function setup() {
     const provider = anchor.getProvider();
     const providerPubkey = provider.publicKey!;
 
-    const superAdmin = new Keypair();
-    const fundSuperAdminIx = SystemProgram.transfer({
+    const superAdmin = Keypair.generate();
+    const mintAuthority = Keypair.generate();
+    const fundMintAuthorityIx = SystemProgram.transfer({
         fromPubkey: providerPubkey,
-        toPubkey: superAdmin.publicKey,
+        toPubkey: mintAuthority.publicKey,
         lamports: 100e9, // 100 SOL
     });
 
+    console.log(`Funding mint authority ${mintAuthority.publicKey.toBase58()}`);
     await provider.sendAndConfirm?.(
-        new anchor.web3.Transaction().add(fundSuperAdminIx)
+        new anchor.web3.Transaction(
+            await provider.connection.getLatestBlockhash()
+        ).add(fundMintAuthorityIx)
     );
 
     const globalConfigKeypair = new Keypair();
@@ -90,6 +94,9 @@ async function setup() {
             globalConfigKeypair.publicKey.toBuffer(),
         ],
         program.programId
+    );
+    console.log(
+        `Initializing global config ${globalConfigKeypair.publicKey.toBase58()}`
     );
     const initGlobalConfigTxSig = await program.methods
         .initGlobalConfig({
@@ -105,6 +112,9 @@ async function setup() {
         .signers([globalConfigKeypair])
         .rpc();
 
+    console.log(
+        `Adding provider pubkey as admin ${provider.publicKey?.toBase58()}`
+    );
     const addProviderAsAdminTxSig = await program.methods
         .updateAdmin({
             adminIndex: new anchor.BN(0),
@@ -119,6 +129,7 @@ async function setup() {
         .signers([superAdmin])
         .rpc();
 
+    console.log('Setting provider pubkey admin perm to dripper');
     const setProviderPermToDripperTxSig = await program.methods
         .updateAdmin({
             adminIndex: new anchor.BN(0),
@@ -133,30 +144,30 @@ async function setup() {
         .signers([superAdmin])
         .rpc();
 
-    const inputTokenMintKeypair = new Keypair();
+    const inputTokenMintKeypair = Keypair.generate();
+    console.log(
+        `Creating input token mint ${inputTokenMintKeypair.publicKey.toBase58()}`
+    );
     const inputTokenMint = await createMint(
         provider.connection,
-        superAdmin,
-        superAdmin.publicKey,
+        mintAuthority,
+        mintAuthority.publicKey,
         null,
         6,
-        inputTokenMintKeypair,
-        {
-            commitment: 'confirmed',
-        }
+        inputTokenMintKeypair
     );
 
     const outputTokenMintKeypair = new Keypair();
+    console.log(
+        `Creating output token mint ${outputTokenMintKeypair.publicKey.toBase58()}`
+    );
     const outputTokenMint = await createMint(
         provider.connection,
-        superAdmin,
-        providerPubkey,
+        mintAuthority,
+        mintAuthority.publicKey,
         null,
         6,
-        outputTokenMintKeypair,
-        {
-            commitment: 'confirmed',
-        }
+        outputTokenMintKeypair
     );
 
     const [pairConfigPubkey] = PublicKey.findProgramAddressSync(
@@ -169,6 +180,7 @@ async function setup() {
         program.programId
     );
 
+    console.log(`Initializing pair config ${pairConfigPubkey.toBase58()}`);
     const initPairConfigTxSig = await program.methods
         .initPairConfig()
         .accounts({
@@ -200,14 +212,24 @@ async function setup() {
             program.programId
         );
 
+        console.log(
+            `Initializing drip position ${dripPositionKeypair.publicKey.toBase58()}`,
+            JSON.stringify(
+                {
+                    owner: dripPositionOwnerKeypair.publicKey.toBase58(),
+                },
+                null,
+                2
+            )
+        );
         const initDripPositionTxSig = await program.methods
             .initDripPosition({
+                owner: dripPositionOwnerKeypair.publicKey,
                 dripAmount: new anchor.BN(100),
                 frequencyInSeconds: new anchor.BN(3600),
             })
             .accounts({
                 payer: providerPubkey,
-                owner: dripPositionOwnerKeypair.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
                 pairConfig: pairConfigPubkey,
                 inputTokenMint,
@@ -226,42 +248,54 @@ async function setup() {
                 tokenProgram: TOKEN_PROGRAM_ID,
                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             })
-            .signers([dripPositionOwnerKeypair, dripPositionKeypair])
+            .signers([dripPositionKeypair])
             .rpc();
 
         let depositTx: string;
         if (i % 2 === 0) {
+            console.log(
+                `Depositing directly into drip position ${dripPositionKeypair.publicKey.toBase58()} by minting`
+            );
             // if even deposit directly
             depositTx = await mintTo(
                 provider.connection,
-                superAdmin,
+                mintAuthority,
                 inputTokenMint,
                 associatedAddress({
                     mint: inputTokenMint,
                     owner: dripPositionSignerPubkey,
                 }),
-                superAdmin,
+                mintAuthority.publicKey,
                 2000e6
             );
         } else {
             // else deposit via drip-v2 program
+            console.log(
+                `Creating ATA for dripPositionOwner if doesn't exist already`
+            );
             const dripPositionOwnerInputTokenAccount =
                 await createAssociatedTokenAccountIdempotent(
                     provider.connection,
-                    superAdmin,
+                    mintAuthority,
                     inputTokenMint,
                     dripPositionOwnerKeypair.publicKey
                 );
 
+            console.log(
+                `Minting input tokens to source token account ${dripPositionOwnerInputTokenAccount.toBase58()}`
+            );
             await mintTo(
                 provider.connection,
-                superAdmin,
+                mintAuthority,
                 inputTokenMint,
                 dripPositionOwnerInputTokenAccount,
-                superAdmin,
+                mintAuthority.publicKey,
                 2000e6
             );
 
+            console.log(
+                `Depositing via program into drip position ${dripPositionKeypair.publicKey.toBase58()}`
+            );
             depositTx = await program.methods
                 .deposit({
                     depositAmount: new anchor.BN(1000e6),
@@ -291,6 +325,7 @@ async function setup() {
         'mocks/setup.json',
         stringifyJSON({
             superAdmin: keyPairToObject(superAdmin),
+            mintAuthority: keyPairToObject(mintAuthority),
             globalConfigKeypair: keyPairToObject(globalConfigKeypair),
             globalSignerPubkey: globalSignerPubkey.toString(),
             pairConfigPubkey: pairConfigPubkey.toString(),
