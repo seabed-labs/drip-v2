@@ -27,32 +27,35 @@ describe('SDK - createPosition', () => {
             provider
         );
 
-        const fundSuperAdminIx = SystemProgram.transfer({
+        // TODO: Move these to setup
+        const fundMintAuthorityIx = SystemProgram.transfer({
             fromPubkey: provider.publicKey,
-            toPubkey: superAdmin.publicKey,
+            toPubkey: mintAuthority.publicKey,
             lamports: 100e9,
         });
 
-        await provider.sendAndConfirm(new Transaction().add(fundSuperAdminIx));
-
-        const globalConfigSignerPubkey = DripPDA.deriveGlobalConfigSigner(
-            globalConfigKeypair.publicKey,
-            program.programId
+        await provider.sendAndConfirm(
+            new Transaction().add(fundMintAuthorityIx)
         );
 
         const inputMint = await createMint(
             provider.connection,
-            superAdmin,
+            mintAuthority,
             mintAuthority.publicKey,
             null,
             6
         );
         const outputMint = await createMint(
             provider.connection,
-            superAdmin,
+            mintAuthority,
             mintAuthority.publicKey,
             null,
             6
+        );
+
+        const globalConfigSignerPubkey = DripPDA.deriveGlobalConfigSigner(
+            globalConfigKeypair.publicKey,
+            program.programId
         );
 
         const initGlobalConfigIx = new Instructions.InitGlobalConfig(
