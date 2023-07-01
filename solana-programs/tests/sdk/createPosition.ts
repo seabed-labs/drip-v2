@@ -98,7 +98,7 @@ describe('SDK - createPosition', () => {
         );
     });
 
-    it.only('creates a position without a pre-existing pair config and no initial deposit', async () => {
+    it('creates a position without a pre-existing pair config and no initial deposit', async () => {
         const positionOwner = Keypair.generate();
 
         const txResult = await dripClient.createPosition({
