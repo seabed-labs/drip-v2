@@ -12,7 +12,6 @@ export const DEFAULT_CONFIRM_OPTIONS: ConfirmOptions = {
     commitment: DEFAULT_COMMITMENT,
     maxRetries: MAX_TX_RETRY,
 };
-
 /**
  * Paginates an array using a callback
  * @param array - array to paginate over
@@ -21,7 +20,7 @@ export const DEFAULT_CONFIRM_OPTIONS: ConfirmOptions = {
  */
 export async function paginate<T>(
     array: T[],
-    fn: (items: T[]) => Promise<void>,
+    fn: (items: T[], page: number) => Promise<void>,
     pageSize: number
 ) {
     let pageNumber = 0;
@@ -33,7 +32,7 @@ export async function paginate<T>(
         if (items.length === 0) {
             return;
         }
-        await fn(items);
+        await fn(items, pageNumber);
         pageNumber += 1;
     }
 }
@@ -54,4 +53,8 @@ export function notEmpty<TValue>(
     value: TValue | null | undefined
 ): value is TValue {
     return value !== null && value !== undefined;
+}
+
+export function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -4,5 +4,6 @@ import { dripperKeypair } from '../env';
 export class Wallet extends AnchorWallet {
     constructor() {
         super(dripperKeypair);
+        console.log(`dripper wallet ${dripperKeypair.publicKey.toString()}`);
     }
 }

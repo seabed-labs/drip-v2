@@ -1,13 +1,9 @@
-import {
-    DripInstructions,
-    ITokenSwapHandler,
-    SwapQuoteWithInstructions,
-} from './index';
-import { Accounts } from '@dcaf/drip-types';
-import { Connection, Signer, Transaction } from '@solana/web3.js';
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
+import { Accounts, DripV2 } from '@dcaf/drip-types';
+import { PublicKey, Signer, Transaction } from '@solana/web3.js';
 import assert from 'assert';
 import { PositionHandlerBase } from './abstract';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Prism } from '@prism-hq/prism-ag';
 import Decimal from 'decimal.js';
 
@@ -47,13 +43,14 @@ export class PrismSwap
 {
     constructor(
         provider: AnchorProvider,
-        connection: Connection,
-        dripPosition: Accounts.DripPosition
+        program: Program<DripV2>,
+        dripPosition: Accounts.DripPosition,
+        dripPositionPublicKey: PublicKey
     ) {
-        super(provider, connection, dripPosition);
+        super(provider, program, dripPosition, dripPositionPublicKey);
     }
 
-    async createSwapInstructions(): Promise<DripInstructions> {
+    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
         return this.quote();
     }
 
@@ -61,11 +58,11 @@ export class PrismSwap
         const [prism, inputToken] = await Promise.all([
             Prism.init({
                 user: this.provider.publicKey,
-                connection: this.connection,
+                connection: this.provider.connection,
                 // TODO(mocha): use slippage from position
                 slippage: 100,
             }),
-            this.connection.getTokenAccountBalance(
+            this.provider.connection.getTokenAccountBalance(
                 this.dripPosition.inputTokenAccount
             ),
         ]);
@@ -91,6 +88,10 @@ export class PrismSwap
             ),
             outputAmount: BigInt(
                 route.amountWithFees *
+                    Math.pow(10, route.routeData.toCoin.decimals)
+            ),
+            minOutputAmount: BigInt(
+                route.minimumReceived *
                     Math.pow(10, route.routeData.toCoin.decimals)
             ),
             preSwapInstructions: swapTxRes.preTransaction.instructions,

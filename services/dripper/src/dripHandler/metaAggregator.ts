@@ -1,22 +1,23 @@
 import { PositionHandlerBase } from './abstract';
-import { DripInstructions, ITokenSwapHandler } from './index';
-import { Accounts } from '@dcaf/drip-types';
-import { Connection } from '@solana/web3.js';
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
+import { Accounts, DripV2 } from '@dcaf/drip-types';
+import { PublicKey } from '@solana/web3.js';
 import assert from 'assert';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { notEmpty } from '../utils';
 
 export class MetaAggregator extends PositionHandlerBase {
     constructor(
         provider: AnchorProvider,
-        connection: Connection,
+        program: Program<DripV2>,
         dripPosition: Accounts.DripPosition,
+        dripPositionPublicKey: PublicKey,
         private readonly swaps: ITokenSwapHandler[]
     ) {
-        super(provider, connection, dripPosition);
+        super(provider, program, dripPosition, dripPositionPublicKey);
     }
 
-    async createSwapInstructions(): Promise<DripInstructions> {
+    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
         const quotesWithIxs = (
             await Promise.all(
                 this.swaps.map((swapImpl) => {

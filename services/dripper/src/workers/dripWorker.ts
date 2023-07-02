@@ -2,6 +2,7 @@ import { IWorker } from './index';
 import { Connection } from '@solana/web3.js';
 import { IPositionsFetcher } from '../positions';
 import { AnchorProvider } from '@coral-xyz/anchor';
+import { delay } from '../utils';
 
 export class DripWorker implements IWorker {
     private enabled: boolean;
@@ -38,11 +39,26 @@ export class DripWorker implements IWorker {
     private async run(): Promise<void> {
         while (this.enabled) {
             const positions = await this.positions.getPositionsPendingDrip();
-            const dripTxSigs = await Promise.all(
-                positions.map((position) => position.drip())
-            );
+            console.log(`dripping ${positions.length} positions`);
+            const dripTxSigs: string[] = [];
+            for (const position of positions) {
+                try {
+                    dripTxSigs.push(await position.drip());
+                } catch (e) {
+                    console.log(
+                        `failed to drip position ${position
+                            .getData()
+                            .publicKey.toString()}`
+                    );
+                    console.error(e);
+                }
+            }
+            // const dripTxSigs = await Promise.all(
+            //     positions.map((position) => position.drip())
+            // );
             // TODO(mocha): send to api server to queue for fetcher
             console.log(dripTxSigs);
+            await delay(100);
         }
     }
 }

@@ -41,6 +41,8 @@
     "@dcaf/drip": "0.1.0",
     "@jup-ag/core": "4.0.0-beta.20",
     "@prism-hq/prism-ag": "^0.2.40",
+    "@solana/spl-token": "0.3.8",
+    "@solana/spl-token-0-3-8": "npm:@solana/spl-token@0.3.8",
     "@solana/web3.js": "1.77.3",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",

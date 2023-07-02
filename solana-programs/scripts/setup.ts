@@ -7,9 +7,9 @@ import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
 import { DripV2, IDL, Accounts } from '@dcaf/drip-types';
 import {
     Connection,
-    Keypair,
+    Keypair, LAMPORTS_PER_SOL,
     PublicKey,
-    SystemProgram,
+    SystemProgram, Transaction,
     TransactionInstruction,
 } from '@solana/web3.js';
 import fs from 'fs/promises';
@@ -17,8 +17,8 @@ import * as anchor from '@coral-xyz/anchor';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
-    createAssociatedTokenAccountInstruction,
-    getAssociatedTokenAddress,
+    createAssociatedTokenAccountInstruction, createSyncNativeInstruction, createTransferInstruction, getAccount,
+    getAssociatedTokenAddress, getMinimumBalanceForRentExemptAccount, NATIVE_MINT,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 
@@ -105,13 +105,83 @@ async function maybeInitAta(
     };
 }
 
+export async function sendSol(provider: AnchorProvider, destinationTokenAccount: PublicKey, amount: BN): Promise<void> {
+    const wSolAta = await getAssociatedTokenAddress(NATIVE_MINT, provider.publicKey);
+    const wSolAtaInfo = await provider.connection.getAccountInfo(wSolAta);
+    const wSolAtaExists = !!wSolAtaInfo;
+    const depositForRentExemption = await getMinimumBalanceForRentExemptAccount(provider.connection);
+
+    const ixs: TransactionInstruction[] = [];
+    let solToTransfer: BN = amount;
+
+    if (wSolAtaExists) {
+        const wSolAtaWrappableSolBalance = wSolAtaInfo.lamports - depositForRentExemption;
+        const wSolAtaAccount = await getAccount(provider.connection, wSolAta);
+        const wSolAtaWSolBalance = wSolAtaAccount.amount;
+        if (amount.lte(new BN(wSolAtaWSolBalance.toString()))) {
+            // Owner already has enough WSOL
+        } else {
+            solToTransfer = BN.max(solToTransfer.sub(new BN(wSolAtaWrappableSolBalance.toString())), new BN(0));
+        }
+
+    } else {
+        const createWSolAtaIx = createAssociatedTokenAccountInstruction(
+            provider.publicKey,
+            wSolAta,
+            provider.publicKey,
+            NATIVE_MINT
+        );
+        ixs.push(createWSolAtaIx);
+    }
+
+    if (solToTransfer.gtn(0)) {
+        const fundWSolAtaIx = SystemProgram.transfer({
+            fromPubkey: provider.publicKey,
+            toPubkey: wSolAta,
+            lamports: BigInt(solToTransfer.toString()),
+        });
+        ixs.push(fundWSolAtaIx);
+    }
+
+    const syncNativeIx = createSyncNativeInstruction(wSolAta);
+    ixs.push(syncNativeIx);
+
+    ixs.push(createTransferInstruction(wSolAta, destinationTokenAccount, provider.publicKey, BigInt(amount.toString())))
+    const tx = new Transaction({
+        feePayer: provider.publicKey,
+    });
+    tx.add(...ixs)
+    const sendWSolTxSig = await provider.sendAndConfirm(tx);
+    console.log('sendWSolTxSig', sendWSolTxSig)
+}
+
+export async function deposit(
+    provider: AnchorProvider,
+    program: Program<DripV2>,
+    dripPositionPub: PublicKey,
+    amount: bigint,
+): Promise<void> {
+    const dripPosition = await Accounts.DripPosition.fetch(provider.connection, dripPositionPub, program.programId)
+    if (!dripPosition) {
+        throw new Error("ERROR")
+    }
+    const { address } = await maybeInitAta(provider, dripPosition.inputTokenMint, provider.publicKey)
+
+    const ix = await createTransferInstruction(address, dripPosition.inputTokenAccount, provider.publicKey, amount)
+
+    const tx = new Transaction().add(ix)
+    const txSig = await provider.sendAndConfirm(tx )
+    console.log("transferTxSig", txSig)
+}
+
 export async function createPosition(
     provider: AnchorProvider,
     program: Program<DripV2>,
     globalConfig: PublicKey,
     inputTokenMint: PublicKey,
     outputTokenMint: PublicKey,
-    positionOwner: PublicKey
+    positionOwner: PublicKey,
+    dripAmount: BN,
 ): Promise<void> {
     const { address: ownerInputTa, instruction: initOwnerInputTa } =
         await maybeInitAta(provider, inputTokenMint, positionOwner);
@@ -147,7 +217,7 @@ export async function createPosition(
 
     const initDripPositionTxSig = await program.methods
         .initDripPosition({
-            dripAmount: new anchor.BN(100),
+            dripAmount: dripAmount,
             frequencyInSeconds: new anchor.BN(30),
             owner: positionOwner,
         })
@@ -268,8 +338,8 @@ async function run() {
     if (cmd === 'setupGlobalConfig') {
         await setupGlobalConfig(provider, program);
     } else if (cmd === 'createPosition') {
-        if (cmdArgs.length < 4 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
-            console.log('usage: createPosition <globalConfig> <inputTokenMint> <outputTokenMint> <positionOwner>')
+        if (cmdArgs.length < 5 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
+            console.log('usage: createPosition <globalConfig> <inputTokenMint> <outputTokenMint> <positionOwner> <dripAmount>')
             console.log(`got ${cmdArgs.length} args but expected 4`)
             return
         }
@@ -277,7 +347,27 @@ async function run() {
         const inputTokenMint = new PublicKey(cmdArgs[1])
         const outputTokenMint = new PublicKey(cmdArgs[2])
         const positionOwner = new PublicKey(cmdArgs[3])
-        await createPosition(provider, program, globalConfig, inputTokenMint, outputTokenMint, positionOwner)
+        const dripAmount = new BN(cmdArgs[4])
+        await createPosition(provider, program, globalConfig, inputTokenMint, outputTokenMint, positionOwner, dripAmount)
+    } else if (cmd === 'sendSol') {
+        if (cmdArgs.length < 2 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
+            console.log('usage: createPosition <destinationTa> <uiAmount>')
+            console.log(`got ${cmdArgs.length} args but expected 2`)
+            return
+        }
+        const destinationTa = new PublicKey(cmdArgs[0])
+        const uiAmount = Number( (cmdArgs[1]))
+        const amountInLamports = new BN(LAMPORTS_PER_SOL * uiAmount)
+        await sendSol(provider, destinationTa, amountInLamports)
+    } else if (cmd === 'deposit') {
+        if (cmdArgs.length < 2 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
+            console.log('usage: createPosition <dripPosition> <amount>')
+            console.log(`got ${cmdArgs.length} args but expected 2`)
+            return
+        }
+        const position = new PublicKey(cmdArgs[0])
+        const amount = Number( (cmdArgs[1]))
+        await deposit(provider, program, position,  BigInt(amount))
     }
 }
 

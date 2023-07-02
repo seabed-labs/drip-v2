@@ -1,18 +1,18 @@
-import { Accounts } from '@dcaf/drip-types';
-import { Connection, Signer, TransactionInstruction } from '@solana/web3.js';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { Accounts, DripV2 } from '@dcaf/drip-types';
+import { PublicKey, Signer, TransactionInstruction } from '@solana/web3.js';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { MetaAggregator } from './metaAggregator';
 import { JupiterSwap } from './jupiterAggregator';
-import { PrismSwap } from './prismAggregator';
 
 export type SwapQuote = {
     inputAmount: bigint;
     outputAmount: bigint;
+    minOutputAmount: bigint;
 };
 
-export type SwapQuoteWithInstructions = SwapQuote & DripInstructions;
+export type SwapQuoteWithInstructions = SwapQuote & SwapInstructions;
 
-export type DripInstructions = {
+export type SwapInstructions = {
     preSwapInstructions: TransactionInstruction[];
     preSigners: Signer[];
     swapInstructions: TransactionInstruction[];
@@ -29,28 +29,37 @@ export interface ITokenSwapHandler {
 }
 
 export type GetPositionHandler = (
-    position: Accounts.DripPosition
+    position: Accounts.DripPosition,
+    positionPublicKey: PublicKey
 ) => Promise<IDripHandler>;
 
 export function getPositionHandler(
     provider: AnchorProvider,
-    connection: Connection
+    program: Program<DripV2>
 ): GetPositionHandler {
     return async (
-        dripPosition: Accounts.DripPosition
+        dripPosition: Accounts.DripPosition,
+        dripPositionPublicKey: PublicKey
     ): Promise<IDripHandler> => {
         const jupiterSwap = new JupiterSwap(
             provider,
-            connection,
+            program,
             dripPosition,
+            dripPositionPublicKey,
             'mainnet-beta'
         );
-        const prismSwap = new PrismSwap(provider, connection, dripPosition);
+        // const prismSwap = new PrismSwap(
+        //     provider,
+        //     program,
+        //     dripPosition,
+        //     dripPositionPublicKey
+        // );
         const metaAggregator = new MetaAggregator(
             provider,
-            connection,
+            program,
             dripPosition,
-            [jupiterSwap, prismSwap]
+            dripPositionPublicKey,
+            [jupiterSwap]
         );
         // TODO: return handler based on position and config
         return metaAggregator;

@@ -2031,6 +2031,8 @@ __metadata:
     "@dcaf/drip": 0.1.0
     "@jup-ag/core": 4.0.0-beta.20
     "@prism-hq/prism-ag": ^0.2.40
+    "@solana/spl-token": 0.3.8
+    "@solana/spl-token-0-3-8": "npm:@solana/spl-token@0.3.8"
     "@solana/web3.js": 1.77.3
     "@types/bn.js": ^5.1.1
     "@types/jest": ^29.5.2
@@ -2097,6 +2099,7 @@ __metadata:
     "@coral-xyz/anchor": 0.27.0
     "@dcaf/drip": 0.1.0
     "@dcaf/drip-types": 0.1.0
+    "@solana/spl-token": 0.3.8
     "@solana/web3.js": ^1.77.3
     "@types/bn.js": ^5.1.0
     "@types/chai": ^4.3.5
@@ -5640,6 +5643,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana/spl-token-0-3-8@npm:@solana/spl-token@0.3.8, @solana/spl-token@npm:0.3.8, @solana/spl-token@npm:^0.3.4, @solana/spl-token@npm:^0.3.5, @solana/spl-token@npm:^0.3.6, @solana/spl-token@npm:^0.3.7, @solana/spl-token@npm:^0.3.8":
+  version: 0.3.8
+  resolution: "@solana/spl-token@npm:0.3.8"
+  dependencies:
+    "@solana/buffer-layout": ^4.0.0
+    "@solana/buffer-layout-utils": ^0.2.0
+    buffer: ^6.0.3
+  peerDependencies:
+    "@solana/web3.js": ^1.47.4
+  checksum: 01f4f87112b0ad277701a3bcb8e03069b69449b92724b17959107686731082bfd3475b5f105e1e8f04badd2e810a43d5ef811744ced5178eea1232de8fd75147
+  languageName: node
+  linkType: hard
+
 "@solana/spl-token-registry@npm:0.2.1105":
   version: 0.2.1105
   resolution: "@solana/spl-token-registry@npm:0.2.1105"
@@ -5716,19 +5732,6 @@ __metadata:
     "@solana/web3.js": ^1.32.0
     start-server-and-test: ^1.14.0
   checksum: c07f32428985ae67f97ed95d31d9e5c6d9317d26fa81b5df6c6f664152c48c9ad08af32a20d8c6667c636bfc22950a261c5cf57457820cba16c488640169b2f6
-  languageName: node
-  linkType: hard
-
-"@solana/spl-token@npm:^0.3.4, @solana/spl-token@npm:^0.3.5, @solana/spl-token@npm:^0.3.6, @solana/spl-token@npm:^0.3.7, @solana/spl-token@npm:^0.3.8":
-  version: 0.3.8
-  resolution: "@solana/spl-token@npm:0.3.8"
-  dependencies:
-    "@solana/buffer-layout": ^4.0.0
-    "@solana/buffer-layout-utils": ^0.2.0
-    buffer: ^6.0.3
-  peerDependencies:
-    "@solana/web3.js": ^1.47.4
-  checksum: 01f4f87112b0ad277701a3bcb8e03069b69449b92724b17959107686731082bfd3475b5f105e1e8f04badd2e810a43d5ef811744ced5178eea1232de8fd75147
   languageName: node
   linkType: hard
 

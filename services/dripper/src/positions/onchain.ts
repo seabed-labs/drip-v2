@@ -3,6 +3,7 @@ import { Accounts } from '@dcaf/drip-types';
 import { GetPositionHandler, IDripHandler } from '../dripHandler';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
+
 export class OnChainPositionsFetcher implements IPositionsFetcher {
     constructor(
         private readonly programId: PublicKey,
@@ -10,18 +11,22 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
         private readonly getPositionHandler: GetPositionHandler
     ) {}
 
+    // TODO: take into account fees
     async getPositionsPendingDrip(limit = 20): Promise<IPosition[]> {
         // use on-chain time, not real-world time!
         const epochInfo = await this.connection.getEpochInfo();
-        const blockInfo = await this.connection.getBlockTime(epochInfo.absoluteSlot)
+        const blockInfo = await this.connection.getBlockTime(
+            epochInfo.absoluteSlot
+        );
         if (!blockInfo) {
             // TODO: define error
-            throw new Error("failed to get blockInfo")
+            throw new Error('failed to get blockInfo');
         }
         const res: IPosition[] = [];
         const accounts = await this.connection.getProgramAccounts(
             this.programId,
             {
+                commitment: 'finalized',
                 dataSlice: { offset: 0, length: 0 },
                 filters: [
                     {
@@ -37,29 +42,43 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                 ],
             }
         );
-        const positionKeys = accounts.map((account) => account.pubkey);
+        // TODO: remove filter
+        // just skipping positions made with small drip amount
+        const positionKeys = accounts
+            .map((account) => account.pubkey)
+            .filter(
+                (account) =>
+                    account.toString() ===
+                        '5jyB8Ta5khzZpKgBJTpqV6frJcGkrB96dqBqzhjC3ka3'
+            );
         let i = 0;
         while (i < positionKeys.length && res.length < limit) {
             const positionKey = positionKeys[i];
+            i += 1;
             const dripPosition = await Accounts.DripPosition.fetch(
                 this.connection,
                 positionKey,
                 this.programId
             );
-            if (dripPosition) {
-                if (
-                    blockInfo >
-                    BigInt(dripPosition.dripActivationTimestamp) * BigInt(1000)
-                ) {
-                    res.push(
-                        new Position(
-                            dripPosition,
-                            await this.getPositionHandler(dripPosition)
-                        )
-                    );
-                }
+            if (!dripPosition) {
+                continue;
             }
-            i += 1;
+            const balance = await this.connection.getTokenAccountBalance(
+                dripPosition.inputTokenAccount,
+                'finalized'
+            );
+            if (
+                BigInt(balance.value.amount) >= dripPosition.dripAmount &&
+                BigInt(blockInfo) > BigInt(dripPosition.dripActivationTimestamp)
+            ) {
+                res.push(
+                    new Position(
+                        dripPosition,
+                        positionKey,
+                        await this.getPositionHandler(dripPosition, positionKey)
+                    )
+                );
+            }
         }
         return res;
     }
@@ -68,6 +87,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
 export class Position implements IPosition {
     constructor(
         private readonly value: Accounts.DripPosition,
+        private readonly address: PublicKey,
         private readonly handler: IDripHandler
     ) {}
 
@@ -77,5 +97,12 @@ export class Position implements IPosition {
 
     toJSON(): Accounts.DripPositionJSON {
         return this.value.toJSON();
+    }
+
+    getData(): Accounts.DripPositionFields & { publicKey: PublicKey } {
+        return {
+            ...this.value,
+            publicKey: this.address,
+        };
     }
 }
