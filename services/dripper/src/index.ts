@@ -5,7 +5,7 @@ import { DripWorker } from './workers/dripWorker';
 import { IWorker } from './workers';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Connection } from './solana';
-import { Wallet } from './wallet';
+import { Wallet } from './wallet/dripperWallet';
 import { DEFAULT_CONFIRM_OPTIONS } from './utils';
 import { OnChainPositionsFetcher } from './positions/onchain';
 import { PublicKey } from '@solana/web3.js';

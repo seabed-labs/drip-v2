@@ -19,7 +19,7 @@ import { createVersionedTransactions } from '../solana';
 import { SwapQuoteWithInstructions } from './index';
 import {
     createAssociatedTokenAccountInstruction,
-    getAssociatedTokenAddress, NATIVE_MINT,
+    getAssociatedTokenAddress,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token-0-3-8';
 
@@ -109,7 +109,7 @@ export abstract class PositionHandlerBase {
         );
         assert(dripTx, new Error('TODO'));
         // TODO(Mocha): wrap closure of lut in try/catch, shouldn't block returning txSig for drip
-        let dripTxSig: string = "";
+        let dripTxSig = '';
 
         try {
             dripTxSig = await this.provider.sendAndConfirm(dripTx, [], {
@@ -118,8 +118,8 @@ export abstract class PositionHandlerBase {
                 // skipPreflight: true,
             });
         } catch (e) {
-            console.log(JSON.stringify(e, null, 2))
-            throw e
+            console.log(JSON.stringify(e, null, 2));
+            throw e;
         }
 
         console.log('dripTxSig', dripTxSig);

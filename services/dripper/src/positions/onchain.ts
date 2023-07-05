@@ -49,7 +49,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
             .filter(
                 (account) =>
                     account.toString() ===
-                        '5jyB8Ta5khzZpKgBJTpqV6frJcGkrB96dqBqzhjC3ka3'
+                    '5jyB8Ta5khzZpKgBJTpqV6frJcGkrB96dqBqzhjC3ka3'
             );
         let i = 0;
         while (i < positionKeys.length && res.length < limit) {

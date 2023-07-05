@@ -11,7 +11,7 @@ import JSBI from 'jsbi';
 import assert from 'assert';
 import { PositionHandlerBase } from './abstract';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import {createCloseAccountInstruction, createTransferInstruction, NATIVE_MINT} from '@solana/spl-token-0-3-8';
+import { createTransferInstruction } from '@solana/spl-token-0-3-8';
 
 export class JupiterSwap
     extends PositionHandlerBase
