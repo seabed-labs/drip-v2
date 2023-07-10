@@ -53,9 +53,6 @@ export class DripWorker implements IWorker {
                     console.error(e);
                 }
             }
-            // const dripTxSigs = await Promise.all(
-            //     positions.map((position) => position.drip())
-            // );
             // TODO(mocha): send to api server to queue for fetcher
             console.log(dripTxSigs);
             await delay(100);

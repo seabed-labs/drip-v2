@@ -51,10 +51,6 @@ export class PrismSwap
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        return this.quote();
-    }
-
-    async quote(): Promise<SwapQuoteWithInstructions> {
         const [prism, inputToken] = await Promise.all([
             Prism.init({
                 user: this.provider.publicKey,

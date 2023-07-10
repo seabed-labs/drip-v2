@@ -1,21 +1,19 @@
 import { Wallet as AnchorWallet } from '@coral-xyz/anchor';
-// import { dripperKeypair } from '../env';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { IDripperWallet } from './index';
-import { HDKey } from 'micro-ed25519-hdkey/index';
 import { mnemonicToSeedSync } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
 export class DripperWallet extends AnchorWallet implements IDripperWallet {
-    private readonly seed: Buffer;
+    private readonly mnemonicSeed: Buffer;
     private readonly rootPath: string;
+
     constructor(
         mnemonic: string,
-        rootPath?: string
-        // private readonly keypair: Keypair
     ) {
-        rootPath = rootPath ?? `m/44'/501'`;
+        // bip44: solana root
+        const rootPath = `m/44'/501'`;
         const mnemonicSeed = mnemonicToSeedSync(mnemonic);
         const derivedSeed = derivePath(
             rootPath,
@@ -26,23 +24,16 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
 
         super(key);
 
-        this.seed = mnemonicSeed;
+        this.mnemonicSeed = mnemonicSeed;
         this.rootPath = rootPath;
         console.log(`dripper wallet ${key.publicKey.toString()}`);
     }
 
-    derivePositionKeyPair(position: PublicKey, cycle: bigint): Keypair {
-        const hd = HDKey.fromMasterSeed(this.seed.toString('hex'));
+    getPathForPosition(position: PublicKey, cycle: bigint): string {
+        const cycleBytes = new DataView(new ArrayBuffer(8));
+        cycleBytes.setBigUint64(0, cycle, false);
 
         const positionPubKeyBytes = position.toBytes();
-        if (positionPubKeyBytes.length !== 32) {
-            throw new Error(
-                `Expected position ${position} to have 32 bytes but instead got ${positionPubKeyBytes.length}`
-            );
-        }
-        const buf = new ArrayBuffer(8);
-        const cycleView = new DataView(buf);
-        cycleView.setBigUint64(0, cycle, false);
 
         const childPath = `/${positionPubKeyBytes.slice(
             0,
@@ -56,12 +47,21 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
         )}'/${positionPubKeyBytes.slice(20, 24)}'/${positionPubKeyBytes.slice(
             24,
             28
-        )}'/${positionPubKeyBytes.slice(28, 32)}'/${cycleView.buffer.slice(
+        )}'/${positionPubKeyBytes.slice(28, 32)}'/${cycleBytes.buffer.slice(
             0,
             4
-        )}'/${cycleView.buffer.slice(4, 8)}'`;
-        // should look something like this:  `m/44'/501'/${chunk1}'/.../${chunk10}'/0'`;
-        const path = `${this.rootPath}${childPath}`;
-        return Keypair.fromSeed(hd.derive(path).privateKey);
+        )}'/${cycleBytes.buffer.slice(4, 8)}'`;
+
+        return `${this.rootPath}${childPath}`;
+    }
+
+    derivePositionKeyPair(position: PublicKey, cycle: bigint): Keypair {
+        const path = this.getPathForPosition(position, cycle)
+        const derivedSeed = derivePath(
+            path,
+            this.mnemonicSeed.toString('hex')
+        ).key;
+        const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+        return Keypair.fromSecretKey(secret);
     }
 }

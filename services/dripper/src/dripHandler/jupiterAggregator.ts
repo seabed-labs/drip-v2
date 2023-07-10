@@ -31,11 +31,6 @@ export class JupiterSwap
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        return this.quote();
-    }
-
-    // TODO: Not sure we need this fn anymore
-    async quote(): Promise<SwapQuoteWithInstructions> {
         const jup = await this.initIfNeeded();
         const computeRoutesRes = await jup.computeRoutes({
             inputMint: new PublicKey(this.dripPosition.inputTokenMint),

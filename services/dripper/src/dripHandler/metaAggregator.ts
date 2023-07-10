@@ -22,7 +22,7 @@ export class MetaAggregator extends PositionHandlerBase {
             await Promise.all(
                 this.swaps.map((swapImpl) => {
                     try {
-                        return swapImpl.quote(this.dripPosition);
+                        return swapImpl.createSwapInstructions(this.dripPosition);
                     } catch (e) {
                         // todo: log unknown errors
                         console.error(e);

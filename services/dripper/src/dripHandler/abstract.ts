@@ -16,7 +16,7 @@ import {
 import assert from 'assert';
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
 import { createVersionedTransactions } from '../solana';
-import { SwapQuoteWithInstructions } from './index';
+import {ITokenSwapHandler, SwapQuoteWithInstructions} from './index';
 import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
@@ -26,7 +26,7 @@ import {
 const MAX_ACCOUNTS_PER_TX = 20;
 const ACCOUNTS_PER_LUT = 256;
 
-export abstract class PositionHandlerBase {
+export abstract class PositionHandlerBase implements ITokenSwapHandler{
     protected constructor(
         readonly provider: AnchorProvider,
         readonly program: Program<DripV2>,
@@ -64,6 +64,7 @@ export abstract class PositionHandlerBase {
     }
 
     async drip(): Promise<string> {
+        console.log(`dripping ${this.dripPositionPublicKey.toString()}`)
         // create token accounts and setup oracle if needed
         const setupIxs = await this.dripSetup();
         if (setupIxs.length) {

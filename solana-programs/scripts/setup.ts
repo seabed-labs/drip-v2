@@ -21,6 +21,9 @@ import {
     getAssociatedTokenAddress, getMinimumBalanceForRentExemptAccount, NATIVE_MINT,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
+import {mnemonicToSeed} from "bip39";
+import { derivePath } from 'ed25519-hd-key';
+import nacl from 'tweetnacl';
 
 export function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -322,11 +325,65 @@ export async function setupGlobalConfig(
     console.log('setProviderPermToDripperTxSig', setProviderPermToDripperTxSig);
 }
 
+export async function setNewDripperPermissions(
+    provider: AnchorProvider,
+    program: Program<DripV2>,
+    superAdmin: Keypair,
+    globalConfig: PublicKey,
+): Promise<void> {
+    const globalConfigAccount = await Accounts.GlobalConfig.fetch(provider.connection, globalConfig, program.programId);
+    if (!globalConfigAccount) {
+        throw new Error("invalid config")
+    }
+    const index = globalConfigAccount.admins.findIndex((admin) => admin.toString() === PublicKey.default.toString());
+    if (index === undefined) {
+        throw new Error("no empty slot")
+    }
+    console.log(`adding admin to index ${index}`)
+
+    const addProviderAsAdminTxSig = await program.methods
+        .updateAdmin({
+            adminIndex: new BN(index),
+            adminChange: {
+                setAdminAndResetPermissions: [provider.publicKey],
+            },
+        })
+        .accounts({
+            signer: superAdmin.publicKey,
+            globalConfig: globalConfig,
+        })
+        .signers([superAdmin])
+        .rpc();
+    console.log('addProviderAsAdminTxSig', addProviderAsAdminTxSig);
+    const setProviderPermToDripperTxSig = await program.methods
+        .updateAdmin({
+            adminIndex: new BN(index),
+            adminChange: {
+                addPermission: [{ drip: {} }],
+            },
+        })
+        .accounts({
+            signer: superAdmin.publicKey,
+            globalConfig: globalConfig,
+        })
+        .signers([superAdmin])
+        .rpc();
+    console.log('setProviderPermToDripperTxSig', setProviderPermToDripperTxSig);
+}
+
+
 async function run() {
     const [, , cmd, ...cmdArgs] = process.argv;
-    const dripperKeypair = Keypair.fromSecretKey(
-        Uint8Array.from(JSON.parse(process.env.DRIPPER_KEY_PAIR!))
-    );
+    const mnemonicSeed = await mnemonicToSeed(process.env.DRIPPER_SEED_PHRASE!)
+
+    const derivedSeed = derivePath(
+        "m/44'/501'",
+        mnemonicSeed.toString('hex')
+    ).key;
+    const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+    const dripperKeypair = Keypair.fromSecretKey(secret);
+    console.log("dripper", dripperKeypair.publicKey.toString());
+
     const connection = new Connection(process.env.RPC_URL!);
     const programId = new PublicKey(process.env.DRIP_PROGRAM_ID!);
     const wallet = new Wallet(dripperKeypair);
@@ -368,6 +425,17 @@ async function run() {
         const position = new PublicKey(cmdArgs[0])
         const amount = Number( (cmdArgs[1]))
         await deposit(provider, program, position,  BigInt(amount))
+    } else if (cmd === 'enableDripperPermissions') {
+        if (cmdArgs.length < 1 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
+            console.log('usage: createPosition <newDripperPubkey>')
+            console.log(`got ${cmdArgs.length} args but expected 1`)
+            return
+        }
+        const superAdminKeypair = Keypair.fromSecretKey(
+            Uint8Array.from(JSON.parse(process.env.SUPER_ADMIN!))
+        );
+        const globalConfig = new PublicKey(cmdArgs[0])
+        await setNewDripperPermissions(provider, program, superAdminKeypair, globalConfig)
     }
 }
 
