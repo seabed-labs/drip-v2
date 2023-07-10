@@ -12,7 +12,7 @@ pub struct DripPosition {
     pub drip_position_signer: Pubkey, // 32
     pub auto_credit_enabled: bool,    // 1
     pub pair_config: Pubkey,          // 32
-    // TODO: Remove input and output token mints
+    // TODO(#106): Remove input and output token mints
     pub input_token_mint: Pubkey,         // 32
     pub output_token_mint: Pubkey,        // 32
     pub input_token_account: Pubkey,      // 32

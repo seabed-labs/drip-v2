@@ -14,8 +14,6 @@ use crate::{
     },
 };
 
-// TODO: On the client-side leverage V0 TX and ALTs to decrease size and increase composability
-
 // NOTE: When changing this struct, also change validation in post-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PreDrip<'info> {
@@ -158,9 +156,9 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         DripError::UnexpectedFeeTokenAccount
     );
 
-    // TODO: Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
+    // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
     //       Else switch to checked math functions.
-    // TODO: Move all math here to a custom module to unit test better
+    // TODO(#105): Move all math here to a custom module to unit test better
     let partial_drip_amount = params.drip_amount_to_fill;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
     let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
@@ -217,7 +215,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         minimum_output_expected: params.minimum_output_tokens_expected,
     });
 
-    // TODO: Refactor the function so that it can be called at the top of the handler
+    // TODO(#100): Refactor the function so that it can be called at the top of the handler
     //       Right now there's issues with borrowing if we try to do that.
     validate_post_drip_ix_present(&ctx)?;
 

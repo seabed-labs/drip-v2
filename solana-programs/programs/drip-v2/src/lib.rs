@@ -6,29 +6,29 @@ use anchor_lang::prelude::*;
 use instructions::*;
 declare_id!("74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk");
 
-// TODO: Check and ensure exhaustive validations for each IX in its handler
-// TODO: Add exhaustive integration tests
-// TODO: Add SDK support + happy path SDK tests
-// TODO: Make sure all IXs support token 2022 (use interfaces, tried but was erroring out - might be a version issue?)
-// TODO: Add invariant checks to all IXs if needed
-// TODO: Be aggressive with signer requirements to avoid accidental unchecked params being blindly used
+// TODO(#77): Check and ensure exhaustive validations for each IX in its handler
+// TODO(#78): Add exhaustive integration tests
+// TODO(#79): Add SDK support + happy path SDK tests
+// TODO(#80): Make sure all IXs support token 2022 (use interfaces, tried but was erroring out - might be a version issue?)
+// TODO(#81): Add invariant checks to all IXs if needed
+// TODO(#82): Be aggressive with signer requirements to avoid accidental unchecked params being blindly used
 //       (already done for super admin update and init_drip_position)
-// TODO: Make pair config default fees and position fees an option to allow globally changing the default by changing field in global config
+// TODO(#83): Make pair config default fees and position fees an option to allow globally changing the default by changing field in global config
 //       Instead of having to update ALL pair configs.
 //       The fee read flow now becomes position_fees_override || pair_config_fees_override || global_default_fees;
-// TODO: Create a Metaplex Collection account when creating a global config to represent all drip positions under that global config.
-// TODO: Create a Metaplex Metadata account along with SPL token mint for a tokenized position. Point back to collection.
-// TODO: Allow users to specify trade slippage
-// TODO: Protect against tiny drip amounts that round to zero input or output fees
-// TODO: Make 2-way account 1:1 checks between pre-drip and post-drip in each IX
-// TODO: Add ability to pause drips (owner and also admin)
-// TODO: Add events
-// TODO: Remove forward references from keypair accounts to their PDAs (1:1 cases). Eg: Drip Position -> Drip Position Signer.
-// TODO: Make CPIs self-documented and clean up
-// TODO: Slippage Bps (use override mechanism position -> pair -> global)
-// TODO: ONLY ALLOW SUPER ADMIN TO UPDATE ORACLES AFTER THEY ARE SET (i.e. NOT UNAVAILABLE)
+// TODO(#84): Create a Metaplex Collection account when creating a global config to represent all drip positions under that global config.
+// TODO(#85): Create a Metaplex Metadata account along with SPL token mint for a tokenized position. Point back to collection.
+// TODO(#86): Allow users to specify trade slippage
+// TODO(#87): Protect against tiny drip amounts that round to zero input or output fees
+// TODO(#88): Make 2-way account 1:1 checks between pre-drip and post-drip in each IX
+// TODO(#89): Add ability to pause drips (owner and also admin)
+// TODO(#90): Add events
+// TODO(#91): Remove forward references from keypair accounts to their PDAs (1:1 cases). Eg: Drip Position -> Drip Position Signer.
+// TODO(#92): Make CPIs self-documented and clean up
+// TODO(#93): Slippage Bps (use override mechanism position -> pair -> global)
+// TODO(#94): ONLY ALLOW SUPER ADMIN TO UPDATE ORACLES AFTER THEY ARE SET (i.e. NOT UNAVAILABLE)
 //       ADMIN PERMS FOR ORACLES SHOULD ONLY ALLOW SETTING AND NOT UNSETTING/UPDATING
-// TODO: Make sure all fields in all accounts' init IXs are set (eg: jitter isn't set properly rn in init_drip_position)
+// TODO(#95): Make sure all fields in all accounts' init IXs are set (eg: jitter isn't set properly rn in init_drip_position)
 
 #[program]
 pub mod drip_v2 {

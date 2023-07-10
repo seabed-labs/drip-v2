@@ -41,7 +41,7 @@ pub struct ClosePosition<'info> {
     #[account(mut)]
     pub drip_position_nft_account: Option<Account<'info, TokenAccount>>,
 
-    // TODO: We can't do a PDA check easily because the dependency drip_position_nft_mint is
+    // TODO(#97): We can't do a PDA check easily because the dependency drip_position_nft_mint is
     // optional
     #[account(
         mut,

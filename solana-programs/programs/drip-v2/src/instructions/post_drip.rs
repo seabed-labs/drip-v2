@@ -143,7 +143,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         DripError::UnexpectedFeeTokenAccount
     );
 
-    // TODO: These calculations are done in pre-drip. Just store the results in ephemeral state.
+    // TODO(#99): These calculations are done in pre-drip. Just store the results in ephemeral state.
     let pre_fees_partal_drip_amount = ephemeral_drip_state.current_pre_fees_partial_drip_amount;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
 
@@ -198,15 +198,15 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             .advance_drip_activation_timestamp()?;
     }
 
-    // TODO: Refactor the function so that it can be called at the top of the handler
+    // TODO(#100): Refactor the function so that it can be called at the top of the handler
     //       Right now there's issues with borrowing if we try to do that.
     validate_pre_drip_ix_present(&ctx)?;
 
-    // TODO: Refactor the function so that it can be called at the top of the handler
+    // TODO(#100): Refactor the function so that it can be called at the top of the handler
     //       Right now there's issues with borrowing if we try to do that.
     validate_price_constraints(&ctx, received_output_tokens, dripped_input_tokens)?;
 
-    // TODO: Support auto-credit flow (not critical, skipping for now)
+    // TODO(#101): Support auto-credit flow (not critical, skipping for now)
 
     Ok(())
 }
@@ -283,15 +283,15 @@ fn validate_price_constraints(
         &ctx.accounts.pair_config.input_token_price_oracle,
         &ctx.accounts.pair_config.output_token_price_oracle,
     ) {
-        // TODO: Add logs
+        // TODO(#102): Add logs
         (PriceOracle::Unavailable, PriceOracle::Unavailable) => {}
         (PriceOracle::Unavailable, _) => {}
         (_, PriceOracle::Unavailable) => {}
-        // TODO: Handle
+        // TODO(#107): Handle
         _ => todo!("price oracles not implemented"),
     }
 
-    // TODO: Apart from oracle deviation (defined in position),
+    // TODO(#103): Apart from oracle deviation (defined in position),
     //       this can also validate other price-based conditions
     //       defined by the position owner.
 
