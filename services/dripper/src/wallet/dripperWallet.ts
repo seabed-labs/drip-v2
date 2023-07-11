@@ -5,16 +5,16 @@ import { mnemonicToSeedSync } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
+const SOLANA_BIP_44_ROOT_PATH = `m/44'/501'`;
+
 export class DripperWallet extends AnchorWallet implements IDripperWallet {
     private readonly mnemonicSeed: Buffer;
     private readonly rootPath: string;
 
     constructor(mnemonic: string) {
-        // bip44: solana root
-        const rootPath = `m/44'/501'`;
         const mnemonicSeed = mnemonicToSeedSync(mnemonic);
         const derivedSeed = derivePath(
-            rootPath,
+            SOLANA_BIP_44_ROOT_PATH,
             mnemonicSeed.toString('hex')
         ).key;
         const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
@@ -23,10 +23,22 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
         super(key);
 
         this.mnemonicSeed = mnemonicSeed;
-        this.rootPath = rootPath;
+        this.rootPath = SOLANA_BIP_44_ROOT_PATH;
         console.log(`dripper wallet ${key.publicKey.toString()}`);
     }
 
+    /**
+     * Derives a deterministic keypair, derived from the dripper wallet for a specific position's drip
+     * This keypair is meant to provide a deterministic account to perform state changing operations during a drip
+     * Example:
+     * - transferring position drip amount to the deribved position drip wallet
+     * - swapping from the derived position drip wallet
+     * - draining input and output tokens from the derived drip wallet
+     * In this way, the same dripper keypair can be used for n number of position and position drips without
+     * retaining any dust/leftover state
+     * @param position - the position address
+     * @param cycle - the position cycle
+     */
     getPathForPosition(position: PublicKey, cycle: bigint): string {
         const cycleBytes = new DataView(new ArrayBuffer(8));
         cycleBytes.setBigUint64(0, cycle, false);

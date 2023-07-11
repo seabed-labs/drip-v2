@@ -1,4 +1,4 @@
-import { IPosition, IPositionsFetcher } from './index';
+import { DripPosition, IPosition, IPositionsFetcher } from './index';
 import { Accounts } from '@dcaf/drip-types';
 import { GetPositionHandler, IDripHandler } from '../dripHandler';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -55,27 +55,32 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
         while (i < positionKeys.length && res.length < limit) {
             const positionKey = positionKeys[i];
             i += 1;
-            const dripPosition = await Accounts.DripPosition.fetch(
+            const dripPositionAccount = await Accounts.DripPosition.fetch(
                 this.connection,
                 positionKey,
                 this.programId
             );
-            if (!dripPosition) {
+            if (!dripPositionAccount) {
                 continue;
             }
             const balance = await this.connection.getTokenAccountBalance(
-                dripPosition.inputTokenAccount,
+                dripPositionAccount.inputTokenAccount,
                 'finalized'
             );
             if (
-                BigInt(balance.value.amount) >= dripPosition.dripAmount &&
-                BigInt(blockInfo) > BigInt(dripPosition.dripActivationTimestamp)
+                BigInt(balance.value.amount) >=
+                    dripPositionAccount.dripAmount &&
+                BigInt(blockInfo) >
+                    BigInt(dripPositionAccount.dripActivationTimestamp)
             ) {
                 res.push(
                     new Position(
-                        dripPosition,
+                        dripPositionAccount,
                         positionKey,
-                        await this.getPositionHandler(dripPosition, positionKey)
+                        await this.getPositionHandler({
+                            address: positionKey,
+                            data: dripPositionAccount,
+                        })
                     )
                 );
             }
@@ -99,10 +104,12 @@ export class Position implements IPosition {
         return this.value.toJSON();
     }
 
-    getData(): Accounts.DripPositionFields & { publicKey: PublicKey } {
+    getData(): DripPosition {
         return {
-            ...this.value,
-            publicKey: this.address,
+            address: this.address,
+            data: {
+                ...this.value,
+            },
         };
     }
 }

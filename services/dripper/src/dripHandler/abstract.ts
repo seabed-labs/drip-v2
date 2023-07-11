@@ -11,27 +11,32 @@ import {
     dedupeInstructionsPublicKeys,
     DEFAULT_CONFIRM_OPTIONS,
     delay,
+    deriveGlobalConfigSigner,
+    derivePositionSigner,
+    maybeInitAta,
     paginate,
+    tryWithReturn,
 } from '../utils';
 import assert from 'assert';
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
 import { createVersionedTransactions } from '../solana';
 import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
 import {
-    createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token-0-3-8';
+import { DripPosition } from '../positions';
 
 const MAX_ACCOUNTS_PER_TX = 20;
 const ACCOUNTS_PER_LUT = 256;
+const APPROX_TIME_PER_SLOT_MS = 400;
+const GET_NEXT_SLOT_MAX_TRY = 3;
 
 export abstract class PositionHandlerBase implements ITokenSwapHandler {
     protected constructor(
         readonly provider: AnchorProvider,
         readonly program: Program<DripV2>,
-        readonly dripPosition: Accounts.DripPosition,
-        readonly dripPositionPublicKey: PublicKey
+        readonly dripPosition: DripPosition
     ) {}
 
     abstract createSwapInstructions(): Promise<SwapQuoteWithInstructions>;
@@ -39,7 +44,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
     async getPairConfig(): Promise<Accounts.PairConfig> {
         const pairConfig = await Accounts.PairConfig.fetch(
             this.provider.connection,
-            this.dripPosition.pairConfig,
+            this.dripPosition.data.pairConfig,
             this.program.programId
         );
         if (!pairConfig) {
@@ -59,89 +64,127 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
     async createUpdatePairConfigOracleIx(
         pairConfig: Accounts.PairConfig
     ): Promise<TransactionInstruction | undefined> {
-        // TODO
+        // TODO(#109): Set oracle config if not already set
         return undefined;
     }
 
     async drip(): Promise<string> {
-        console.log(`dripping ${this.dripPositionPublicKey.toString()}`);
-        // create token accounts and setup oracle if needed
-        const setupIxs = await this.dripSetup();
-        if (setupIxs.length) {
-            const dripSetupTxSig = await this.provider.sendAndConfirm(
-                new Transaction().add(...setupIxs),
-                [],
-                DEFAULT_CONFIRM_OPTIONS
-            );
-            console.log('dripSetupTxSig', dripSetupTxSig);
-        }
+        console.log(`dripping ${this.dripPosition.address.toString()}`);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // setup
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        await tryWithReturn(async () => {
+            // create token accounts and setup oracle if needed
+            const setupIxs = await this.dripSetup();
+            if (setupIxs.length) {
+                const dripSetupTxSig = await this.provider.sendAndConfirm(
+                    new Transaction().add(...setupIxs),
+                    [],
+                    DEFAULT_CONFIRM_OPTIONS
+                );
+                console.log('dripSetupTxSig', dripSetupTxSig);
+            }
+        });
 
         const { inputAmount, minOutputAmount, ...swapIxs } =
-            await this.createSwapInstructions();
+            await tryWithReturn(async () => {
+                return await this.createSwapInstructions();
+            });
 
         // swap tx setup
         if (swapIxs.preSwapInstructions.length) {
-            const [preSwapSetupTx] = await createVersionedTransactions(
-                this.provider.connection,
-                this.provider.publicKey,
-                [swapIxs.preSwapInstructions]
-            );
-            const swagSetupTxSig = await this.provider.sendAndConfirm(
-                preSwapSetupTx,
-                swapIxs.preSigners,
-                DEFAULT_CONFIRM_OPTIONS
-            );
-            console.log('swagSetupTxSig', swagSetupTxSig);
+            await tryWithReturn(async () => {
+                const [preSwapSetupTx] = await createVersionedTransactions(
+                    this.provider.connection,
+                    this.provider.publicKey,
+                    [swapIxs.preSwapInstructions]
+                );
+                const swagSetupTxSig = await this.provider.sendAndConfirm(
+                    preSwapSetupTx,
+                    swapIxs.preSigners,
+                    DEFAULT_CONFIRM_OPTIONS
+                );
+                console.log('swagSetupTxSig', swagSetupTxSig);
+            });
         }
 
-        const dripIxsWithSandwich = await this.createDripSandwich(
-            swapIxs.swapInstructions,
-            inputAmount,
-            minOutputAmount
-        );
-        const { txSigs: createLutsTxSigs, luts } =
-            await this.createLookupTables(dripIxsWithSandwich);
-        console.log(`created luts in txs ${JSON.stringify(createLutsTxSigs)}`);
-        const [dripTx] = await createVersionedTransactions(
-            this.provider.connection,
-            this.provider.publicKey,
-            [dripIxsWithSandwich],
-            luts
-        );
-        assert(dripTx, new Error('TODO'));
-        // TODO(Mocha): wrap closure of lut in try/catch, shouldn't block returning txSig for drip
-        let dripTxSig = '';
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // drip
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        try {
-            dripTxSig = await this.provider.sendAndConfirm(dripTx, [], {
+        const { dripIxsWithSandwich, luts } = await tryWithReturn(async () => {
+            const dripIxsWithSandwich = await this.createDripSandwich(
+                swapIxs.swapInstructions,
+                inputAmount,
+                minOutputAmount
+            );
+            const { txSigs: createLutsTxSigs, luts } =
+                await this.createLookupTables(dripIxsWithSandwich);
+            console.log(
+                `created luts in txs ${JSON.stringify(createLutsTxSigs)}`
+            );
+            return {
+                dripIxsWithSandwich,
+                luts,
+            };
+        });
+        const dripTxSig = await tryWithReturn(async () => {
+            const [dripTx] = await createVersionedTransactions(
+                this.provider.connection,
+                this.provider.publicKey,
+                [dripIxsWithSandwich],
+                luts
+            );
+            return this.provider.sendAndConfirm(dripTx, [], {
                 ...DEFAULT_CONFIRM_OPTIONS,
                 // TODO: Remove
                 // skipPreflight: true,
             });
-        } catch (e) {
-            console.log(JSON.stringify(e, null, 2));
-            throw e;
-        }
-
+        });
         console.log('dripTxSig', dripTxSig);
 
-        const closeLutsTxSig = await this.deactivateLookupTables(luts);
-        console.log('closeLutsTxSig', closeLutsTxSig);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // cleanup
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // cleanup ephemeral token accounts
         if (swapIxs.postSwapInstructions.length) {
-            const [postSwapCleanupTx] = await createVersionedTransactions(
-                this.provider.connection,
-                this.provider.publicKey,
-                [swapIxs.postSwapInstructions]
+            await tryWithReturn(
+                async () => {
+                    const [postSwapCleanupTx] =
+                        await createVersionedTransactions(
+                            this.provider.connection,
+                            this.provider.publicKey,
+                            [swapIxs.postSwapInstructions]
+                        );
+                    const txSig = await this.provider.sendAndConfirm(
+                        postSwapCleanupTx,
+                        [],
+                        DEFAULT_CONFIRM_OPTIONS
+                    );
+                    console.log(`cleaned up drip swap with ${txSig}`);
+                },
+                (e) => {
+                    console.log('failed to execute postSwapCleanup');
+                    console.error(e);
+                }
             );
-            const txSig = await this.provider.sendAndConfirm(
-                postSwapCleanupTx,
-                [],
-                DEFAULT_CONFIRM_OPTIONS
-            );
-            console.log(`cleaned up drip swap with ${txSig}`);
         }
+
+        await tryWithReturn(
+            async () => {
+                const deactivateLutTxSig = await this.deactivateLookupTables(
+                    luts
+                );
+                console.log('deactivateLutTxSig', deactivateLutTxSig);
+            },
+            (e) => {
+                console.log('failed to execute postSwapCleanup');
+                console.error(e);
+            }
+        );
+
         return dripTxSig;
     }
 
@@ -157,39 +200,45 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         const [globalConfigSigner] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from('drip-v2-global-signer'),
-                this.dripPosition.globalConfig.toBuffer(),
+                this.dripPosition.data.globalConfig.toBuffer(),
             ],
             this.program.programId
         );
-        const { instruction: initInputTokenFeeAccount } =
-            await this.maybeInitAta(
-                this.dripPosition.inputTokenMint,
-                globalConfigSigner,
-                true
-            );
+        const { instruction: initInputTokenFeeAccount } = await maybeInitAta(
+            this.provider.connection,
+            this.provider.publicKey,
+            this.dripPosition.data.inputTokenMint,
+            globalConfigSigner,
+            true
+        );
         if (initInputTokenFeeAccount) {
             ixs.push(initInputTokenFeeAccount);
         }
-        const { instruction: initOutputTokenFeeAccount } =
-            await this.maybeInitAta(
-                this.dripPosition.outputTokenMint,
-                globalConfigSigner,
-                true
-            );
+        const { instruction: initOutputTokenFeeAccount } = await maybeInitAta(
+            this.provider.connection,
+            this.provider.publicKey,
+            this.dripPosition.data.outputTokenMint,
+            globalConfigSigner,
+            true
+        );
         if (initOutputTokenFeeAccount) {
             ixs.push(initOutputTokenFeeAccount);
         }
         const { instruction: initDripperInputTokenAccount } =
-            await this.maybeInitAta(
-                this.dripPosition.inputTokenMint,
+            await maybeInitAta(
+                this.provider.connection,
+                this.provider.publicKey,
+                this.dripPosition.data.inputTokenMint,
                 this.provider.publicKey
             );
         if (initDripperInputTokenAccount) {
             ixs.push(initDripperInputTokenAccount);
         }
         const { instruction: initDripperOutputTokenAccount } =
-            await this.maybeInitAta(
-                this.dripPosition.outputTokenMint,
+            await maybeInitAta(
+                this.provider.connection,
+                this.provider.publicKey,
+                this.dripPosition.data.outputTokenMint,
                 this.provider.publicKey
             );
         if (initDripperOutputTokenAccount) {
@@ -204,35 +253,36 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         minimumOutputTokensExpected: bigint
     ): Promise<TransactionInstruction[]> {
         const ixs: TransactionInstruction[] = [];
-        const [globalConfigSigner] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-global-signer'),
-                this.dripPosition.globalConfig.toBuffer(),
-            ],
-            this.program.programId
-        );
-        const { address: inputTokenFeeAccount } = await this.maybeInitAta(
-            this.dripPosition.inputTokenMint,
-            globalConfigSigner,
-            true
-        );
-        const { address: outputTokenFeeAccount } = await this.maybeInitAta(
-            this.dripPosition.outputTokenMint,
-            globalConfigSigner,
-            true
-        );
-        const { address: dripperInputTokenAccount } = await this.maybeInitAta(
-            this.dripPosition.inputTokenMint,
-            this.provider.publicKey
-        );
-        const [dripPositionSigner] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-drip-position-signer'),
-                this.dripPositionPublicKey.toBuffer(),
-            ],
-            this.program.programId
-        );
-
+        const [globalConfigSigner, dripPositionSigner] = [
+            deriveGlobalConfigSigner(
+                this.dripPosition.data.globalConfig,
+                this.program.programId
+            ),
+            derivePositionSigner(
+                this.dripPosition.address,
+                this.program.programId
+            ),
+        ];
+        const [
+            inputTokenFeeAccount,
+            outputTokenFeeAccount,
+            dripperInputTokenAccount,
+        ] = await Promise.all([
+            getAssociatedTokenAddress(
+                this.dripPosition.data.inputTokenMint,
+                globalConfigSigner,
+                true
+            ),
+            getAssociatedTokenAddress(
+                this.dripPosition.data.outputTokenMint,
+                globalConfigSigner,
+                true
+            ),
+            getAssociatedTokenAddress(
+                this.dripPosition.data.inputTokenMint,
+                this.provider.publicKey
+            ),
+        ]);
         const preDripIx = await this.program.methods
             .preDrip({
                 dripAmountToFill: new BN(dripAmountToFill.toString()),
@@ -242,15 +292,15 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             })
             .accounts({
                 signer: this.provider.publicKey,
-                globalConfig: this.dripPosition.globalConfig,
+                globalConfig: this.dripPosition.data.globalConfig,
                 inputTokenFeeAccount,
-                pairConfig: this.dripPosition.pairConfig,
-                dripPosition: this.dripPositionPublicKey,
+                pairConfig: this.dripPosition.data.pairConfig,
+                dripPosition: this.dripPosition.address,
                 dripPositionSigner: dripPositionSigner,
                 dripPositionInputTokenAccount:
-                    this.dripPosition.inputTokenAccount,
+                    this.dripPosition.data.inputTokenAccount,
                 dripPositionOutputTokenAccount:
-                    this.dripPosition.outputTokenAccount,
+                    this.dripPosition.data.outputTokenAccount,
                 dripperInputTokenAccount,
                 instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
                 tokenProgram: TOKEN_PROGRAM_ID,
@@ -262,15 +312,15 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             .postDrip()
             .accounts({
                 signer: this.provider.publicKey,
-                globalConfig: this.dripPosition.globalConfig,
+                globalConfig: this.dripPosition.data.globalConfig,
                 outputTokenFeeAccount,
-                pairConfig: this.dripPosition.pairConfig,
-                dripPosition: this.dripPositionPublicKey,
+                pairConfig: this.dripPosition.data.pairConfig,
+                dripPosition: this.dripPosition.address,
                 dripPositionSigner: dripPositionSigner,
                 dripPositionInputTokenAccount:
-                    this.dripPosition.inputTokenAccount,
+                    this.dripPosition.data.inputTokenAccount,
                 dripPositionOutputTokenAccount:
-                    this.dripPosition.outputTokenAccount,
+                    this.dripPosition.data.outputTokenAccount,
                 dripperInputTokenAccount,
                 instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
                 tokenProgram: TOKEN_PROGRAM_ID,
@@ -288,20 +338,10 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
     }> {
         console.log('creating luts');
         const accounts = dedupeInstructionsPublicKeys(dripIxs);
-
-        // each row represents the instructions for a tx
-        // const ixsForTxs: TransactionInstruction[][] = [];
         const lutAddresses: PublicKey[] = [];
-
-        // TODO: do we need a new slot per LUT?
-        // console.log('currentSlot:', currentSlot);
-        // const slots = await this.provider.connection.getBlocks(currentSlot - Math.round(accounts.length / ACCOUNTS_PER_LUT) + 1, currentSlot, 'finalized');
-        // if (slots.length < 100) {
-        //     throw new Error(`Could find only ${slots.length} ${slots} on the main fork`);
-        // }
-
-        // let currentSlot = -1;
         const txSigs: string[] = [];
+
+        // TODO: Mocha, read up in depth on how lut activation/extensions work
         // paginate to create each lut
         await paginate(
             accounts,
@@ -364,21 +404,6 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             DEFAULT_CONFIRM_OPTIONS.commitment
         );
 
-        // const txs = await createVersionedTransactions(
-        //     this.provider.connection,
-        //     this.provider.publicKey,
-        //     ixsForTxs
-        // );
-        // console.log(`creating luts takes ${txs.length} transactions`)
-
-        // for (let i = 0; i < txs.length; i++) {
-        //     const tx = txs[i];
-        //     // https://solana.stackexchange.com/questions/2896/what-does-transaction-address-table-lookup-uses-an-invalid-index-mean
-        //     // waiting for finalization after creating lut should be enough of a delay
-        //     // const options = i === 0 ? CREATE_LUT_CONFIRM_OPTIONS : DEFAULT_CONFIRM_OPTIONS
-        //     const txSig = await this.provider.sendAndConfirm(tx, [], CREATE_LUT_CONFIRM_OPTIONS)
-        //     txSigs.push(txSig)
-        // }
         const latestBlockHash =
             await this.provider.connection.getLatestBlockhash(
                 DEFAULT_CONFIRM_OPTIONS.commitment
@@ -393,43 +418,33 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
                 DEFAULT_CONFIRM_OPTIONS.commitment
             );
         }
-        // TODO clean this up
-        for (let i = 0; i < 3; i++) {
-            const slot = await this.provider.connection.getSlot(
-                DEFAULT_CONFIRM_OPTIONS.commitment
-            );
-            if (slot >= currentSlot + 1) {
-                break;
-            } else if (i === 2) {
-                throw new Error(
-                    "TODO: couldn't find a slot greater than currentSlot + 1 after 3 tries"
-                );
-            }
-            await delay(500);
-        }
-        const luts = await Promise.all(
-            lutAddresses.map((lutAddress) =>
-                this.provider.connection.getAddressLookupTable(lutAddress, {
-                    commitment: DEFAULT_CONFIRM_OPTIONS.commitment,
-                    minContextSlot: currentSlot + 1,
-                })
-            )
+        const nextSlot = await this.getNextSlotWithRetry(
+            currentSlot,
+            0,
+            GET_NEXT_SLOT_MAX_TRY
         );
+        const getLuts = lutAddresses.map((lutAddress) =>
+            this.provider.connection.getAddressLookupTable(lutAddress, {
+                commitment: DEFAULT_CONFIRM_OPTIONS.commitment,
+                minContextSlot: nextSlot,
+            })
+        );
+        const luts = (await Promise.all(getLuts)).map((lut) => {
+            assert(lut.value, new Error('TODO'));
+            return lut.value;
+        });
         console.log(`created ${luts.length} luts`);
         return {
             txSigs,
-            luts: luts.map((lut) => {
-                assert(lut.value, new Error('TODO'));
-                return lut.value;
-            }),
+            luts,
         };
     }
 
-    // TODO: Add worker to close all deactivated lookup tables
+    // TODO(#110): Add worker to close all deactivated lookup tables
     private async deactivateLookupTables(
         luts: AddressLookupTableAccount[]
     ): Promise<string> {
-        const closeLutIxs = luts.map((lut) =>
+        const deactivateLutIxs = luts.map((lut) =>
             AddressLookupTableProgram.deactivateLookupTable({
                 lookupTable: lut.key,
                 authority: this.provider.publicKey,
@@ -438,7 +453,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         const [tx] = await createVersionedTransactions(
             this.provider.connection,
             this.provider.publicKey,
-            [closeLutIxs],
+            [deactivateLutIxs],
             luts
         );
         assert(tx, new Error('TODO'));
@@ -449,33 +464,27 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         );
     }
 
-    async maybeInitAta(
-        mint: PublicKey,
-        owner: PublicKey,
-        allowOwnerOffCurve = false
-    ): Promise<{
-        address: PublicKey;
-        instruction?: TransactionInstruction;
-    }> {
-        const ata = await getAssociatedTokenAddress(
-            mint,
-            owner,
-            allowOwnerOffCurve
-        );
-        let ix: TransactionInstruction | undefined = undefined;
-        if ((await this.provider.connection.getAccountInfo(ata)) === null) {
-            ix = createAssociatedTokenAccountInstruction(
-                this.provider.publicKey,
-                ata,
-                owner,
-                mint
+    async getNextSlotWithRetry(
+        currentSlot: number,
+        tryCount: number,
+        maxTryLimit: number
+    ): Promise<number> {
+        if (tryCount >= maxTryLimit) {
+            throw new Error(
+                `TODO: couldn't find a slot greater than ${currentSlot} after ${maxTryLimit} tries`
             );
         }
-        return {
-            address: ata,
-            instruction: ix,
-        };
+        const slot = await this.provider.connection.getSlot(
+            DEFAULT_CONFIRM_OPTIONS.commitment
+        );
+        if (slot >= currentSlot + 1) {
+            return slot;
+        }
+        await delay(APPROX_TIME_PER_SLOT_MS);
+        return this.getNextSlotWithRetry(
+            currentSlot,
+            tryCount + 1,
+            maxTryLimit
+        );
     }
-
-    // async getPositionSigner(): Promise
 }

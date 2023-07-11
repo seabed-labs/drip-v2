@@ -1,5 +1,5 @@
 import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
-import { Accounts, DripV2 } from '@dcaf/drip-types';
+import { DripV2 } from '@dcaf/drip-types';
 import { Jupiter, SwapMode } from '@jup-ag/core';
 import {
     Cluster,
@@ -12,6 +12,8 @@ import assert from 'assert';
 import { PositionHandlerBase } from './abstract';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { createTransferInstruction } from '@solana/spl-token-0-3-8';
+import { maybeInitAta } from '../utils';
+import { DripPosition } from '../positions';
 
 export class JupiterSwap
     extends PositionHandlerBase
@@ -22,20 +24,19 @@ export class JupiterSwap
     constructor(
         provider: AnchorProvider,
         program: Program<DripV2>,
-        dripPosition: Accounts.DripPosition,
-        dripPositionPublicKey: PublicKey,
+        dripPosition: DripPosition,
         private readonly cluster: Cluster
     ) {
-        super(provider, program, dripPosition, dripPositionPublicKey);
+        super(provider, program, dripPosition);
         this.jupiter = undefined;
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
         const jup = await this.initIfNeeded();
         const computeRoutesRes = await jup.computeRoutes({
-            inputMint: new PublicKey(this.dripPosition.inputTokenMint),
-            amount: JSBI.BigInt(this.dripPosition.dripAmount.toString()),
-            outputMint: new PublicKey(this.dripPosition.outputTokenMint),
+            inputMint: new PublicKey(this.dripPosition.data.inputTokenMint),
+            amount: JSBI.BigInt(this.dripPosition.data.dripAmount.toString()),
+            outputMint: new PublicKey(this.dripPosition.data.outputTokenMint),
             // TODO: use position defined position slippage
             slippageBps: 100,
             forceFetch: true,
@@ -62,22 +63,16 @@ export class JupiterSwap
             }
         );
         const instructions = message.instructions;
-        const { address: dripperOutputTokenAta } = await this.maybeInitAta(
-            this.dripPosition.outputTokenMint,
+        const { address: dripperOutputTokenAta } = await maybeInitAta(
+            this.provider.connection,
+            this.program.programId,
+            this.dripPosition.data.outputTokenMint,
             this.provider.publicKey
         );
-        // TODO: wont need this after
-        // instructions.push(
-        //     createCloseAccountInstruction(
-        //         dripperOutputTokenAta,
-        //         this.dripPosition.outputTokenAccount,
-        //         this.provider.publicKey
-        //     )
-        // );
         instructions.push(
             createTransferInstruction(
                 dripperOutputTokenAta,
-                this.dripPosition.outputTokenAccount,
+                this.dripPosition.data.outputTokenAccount,
                 this.provider.publicKey,
                 BigInt(route.otherAmountThreshold.toString())
             )

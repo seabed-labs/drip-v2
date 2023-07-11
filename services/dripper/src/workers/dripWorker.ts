@@ -48,7 +48,7 @@ export class DripWorker implements IWorker {
                     console.log(
                         `failed to drip position ${position
                             .getData()
-                            .publicKey.toString()}`
+                            .address.toString()}`
                     );
                     console.error(e);
                 }

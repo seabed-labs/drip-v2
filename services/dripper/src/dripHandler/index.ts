@@ -1,8 +1,9 @@
-import { Accounts, DripV2 } from '@dcaf/drip-types';
-import { PublicKey, Signer, TransactionInstruction } from '@solana/web3.js';
+import { DripV2 } from '@dcaf/drip-types';
+import { Signer, TransactionInstruction } from '@solana/web3.js';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { MetaAggregator } from './metaAggregator';
 import { JupiterSwap } from './jupiterAggregator';
+import { DripPosition } from '../positions';
 
 export type SwapQuote = {
     inputAmount: bigint;
@@ -26,44 +27,50 @@ export interface IDripHandler {
 
 export interface ITokenSwapHandler {
     createSwapInstructions(
-        position: Accounts.DripPosition
+        position: DripPosition
     ): Promise<SwapQuoteWithInstructions>;
 }
 
 export type GetPositionHandler = (
-    position: Accounts.DripPosition,
-    positionPublicKey: PublicKey
+    position: DripPosition
 ) => Promise<IDripHandler>;
 
 export function getPositionHandler(
     provider: AnchorProvider,
     program: Program<DripV2>
 ): GetPositionHandler {
-    return async (
-        dripPosition: Accounts.DripPosition,
-        dripPositionPublicKey: PublicKey
-    ): Promise<IDripHandler> => {
+    return async (dripPosition: DripPosition): Promise<IDripHandler> => {
         const jupiterSwap = new JupiterSwap(
             provider,
             program,
             dripPosition,
-            dripPositionPublicKey,
             'mainnet-beta'
         );
         // const prismSwap = new PrismSwap(
         //     provider,
         //     program,
         //     dripPosition,
-        //     dripPositionPublicKey
         // );
         const metaAggregator = new MetaAggregator(
             provider,
             program,
             dripPosition,
-            dripPositionPublicKey,
             [jupiterSwap]
         );
         // TODO: return handler based on position and config
         return metaAggregator;
     };
+}
+
+export function compareSwapQuoteDesc(a: SwapQuote, b: SwapQuote): number {
+    const aQuoute = a.minOutputAmount / a.inputAmount;
+    const bQuoute = b.minOutputAmount / b.inputAmount;
+    if (aQuoute > bQuoute) {
+        // sort a before b, e.g. [a, b]
+        return -1;
+    } else if (aQuoute < bQuoute) {
+        // sort a after b, e.g. [b, a]
+        return 1;
+    }
+    return 0;
 }
