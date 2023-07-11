@@ -40,6 +40,8 @@ const LUT_NOT_FOUND = new Error(`lut not found`);
 export abstract class PositionHandlerBase implements ITokenSwapHandler {
     readonly logger: Logger;
     readonly positionKeypair: Keypair;
+    pairConfig: Accounts.PairConfig | undefined = undefined;
+
     protected constructor(
         baseLogger: Logger,
         readonly dripperWallet: DripperWallet,
@@ -63,10 +65,6 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
                 dripPosition.data.globalConfig.toString(),
             dripPositionPairConfigPublicKey:
                 dripPosition.data.pairConfig.toString(),
-            dripPositionInputTokenMintPublicKey:
-                dripPosition.data.inputTokenMint.toString(),
-            dripPositionOutputTokenMintPublicKey:
-                dripPosition.data.outputTokenMint.toString(),
             dripperWalletPublicKey: dripperWallet.publicKey.toString(),
             dripperWalletDerivedPositionPublicKey:
                 this.positionKeypair.publicKey.toString(),
@@ -77,6 +75,9 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
     abstract createSwapInstructions(): Promise<SwapQuoteWithInstructions>;
 
     async getPairConfig(): Promise<Accounts.PairConfig> {
+        if (this.pairConfig) {
+            return this.pairConfig;
+        }
         const pairConfig = await Accounts.PairConfig.fetch(
             this.provider.connection,
             this.dripPosition.data.pairConfig,
@@ -91,6 +92,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
                 .error('not found');
             throw PAIR_CONFIG_NOT_FOUND(this.dripPosition.data.pairConfig);
         }
+        this.pairConfig = pairConfig;
         return pairConfig;
     }
 
@@ -255,6 +257,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
     }
 
     private async dripSetup(): Promise<TransactionInstruction[]> {
+        const pairConfigAccount = await this.getPairConfig();
         const ixs: TransactionInstruction[] = [];
         const pairConfig = await this.getPairConfig();
         const updatePairConfigOracleIx =
@@ -269,7 +272,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         const { instruction: initInputTokenFeeAccount } = await maybeInitAta(
             this.provider.connection,
             this.provider.publicKey,
-            this.dripPosition.data.inputTokenMint,
+            pairConfigAccount.inputTokenMint,
             globalConfigSigner,
             true
         );
@@ -279,7 +282,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         const { instruction: initOutputTokenFeeAccount } = await maybeInitAta(
             this.provider.connection,
             this.provider.publicKey,
-            this.dripPosition.data.outputTokenMint,
+            pairConfigAccount.outputTokenMint,
             globalConfigSigner,
             true
         );
@@ -290,7 +293,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             await maybeInitAta(
                 this.provider.connection,
                 this.provider.publicKey,
-                this.dripPosition.data.inputTokenMint,
+                pairConfigAccount.inputTokenMint,
                 this.provider.publicKey
             );
         if (initDripperInputTokenAccount) {
@@ -300,7 +303,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             await maybeInitAta(
                 this.provider.connection,
                 this.provider.publicKey,
-                this.dripPosition.data.outputTokenMint,
+                pairConfigAccount.outputTokenMint,
                 this.provider.publicKey
             );
         if (initDripperOutputTokenAccount) {
@@ -317,6 +320,7 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         dripAmountToFill: bigint,
         minimumOutputTokensExpected: bigint
     ): Promise<TransactionInstruction[]> {
+        const pairConfigAccount = await this.getPairConfig();
         const ixs: TransactionInstruction[] = [];
         const [globalConfigSigner, dripPositionSigner] = [
             deriveGlobalConfigSigner(
@@ -334,17 +338,17 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             dripperInputTokenAccount,
         ] = await Promise.all([
             getAssociatedTokenAddress(
-                this.dripPosition.data.inputTokenMint,
+                pairConfigAccount.inputTokenMint,
                 globalConfigSigner,
                 true
             ),
             getAssociatedTokenAddress(
-                this.dripPosition.data.outputTokenMint,
+                pairConfigAccount.outputTokenMint,
                 globalConfigSigner,
                 true
             ),
             getAssociatedTokenAddress(
-                this.dripPosition.data.inputTokenMint,
+                pairConfigAccount.inputTokenMint,
                 this.provider.publicKey
             ),
         ]);

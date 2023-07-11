@@ -117,8 +117,6 @@ pub fn handle_init_drip_position(
     drip_position.drip_position_signer = ctx.accounts.drip_position_signer.key();
     // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
     drip_position.auto_credit_enabled = false;
-    drip_position.input_token_mint = ctx.accounts.input_token_mint.key();
-    drip_position.output_token_mint = ctx.accounts.output_token_mint.key();
     drip_position.input_token_account = ctx.accounts.input_token_account.key();
     drip_position.output_token_account = ctx.accounts.output_token_account.key();
     drip_position.drip_amount = params.drip_amount;

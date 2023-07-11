@@ -36,11 +36,14 @@ export class JupiterSwap
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        const jup = await this.initIfNeeded();
+        const [jup, pairConfigAccount] = await Promise.all([
+            this.initIfNeeded(),
+            this.getPairConfig(),
+        ]);
         const computeRoutesRes = await jup.computeRoutes({
-            inputMint: new PublicKey(this.dripPosition.data.inputTokenMint),
+            inputMint: new PublicKey(pairConfigAccount.inputTokenMint),
             amount: JSBI.BigInt(this.dripPosition.data.dripAmount.toString()),
-            outputMint: new PublicKey(this.dripPosition.data.outputTokenMint),
+            outputMint: new PublicKey(pairConfigAccount.outputTokenMint),
             // TODO: use position defined position slippage
             slippageBps: 100,
             forceFetch: true,
@@ -70,7 +73,7 @@ export class JupiterSwap
         const { address: dripperOutputTokenAta } = await maybeInitAta(
             this.provider.connection,
             this.program.programId,
-            this.dripPosition.data.outputTokenMint,
+            pairConfigAccount.outputTokenMint,
             this.provider.publicKey
         );
         instructions.push(
