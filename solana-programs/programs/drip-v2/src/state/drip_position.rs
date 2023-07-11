@@ -90,7 +90,7 @@ impl DripPosition {
         Ok(())
     }
 
-    pub fn advance_drip_activation_timestamp(&mut self) -> Result<()> {
+    pub fn get_next_drip_activation_timestamp(&self) -> Result<i64> {
         let drip_frequency = self.frequency_in_seconds as i64;
 
         // If pre-jitter, clip it to current activation
@@ -102,11 +102,7 @@ impl DripPosition {
 
         let shifted_current_canonical_activation_timestamp =
             current_canonical_activation_timestamp + self.drip_activation_genesis_shift;
-
-        self.drip_activation_timestamp =
-            shifted_current_canonical_activation_timestamp + drip_frequency;
-        self.drip_amount_filled = 0;
-        Ok(())
+        Ok(shifted_current_canonical_activation_timestamp)
     }
 }
 

@@ -183,10 +183,10 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     drip_position.total_output_token_received += received_output_tokens;
     drip_position.ephemeral_drip_state = None;
 
-    if ctx.accounts.drip_position.drip_amount_filled == ctx.accounts.drip_position.drip_amount {
-        ctx.accounts
-            .drip_position
-            .advance_drip_activation_timestamp()?;
+    if drip_position.drip_amount_filled == drip_position.drip_amount {
+        drip_position.drip_activation_timestamp =
+            drip_position.get_next_drip_activation_timestamp()?;
+        drip_position.drip_amount = 0;
     }
 
     // TODO(#100): Refactor the function so that it can be called at the top of the handler
