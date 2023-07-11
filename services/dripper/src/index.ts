@@ -15,7 +15,7 @@ import { IDL } from '@dcaf/drip-types';
 import winston, { format } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
-const { combine, timestamp, label, prettyPrint } = format;
+const { combine, timestamp, label } = format;
 
 let logger = winston.createLogger({
     level: 'verbose',

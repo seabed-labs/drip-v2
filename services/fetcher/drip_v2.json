@@ -859,14 +859,14 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "DripPosition",
-                "path": "drip_position.input_token_mint"
+                "account": "PairConfig",
+                "path": "pair_config.input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "DripPosition",
-                "path": "drip_position.output_token_mint"
+                "account": "PairConfig",
+                "path": "pair_config.output_token_mint"
               }
             ]
           }
@@ -975,14 +975,14 @@
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "DripPosition",
-                "path": "drip_position.input_token_mint"
+                "account": "PairConfig",
+                "path": "pair_config.input_token_mint"
               },
               {
                 "kind": "account",
                 "type": "publicKey",
-                "account": "DripPosition",
-                "path": "drip_position.output_token_mint"
+                "account": "PairConfig",
+                "path": "pair_config.output_token_mint"
               }
             ]
           }
@@ -1077,14 +1077,6 @@
           },
           {
             "name": "pairConfig",
-            "type": "publicKey"
-          },
-          {
-            "name": "inputTokenMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "outputTokenMint",
             "type": "publicKey"
           },
           {

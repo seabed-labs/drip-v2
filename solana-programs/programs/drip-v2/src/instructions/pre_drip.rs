@@ -28,8 +28,8 @@ pub struct PreDrip<'info> {
         seeds = [
             b"drip-v2-pair-config",
             drip_position.global_config.key().as_ref(),
-            drip_position.input_token_mint.key().as_ref(),
-            drip_position.output_token_mint.key().as_ref(),
+            pair_config.input_token_mint.key().as_ref(),
+            pair_config.output_token_mint.key().as_ref(),
         ],
         bump = pair_config.bump,
     )]
@@ -111,16 +111,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     );
 
     require!(
-        pair_config
-            .input_token_mint
-            .eq(&drip_position.input_token_mint.key()),
-        DripError::PairConfigMismatch
-    );
-
-    require!(
-        pair_config
-            .output_token_mint
-            .eq(&drip_position.output_token_mint.key()),
+        drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
     );
 

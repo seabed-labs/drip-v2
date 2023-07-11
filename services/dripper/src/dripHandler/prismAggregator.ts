@@ -55,25 +55,28 @@ export class PrismSwap
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        const [prism, inputToken] = await Promise.all([
-            Prism.init({
-                user: this.provider.publicKey,
-                connection: this.provider.connection,
-                // TODO(mocha): use slippage from position
-                slippage: 100,
-            }),
-            this.provider.connection.getTokenAccountBalance(
-                this.dripPosition.data.inputTokenAccount
-            ),
-        ]);
+        const [prism, inputTokenAccount, pairConfigAccount] = await Promise.all(
+            [
+                Prism.init({
+                    user: this.provider.publicKey,
+                    connection: this.provider.connection,
+                    // TODO(mocha): use slippage from position
+                    slippage: 100,
+                }),
+                this.provider.connection.getTokenAccountBalance(
+                    this.dripPosition.data.inputTokenAccount
+                ),
+                this.getPairConfig(),
+            ]
+        );
         await prism.loadRoutes(
-            this.dripPosition.data.inputTokenMint.toString(),
-            this.dripPosition.data.outputTokenMint.toString()
+            pairConfigAccount.inputTokenMint.toString(),
+            pairConfigAccount.outputTokenMint.toString()
         );
         // Prism sdk uses UI values
         const [route] = prism.getRoutes(
             new Decimal(this.dripPosition.data.dripAmount.toString())
-                .div(Math.pow(10, inputToken.value.decimals))
+                .div(Math.pow(10, inputTokenAccount.value.decimals))
                 .toNumber()
         ) as PrismRoute[];
 

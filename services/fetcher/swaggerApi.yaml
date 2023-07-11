@@ -654,10 +654,6 @@ components:
                     type: boolean
                 pairConfig:
                     type: string
-                inputTokenMint:
-                    type: string
-                outputTokenMint:
-                    type: string
                 inputTokenAccount:
                     type: string
                 outputTokenAccount:
@@ -693,8 +689,6 @@ components:
                 - dripPositionSigner
                 - autoCreditEnabled
                 - pairConfig
-                - inputTokenMint
-                - outputTokenMint
                 - inputTokenAccount
                 - outputTokenAccount
                 - dripAmount
@@ -811,13 +805,13 @@ components:
             properties:
                 globalConfig:
                     type: string
+                version:
+                    type: number
+                    format: double
                 inputTokenMint:
                     type: string
                 outputTokenMint:
                     type: string
-                version:
-                    type: number
-                    format: double
                 bump:
                     type: number
                     format: double
@@ -827,9 +821,9 @@ components:
                     type: string
             required:
                 - globalConfig
+                - version
                 - inputTokenMint
                 - outputTokenMint
-                - version
                 - bump
                 - defaultPairDripFeeBps
                 - inputTokenDripFeePortionBps

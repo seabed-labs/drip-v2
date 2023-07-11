@@ -151,7 +151,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            20
+            18
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -173,8 +173,6 @@ describe('SDK - createPosition', () => {
                 ],
                 program.programId
             )[0].toBase58(),
-            inputTokenMint: inputMintPubkey.toBase58(),
-            outputTokenMint: outputMintPubkey.toBase58(),
             inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
@@ -279,7 +277,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            20
+            18
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -301,8 +299,6 @@ describe('SDK - createPosition', () => {
                 ],
                 program.programId
             )[0].toBase58(),
-            inputTokenMint: inputMintPubkey.toBase58(),
-            outputTokenMint: outputMintPubkey.toBase58(),
             inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
