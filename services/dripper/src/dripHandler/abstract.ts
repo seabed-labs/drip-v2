@@ -67,8 +67,8 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
                 dripPosition.data.inputTokenMint.toString(),
             dripPositionOutputTokenMintPublicKey:
                 dripPosition.data.outputTokenMint.toString(),
-            dripperPublicKey: dripperWallet.publicKey.toString(),
-            dripperPositionPublicKeyL:
+            dripperWalletPublicKey: dripperWallet.publicKey.toString(),
+            dripperWalletDerivedPositionPublicKey:
                 this.positionKeypair.publicKey.toString(),
             programId: program.programId.toString(),
         });
