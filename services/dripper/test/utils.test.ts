@@ -5,9 +5,11 @@ describe('Utils', () => {
     describe('paginate', () => {
         test('should paginate once', async () => {
             let paginateCalled = false;
+            const arr = ['1', '2', '3'];
             await paginate(
-                ['1', '2', '3'],
+                arr,
                 async (items: string[]) => {
+                    expect(items).toStrictEqual(arr);
                     paginateCalled = true;
                 },
                 4
@@ -16,9 +18,13 @@ describe('Utils', () => {
         });
         test('should paginate twice', async () => {
             let paginateCalledTimes = 0;
+            const arr = ['1', '2'];
+            const expectedCalls = [['1'], ['2']];
             await paginate(
-                ['1', '2'],
+                arr,
                 async (items: string[]) => {
+                    expect(items).toStrictEqual(expectedCalls[0]);
+                    expectedCalls.shift();
                     paginateCalledTimes += 1;
                 },
                 1
@@ -27,9 +33,13 @@ describe('Utils', () => {
         });
         test('should with last pagination length smaller than page size', async () => {
             let paginateCalledTimes = 0;
+            const arr = ['1', '2', '3', '4', '5'];
+            const expectedCalls = [['1', '2'], ['3', '4'], ['5']];
             await paginate(
-                ['1', '2', '3', '4', '5'],
+                arr,
                 async (items: string[]) => {
+                    expect(items).toStrictEqual(expectedCalls[0]);
+                    expectedCalls.shift();
                     paginateCalledTimes += 1;
                 },
                 2

@@ -14,6 +14,8 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { createTransferInstruction } from '@solana/spl-token-0-3-8';
 import { maybeInitAta } from '../utils';
 import { DripPosition } from '../positions';
+import { DripperWallet } from '../wallet/dripperWallet';
+import { Logger } from 'winston';
 
 export class JupiterSwap
     extends PositionHandlerBase
@@ -22,12 +24,14 @@ export class JupiterSwap
     private jupiter: Jupiter | undefined;
 
     constructor(
+        baseLogger: Logger,
+        dripperWallet: DripperWallet,
         provider: AnchorProvider,
         program: Program<DripV2>,
         dripPosition: DripPosition,
         private readonly cluster: Cluster
     ) {
-        super(provider, program, dripPosition);
+        super(baseLogger, dripperWallet, provider, program, dripPosition);
         this.jupiter = undefined;
     }
 

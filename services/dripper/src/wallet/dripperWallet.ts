@@ -24,25 +24,19 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
 
         this.mnemonicSeed = mnemonicSeed;
         this.rootPath = SOLANA_BIP_44_ROOT_PATH;
-        console.log(`dripper wallet ${key.publicKey.toString()}`);
     }
 
     /**
-     * Derives a deterministic keypair, derived from the dripper wallet for a specific position's drip
-     * This keypair is meant to provide a deterministic account to perform state changing operations during a drip
+     * Derives a deterministic keypair, derived from the dripper wallet for a specific position
+     * This keypair is meant to provide a deterministic account to perform state changing operations for a position
      * Example:
-     * - transferring position drip amount to the deribved position drip wallet
+     * - transferring position drip amount to the derived position drip wallet
      * - swapping from the derived position drip wallet
      * - draining input and output tokens from the derived drip wallet
-     * In this way, the same dripper keypair can be used for n number of position and position drips without
-     * retaining any dust/leftover state
+     * In this way, the same dripper keypair can be used for n number of positions without leaking any state between them
      * @param position - the position address
-     * @param cycle - the position cycle
      */
-    getPathForPosition(position: PublicKey, cycle: bigint): string {
-        const cycleBytes = new DataView(new ArrayBuffer(8));
-        cycleBytes.setBigUint64(0, cycle, false);
-
+    getPathForPosition(position: PublicKey): string {
         const positionPubKeyBytes = position.toBytes();
 
         const childPath = `/${positionPubKeyBytes.slice(
@@ -57,16 +51,13 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
         )}'/${positionPubKeyBytes.slice(20, 24)}'/${positionPubKeyBytes.slice(
             24,
             28
-        )}'/${positionPubKeyBytes.slice(28, 32)}'/${cycleBytes.buffer.slice(
-            0,
-            4
-        )}'/${cycleBytes.buffer.slice(4, 8)}'`;
+        )}'/${positionPubKeyBytes.slice(28, 32)}'`;
 
         return `${this.rootPath}${childPath}`;
     }
 
-    derivePositionKeyPair(position: PublicKey, cycle: bigint): Keypair {
-        const path = this.getPathForPosition(position, cycle);
+    derivePositionKeyPair(position: PublicKey): Keypair {
+        const path = this.getPathForPosition(position);
         const derivedSeed = derivePath(
             path,
             this.mnemonicSeed.toString('hex')
