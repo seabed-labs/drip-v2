@@ -1,8 +1,6 @@
 // TODO(mocha): shouldn't have to ts-ignore this
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import dripper_local_key from '../local.json';
-import { Keypair } from '@solana/web3.js';
 
 export const programId: string | undefined = process.env.DRIP_PROGRAM_ID;
 

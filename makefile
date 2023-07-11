@@ -2,11 +2,10 @@ all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner t
 # all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner api-inner test-inner lint-fix-inner
 
 root:
-	yarn
+	yarn install
 
-clean:
+clean: root
 	yarn workspaces foreach run clean
-	cd packages/sdk && yarn clean
 	cd solana-programs && cargo clean
 
 lint-fix: root lint-fix-inner

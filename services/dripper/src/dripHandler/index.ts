@@ -25,7 +25,9 @@ export interface IDripHandler {
 }
 
 export interface ITokenSwapHandler {
-    createSwapInstructions(position: Accounts.DripPosition): Promise<SwapQuoteWithInstructions>;
+    createSwapInstructions(
+        position: Accounts.DripPosition
+    ): Promise<SwapQuoteWithInstructions>;
 }
 
 export type GetPositionHandler = (

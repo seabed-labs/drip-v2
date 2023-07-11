@@ -7,9 +7,11 @@ import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
 import { DripV2, IDL, Accounts } from '@dcaf/drip-types';
 import {
     Connection,
-    Keypair, LAMPORTS_PER_SOL,
+    Keypair,
+    LAMPORTS_PER_SOL,
     PublicKey,
-    SystemProgram, Transaction,
+    SystemProgram,
+    Transaction,
     TransactionInstruction,
 } from '@solana/web3.js';
 import fs from 'fs/promises';
@@ -17,11 +19,16 @@ import * as anchor from '@coral-xyz/anchor';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
-    createAssociatedTokenAccountInstruction, createSyncNativeInstruction, createTransferInstruction, getAccount,
-    getAssociatedTokenAddress, getMinimumBalanceForRentExemptAccount, NATIVE_MINT,
+    createAssociatedTokenAccountInstruction,
+    createSyncNativeInstruction,
+    createTransferInstruction,
+    getAccount,
+    getAssociatedTokenAddress,
+    getMinimumBalanceForRentExemptAccount,
+    NATIVE_MINT,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
-import {mnemonicToSeed} from "bip39";
+import { mnemonicToSeed } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
@@ -108,25 +115,39 @@ async function maybeInitAta(
     };
 }
 
-export async function sendSol(provider: AnchorProvider, destinationTokenAccount: PublicKey, amount: BN): Promise<void> {
-    const wSolAta = await getAssociatedTokenAddress(NATIVE_MINT, provider.publicKey);
+export async function sendSol(
+    provider: AnchorProvider,
+    destinationTokenAccount: PublicKey,
+    amount: BN
+): Promise<void> {
+    const wSolAta = await getAssociatedTokenAddress(
+        NATIVE_MINT,
+        provider.publicKey
+    );
     const wSolAtaInfo = await provider.connection.getAccountInfo(wSolAta);
     const wSolAtaExists = !!wSolAtaInfo;
-    const depositForRentExemption = await getMinimumBalanceForRentExemptAccount(provider.connection);
+    const depositForRentExemption = await getMinimumBalanceForRentExemptAccount(
+        provider.connection
+    );
 
     const ixs: TransactionInstruction[] = [];
     let solToTransfer: BN = amount;
 
     if (wSolAtaExists) {
-        const wSolAtaWrappableSolBalance = wSolAtaInfo.lamports - depositForRentExemption;
+        const wSolAtaWrappableSolBalance =
+            wSolAtaInfo.lamports - depositForRentExemption;
         const wSolAtaAccount = await getAccount(provider.connection, wSolAta);
         const wSolAtaWSolBalance = wSolAtaAccount.amount;
         if (amount.lte(new BN(wSolAtaWSolBalance.toString()))) {
             // Owner already has enough WSOL
         } else {
-            solToTransfer = BN.max(solToTransfer.sub(new BN(wSolAtaWrappableSolBalance.toString())), new BN(0));
+            solToTransfer = BN.max(
+                solToTransfer.sub(
+                    new BN(wSolAtaWrappableSolBalance.toString())
+                ),
+                new BN(0)
+            );
         }
-
     } else {
         const createWSolAtaIx = createAssociatedTokenAccountInstruction(
             provider.publicKey,
@@ -149,32 +170,52 @@ export async function sendSol(provider: AnchorProvider, destinationTokenAccount:
     const syncNativeIx = createSyncNativeInstruction(wSolAta);
     ixs.push(syncNativeIx);
 
-    ixs.push(createTransferInstruction(wSolAta, destinationTokenAccount, provider.publicKey, BigInt(amount.toString())))
+    ixs.push(
+        createTransferInstruction(
+            wSolAta,
+            destinationTokenAccount,
+            provider.publicKey,
+            BigInt(amount.toString())
+        )
+    );
     const tx = new Transaction({
         feePayer: provider.publicKey,
     });
-    tx.add(...ixs)
+    tx.add(...ixs);
     const sendWSolTxSig = await provider.sendAndConfirm(tx);
-    console.log('sendWSolTxSig', sendWSolTxSig)
+    console.log('sendWSolTxSig', sendWSolTxSig);
 }
 
 export async function deposit(
     provider: AnchorProvider,
     program: Program<DripV2>,
     dripPositionPub: PublicKey,
-    amount: bigint,
+    amount: bigint
 ): Promise<void> {
-    const dripPosition = await Accounts.DripPosition.fetch(provider.connection, dripPositionPub, program.programId)
+    const dripPosition = await Accounts.DripPosition.fetch(
+        provider.connection,
+        dripPositionPub,
+        program.programId
+    );
     if (!dripPosition) {
-        throw new Error("ERROR")
+        throw new Error('ERROR');
     }
-    const { address } = await maybeInitAta(provider, dripPosition.inputTokenMint, provider.publicKey)
+    const { address } = await maybeInitAta(
+        provider,
+        dripPosition.inputTokenMint,
+        provider.publicKey
+    );
 
-    const ix = await createTransferInstruction(address, dripPosition.inputTokenAccount, provider.publicKey, amount)
+    const ix = await createTransferInstruction(
+        address,
+        dripPosition.inputTokenAccount,
+        provider.publicKey,
+        amount
+    );
 
-    const tx = new Transaction().add(ix)
-    const txSig = await provider.sendAndConfirm(tx )
-    console.log("transferTxSig", txSig)
+    const tx = new Transaction().add(ix);
+    const txSig = await provider.sendAndConfirm(tx);
+    console.log('transferTxSig', txSig);
 }
 
 export async function createPosition(
@@ -184,12 +225,18 @@ export async function createPosition(
     inputTokenMint: PublicKey,
     outputTokenMint: PublicKey,
     positionOwner: PublicKey,
-    dripAmount: BN,
+    dripAmount: BN
 ): Promise<void> {
-    const { address: ownerInputTa, instruction: initOwnerInputTa } =
-        await maybeInitAta(provider, inputTokenMint, positionOwner);
-    const { address: ownerOutputTa, instruction: initOwnerOutputTa } =
-        await maybeInitAta(provider, outputTokenMint, positionOwner);
+    const { instruction: initOwnerInputTa } = await maybeInitAta(
+        provider,
+        inputTokenMint,
+        positionOwner
+    );
+    const { instruction: initOwnerOutputTa } = await maybeInitAta(
+        provider,
+        outputTokenMint,
+        positionOwner
+    );
     const { address: pairConfig, instruction: initPairConfigIx } =
         await maybeInitPairConfig(
             provider,
@@ -247,7 +294,7 @@ export async function createPosition(
         .preInstructions(preInstructions)
         .signers([dripPositionKeypair])
         .rpc();
-    console.log("initDripPositionTxSig", initDripPositionTxSig);
+    console.log('initDripPositionTxSig', initDripPositionTxSig);
 }
 
 export async function setupGlobalConfig(
@@ -329,17 +376,23 @@ export async function setNewDripperPermissions(
     provider: AnchorProvider,
     program: Program<DripV2>,
     superAdmin: Keypair,
-    globalConfig: PublicKey,
+    globalConfig: PublicKey
 ): Promise<void> {
-    const globalConfigAccount = await Accounts.GlobalConfig.fetch(provider.connection, globalConfig, program.programId);
+    const globalConfigAccount = await Accounts.GlobalConfig.fetch(
+        provider.connection,
+        globalConfig,
+        program.programId
+    );
     if (!globalConfigAccount) {
-        throw new Error("invalid config")
+        throw new Error('invalid config');
     }
-    const index = globalConfigAccount.admins.findIndex((admin) => admin.toString() === PublicKey.default.toString());
+    const index = globalConfigAccount.admins.findIndex(
+        (admin) => admin.toString() === PublicKey.default.toString()
+    );
     if (index === undefined) {
-        throw new Error("no empty slot")
+        throw new Error('no empty slot');
     }
-    console.log(`adding admin to index ${index}`)
+    console.log(`adding admin to index ${index}`);
 
     const addProviderAsAdminTxSig = await program.methods
         .updateAdmin({
@@ -371,10 +424,9 @@ export async function setNewDripperPermissions(
     console.log('setProviderPermToDripperTxSig', setProviderPermToDripperTxSig);
 }
 
-
 async function run() {
     const [, , cmd, ...cmdArgs] = process.argv;
-    const mnemonicSeed = await mnemonicToSeed(process.env.DRIPPER_SEED_PHRASE!)
+    const mnemonicSeed = await mnemonicToSeed(process.env.DRIPPER_SEED_PHRASE!);
 
     const derivedSeed = derivePath(
         "m/44'/501'",
@@ -382,7 +434,7 @@ async function run() {
     ).key;
     const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
     const dripperKeypair = Keypair.fromSecretKey(secret);
-    console.log("dripper", dripperKeypair.publicKey.toString());
+    console.log('dripper', dripperKeypair.publicKey.toString());
 
     const connection = new Connection(process.env.RPC_URL!);
     const programId = new PublicKey(process.env.DRIP_PROGRAM_ID!);
@@ -395,47 +447,78 @@ async function run() {
     if (cmd === 'setupGlobalConfig') {
         await setupGlobalConfig(provider, program);
     } else if (cmd === 'createPosition') {
-        if (cmdArgs.length < 5 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
-            console.log('usage: createPosition <globalConfig> <inputTokenMint> <outputTokenMint> <positionOwner> <dripAmount>')
-            console.log(`got ${cmdArgs.length} args but expected 4`)
-            return
+        if (
+            cmdArgs.length < 5 ||
+            cmdArgs[0] === '--help' ||
+            cmdArgs[0] === '-h'
+        ) {
+            console.log(
+                'usage: createPosition <globalConfig> <inputTokenMint> <outputTokenMint> <positionOwner> <dripAmount>'
+            );
+            console.log(`got ${cmdArgs.length} args but expected 4`);
+            return;
         }
-        const globalConfig = new PublicKey(cmdArgs[0])
-        const inputTokenMint = new PublicKey(cmdArgs[1])
-        const outputTokenMint = new PublicKey(cmdArgs[2])
-        const positionOwner = new PublicKey(cmdArgs[3])
-        const dripAmount = new BN(cmdArgs[4])
-        await createPosition(provider, program, globalConfig, inputTokenMint, outputTokenMint, positionOwner, dripAmount)
+        const globalConfig = new PublicKey(cmdArgs[0]);
+        const inputTokenMint = new PublicKey(cmdArgs[1]);
+        const outputTokenMint = new PublicKey(cmdArgs[2]);
+        const positionOwner = new PublicKey(cmdArgs[3]);
+        const dripAmount = new BN(cmdArgs[4]);
+        await createPosition(
+            provider,
+            program,
+            globalConfig,
+            inputTokenMint,
+            outputTokenMint,
+            positionOwner,
+            dripAmount
+        );
     } else if (cmd === 'sendSol') {
-        if (cmdArgs.length < 2 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
-            console.log('usage: createPosition <destinationTa> <uiAmount>')
-            console.log(`got ${cmdArgs.length} args but expected 2`)
-            return
+        if (
+            cmdArgs.length < 2 ||
+            cmdArgs[0] === '--help' ||
+            cmdArgs[0] === '-h'
+        ) {
+            console.log('usage: createPosition <destinationTa> <uiAmount>');
+            console.log(`got ${cmdArgs.length} args but expected 2`);
+            return;
         }
-        const destinationTa = new PublicKey(cmdArgs[0])
-        const uiAmount = Number( (cmdArgs[1]))
-        const amountInLamports = new BN(LAMPORTS_PER_SOL * uiAmount)
-        await sendSol(provider, destinationTa, amountInLamports)
+        const destinationTa = new PublicKey(cmdArgs[0]);
+        const uiAmount = Number(cmdArgs[1]);
+        const amountInLamports = new BN(LAMPORTS_PER_SOL * uiAmount);
+        await sendSol(provider, destinationTa, amountInLamports);
     } else if (cmd === 'deposit') {
-        if (cmdArgs.length < 2 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
-            console.log('usage: createPosition <dripPosition> <amount>')
-            console.log(`got ${cmdArgs.length} args but expected 2`)
-            return
+        if (
+            cmdArgs.length < 2 ||
+            cmdArgs[0] === '--help' ||
+            cmdArgs[0] === '-h'
+        ) {
+            console.log('usage: createPosition <dripPosition> <amount>');
+            console.log(`got ${cmdArgs.length} args but expected 2`);
+            return;
         }
-        const position = new PublicKey(cmdArgs[0])
-        const amount = Number( (cmdArgs[1]))
-        await deposit(provider, program, position,  BigInt(amount))
+        const position = new PublicKey(cmdArgs[0]);
+        const amount = Number(cmdArgs[1]);
+        await deposit(provider, program, position, BigInt(amount));
     } else if (cmd === 'enableDripperPermissions') {
-        if (cmdArgs.length < 1 || cmdArgs[0] === '--help' || cmdArgs[0] === '-h') {
-            console.log('usage: createPosition <newDripperPubkey>')
-            console.log(`got ${cmdArgs.length} args but expected 1`)
-            return
+        if (
+            cmdArgs.length < 1 ||
+            cmdArgs[0] === '--help' ||
+            cmdArgs[0] === '-h'
+        ) {
+            console.log('usage: createPosition <newDripperPubkey>');
+            console.log(`got ${cmdArgs.length} args but expected 1`);
+            return;
         }
         const superAdminKeypair = Keypair.fromSecretKey(
             Uint8Array.from(JSON.parse(process.env.SUPER_ADMIN!))
         );
-        const globalConfig = new PublicKey(cmdArgs[0])
-        await setNewDripperPermissions(provider, program, superAdminKeypair, globalConfig)
+        const globalConfig = new PublicKey(cmdArgs[0]);
+        await setNewDripperPermissions(
+            provider,
+            program,
+            superAdminKeypair,
+            globalConfig
+        );
     }
 }
 

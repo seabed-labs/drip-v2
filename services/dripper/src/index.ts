@@ -9,7 +9,7 @@ import { DripperWallet } from './wallet/dripperWallet';
 import { DEFAULT_CONFIRM_OPTIONS } from './utils';
 import { OnChainPositionsFetcher } from './positions/onchain';
 import { PublicKey } from '@solana/web3.js';
-import {dripperSeedPhrase, programId} from './env';
+import { dripperSeedPhrase, programId } from './env';
 import { getPositionHandler } from './dripHandler';
 import { IDL } from '@dcaf/drip-types';
 
@@ -21,10 +21,10 @@ async function exitHandler(signal: string, worker: IWorker) {
 
 async function main() {
     if (!programId) {
-        throw new Error("empty programId")
+        throw new Error('empty programId');
     }
     if (!dripperSeedPhrase) {
-        throw new Error("empty seed phrase")
+        throw new Error('empty seed phrase');
     }
 
     const wallet = new DripperWallet(dripperSeedPhrase);

@@ -9,9 +9,7 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
     private readonly mnemonicSeed: Buffer;
     private readonly rootPath: string;
 
-    constructor(
-        mnemonic: string,
-    ) {
+    constructor(mnemonic: string) {
         // bip44: solana root
         const rootPath = `m/44'/501'`;
         const mnemonicSeed = mnemonicToSeedSync(mnemonic);
@@ -56,7 +54,7 @@ export class DripperWallet extends AnchorWallet implements IDripperWallet {
     }
 
     derivePositionKeyPair(position: PublicKey, cycle: bigint): Keypair {
-        const path = this.getPathForPosition(position, cycle)
+        const path = this.getPathForPosition(position, cycle);
         const derivedSeed = derivePath(
             path,
             this.mnemonicSeed.toString('hex')

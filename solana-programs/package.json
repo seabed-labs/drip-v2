@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "author": "Dcaf Labs",
     "license": "UNLICENSED",
+    "type": "module",
     "scripts": {
         "clean": "rm -rf target && rm -rf node_modules",
         "lint": "yarn run lint:eslint && yarn run lint:prettier",
