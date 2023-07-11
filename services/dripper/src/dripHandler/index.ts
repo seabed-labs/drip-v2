@@ -4,6 +4,8 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { MetaAggregator } from './metaAggregator';
 import { JupiterSwap } from './jupiterAggregator';
 import { DripPosition } from '../positions';
+import { Logger } from 'winston';
+import { DripperWallet } from '../wallet/dripperWallet';
 
 export type SwapQuote = {
     inputAmount: bigint;
@@ -36,11 +38,15 @@ export type GetPositionHandler = (
 ) => Promise<IDripHandler>;
 
 export function getPositionHandler(
+    baseLogger: Logger,
+    dripperWallet: DripperWallet,
     provider: AnchorProvider,
     program: Program<DripV2>
 ): GetPositionHandler {
     return async (dripPosition: DripPosition): Promise<IDripHandler> => {
         const jupiterSwap = new JupiterSwap(
+            baseLogger,
+            dripperWallet,
             provider,
             program,
             dripPosition,
@@ -52,6 +58,8 @@ export function getPositionHandler(
         //     dripPosition,
         // );
         const metaAggregator = new MetaAggregator(
+            baseLogger,
+            dripperWallet,
             provider,
             program,
             dripPosition,

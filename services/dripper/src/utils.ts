@@ -1,4 +1,5 @@
 import {
+    AddressLookupTableProgram,
     Commitment,
     ConfirmOptions,
     Connection,
@@ -9,6 +10,13 @@ import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
 } from '@solana/spl-token-0-3-8';
+import { createVersionedTransactions } from './solana';
+import { AnchorProvider } from '@coral-xyz/anchor';
+import { Logger } from 'winston';
+
+const MAX_ACCOUNTS_PER_TX = 20;
+const ACCOUNTS_PER_LUT = 256;
+const APPROX_TIME_PER_SLOT_MS = 400;
 
 export const DEFAULT_COMMITMENT: Commitment = 'confirmed';
 export const MAX_TX_RETRY = 3;
@@ -117,6 +125,7 @@ export function derivePositionSigner(
 
 // TODO(#114): this type of error handling likely exists already in a well formed and tested lib
 export async function tryWithReturn<T>(
+    logger: Logger,
     fn: () => Promise<T> | T,
     errorHandler?: (e: unknown) => Promise<T> | T
 ): Promise<T> {
@@ -126,8 +135,149 @@ export async function tryWithReturn<T>(
         if (errorHandler) {
             return errorHandler(e);
         } else {
-            console.log(JSON.stringify(e, null, 2));
+            logger.data({ error: JSON.stringify(e) }).error('unhandled error');
             throw e;
         }
     }
+}
+
+export async function createLut(
+    provider: AnchorProvider,
+    logger: Logger
+): Promise<{
+    lutAddress: PublicKey;
+    txSig: string;
+}> {
+    const currentSlot = await provider.connection.getSlot(
+        DEFAULT_CONFIRM_OPTIONS.commitment
+    );
+    const previousSlot = currentSlot - 1;
+    const [lookupTableInst, lutAddress] =
+        AddressLookupTableProgram.createLookupTable({
+            authority: provider.publicKey,
+            payer: provider.publicKey,
+            recentSlot: previousSlot,
+        });
+    logger
+        .data({ currentSlot, previousSlot, lutAddress })
+        .info('created createLookUpTable ix');
+    const [createLutTx] = await createVersionedTransactions(
+        provider.connection,
+        provider.publicKey,
+        [[lookupTableInst]]
+    );
+    // lutAddresses.push(lookupTableAddress);
+    const txSig = await provider.sendAndConfirm(
+        createLutTx,
+        [],
+        DEFAULT_CONFIRM_OPTIONS
+    );
+    logger
+        .data({ currentSlot, previousSlot, lutAddress, txSig })
+        .info('created lut');
+    return {
+        lutAddress,
+        txSig,
+    };
+}
+
+export async function extendLut(
+    provider: AnchorProvider,
+    logger: Logger,
+    lutAddress: PublicKey,
+    accounts: PublicKey[]
+): Promise<string> {
+    logger
+        .data({ lutAddress, accounts: accounts.length })
+        .info('extending lut');
+    const extendInstruction = AddressLookupTableProgram.extendLookupTable({
+        payer: provider.publicKey,
+        authority: provider.publicKey,
+        lookupTable: lutAddress,
+        addresses: accounts,
+    });
+    const [extendLutTx] = await createVersionedTransactions(
+        provider.connection,
+        provider.publicKey,
+        [[extendInstruction]]
+    );
+    const txSig = await provider.sendAndConfirm(
+        extendLutTx,
+        [],
+        DEFAULT_CONFIRM_OPTIONS
+    );
+    logger
+        .data({ lutAddress, accounts: accounts.length, txSig })
+        .info('extended lut');
+    return txSig;
+}
+
+// TODO: Mocha, read up in depth on how lut activation/extensions work
+export async function createLuts(
+    provider: AnchorProvider,
+    logger: Logger,
+    allAccounts: PublicKey[]
+): Promise<{
+    lutAddresses: PublicKey[];
+    txSigs: string[];
+}> {
+    logger
+        .data({ lutAccountsLength: allAccounts.length })
+        .info('creating luts');
+    const lutAddresses: PublicKey[] = [];
+    const txSigs: string[] = [];
+    await paginate(
+        allAccounts,
+        async (lutAccounts, page: number) => {
+            const { lutAddress, txSig: createLutTxSig } = await createLut(
+                provider,
+                logger.data({ lutNumber: page })
+            );
+            lutAddresses.push(lutAddress);
+            txSigs.push(createLutTxSig);
+
+            await paginate(
+                lutAccounts,
+                async (extendLutAccounts) => {
+                    const extendLutTxSig = await extendLut(
+                        provider,
+                        logger,
+                        lutAddress,
+                        extendLutAccounts
+                    );
+                    txSigs.push(extendLutTxSig);
+                },
+                MAX_ACCOUNTS_PER_TX
+            );
+        },
+        ACCOUNTS_PER_LUT
+    );
+    return {
+        lutAddresses,
+        txSigs,
+    };
+}
+
+export async function getNextSlotWithRetry(
+    connection: Connection,
+    currentSlot: number,
+    tryCount: number,
+    maxTryLimit: number
+): Promise<number> {
+    if (tryCount >= maxTryLimit) {
+        throw new Error(
+            `TODO: couldn't find a slot greater than ${currentSlot} after ${maxTryLimit} tries`
+        );
+    }
+    const slot = await connection.getSlot(DEFAULT_CONFIRM_OPTIONS.commitment);
+    if (slot >= currentSlot + 1) {
+        return slot;
+    }
+    await delay(APPROX_TIME_PER_SLOT_MS);
+    return getNextSlotWithRetry(
+        connection,
+        currentSlot,
+        tryCount + 1,
+        maxTryLimit
+    );
 }

@@ -7,6 +7,8 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Prism } from '@prism-hq/prism-ag';
 import Decimal from 'decimal.js';
 import { DripPosition } from '../positions';
+import { Logger } from 'winston';
+import { DripperWallet } from '../wallet/dripperWallet';
 
 // Reverse engineered these types by logging their sdk
 
@@ -43,11 +45,13 @@ export class PrismSwap
     implements ITokenSwapHandler
 {
     constructor(
+        baseLogger: Logger,
+        dripperWallet: DripperWallet,
         provider: AnchorProvider,
         program: Program<DripV2>,
         dripPosition: DripPosition
     ) {
-        super(provider, program, dripPosition);
+        super(baseLogger, dripperWallet, provider, program, dripPosition);
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {

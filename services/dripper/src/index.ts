@@ -12,10 +12,23 @@ import { PublicKey } from '@solana/web3.js';
 import { dripperSeedPhrase, programId } from './env';
 import { getPositionHandler } from './dripHandler';
 import { IDL } from '@dcaf/drip-types';
+import winston, { format } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+
+const { combine, timestamp, label, prettyPrint } = format;
+
+let logger = winston.createLogger({
+    level: 'verbose',
+    transports: [
+        new winston.transports.Console(),
+        new DailyRotateFile({ filename: 'dripper.log' }),
+    ],
+    format: combine(label({ label: 'dripper' }), timestamp()),
+});
 
 async function exitHandler(signal: string, worker: IWorker) {
     await worker.stop();
-    console.log(`existing from signal ${signal}`);
+    logger.data({ signal }).info('exiting dripper');
     process.exit(0);
 }
 
@@ -27,21 +40,31 @@ async function main() {
         throw new Error('empty seed phrase');
     }
 
-    const wallet = new DripperWallet(dripperSeedPhrase);
+    const dripperWallet = new DripperWallet(dripperSeedPhrase);
     const programIdPublicKey = new PublicKey(programId);
     const connection = new Connection();
     const provider = new AnchorProvider(
         connection,
-        wallet,
+        dripperWallet,
         DEFAULT_CONFIRM_OPTIONS
     );
     const program = new Program(IDL, programIdPublicKey, provider);
+    logger = logger.data({
+        dripperWalletPublicKey: dripperWallet.publicKey.toString(),
+        programId: programIdPublicKey.toString(),
+    });
+
     const positionFetcher = new OnChainPositionsFetcher(
         programIdPublicKey,
         connection,
-        getPositionHandler(provider, program)
+        getPositionHandler(logger, dripperWallet, provider, program)
     );
-    const worker = new DripWorker(connection, provider, positionFetcher);
+    const worker = new DripWorker(
+        logger,
+        connection,
+        provider,
+        positionFetcher
+    );
 
     process.on('SIGINT', async () => {
         await exitHandler('SIGINT', worker);
@@ -53,7 +76,9 @@ async function main() {
 }
 
 main().catch((e: unknown) => {
-    // TODO(mocha): better logger
+    logger
+        .data({ error: JSON.stringify(e) })
+        .error('uncaught exception in dripper worker loop');
     console.error(e);
     throw e;
 });

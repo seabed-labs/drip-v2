@@ -9,15 +9,19 @@ import assert from 'assert';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { notEmpty } from '../utils';
 import { DripPosition } from '../positions';
+import { Logger } from 'winston';
+import { DripperWallet } from '../wallet/dripperWallet';
 
 export class MetaAggregator extends PositionHandlerBase {
     constructor(
+        baseLogger: Logger,
+        dripperWallet: DripperWallet,
         provider: AnchorProvider,
         program: Program<DripV2>,
         dripPosition: DripPosition,
         private readonly swaps: ITokenSwapHandler[]
     ) {
-        super(provider, program, dripPosition);
+        super(baseLogger, dripperWallet, provider, program, dripPosition);
     }
 
     async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
