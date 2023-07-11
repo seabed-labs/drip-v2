@@ -7,7 +7,7 @@ import {
     VersionedTransaction,
 } from '@solana/web3.js';
 import { rpcUrl } from '../env';
-import { DEFAULT_COMMITMENT } from '../utils';
+import { DEFAULT_COMMITMENT, DEFAULT_CONFIRM_OPTIONS } from '../utils';
 
 export class Connection extends Web3Conn {
     constructor() {
@@ -22,7 +22,7 @@ export async function createVersionedTransactions(
     addressLookupTableAccounts?: AddressLookupTableAccount[]
 ): Promise<VersionedTransaction[]> {
     const recentBlockhash = await connection
-        .getLatestBlockhash()
+        .getLatestBlockhash(DEFAULT_CONFIRM_OPTIONS.commitment)
         .then((lb) => lb.blockhash);
     return instructionsForTxs.map((instructions) => {
         const messageV0 = new TransactionMessage({

@@ -1,46 +1,44 @@
 import { PositionHandlerBase } from './abstract';
-import { DripInstructions, ITokenSwapHandler } from './index';
-import { Accounts } from '@dcaf/drip-types';
-import { Connection } from '@solana/web3.js';
+import {
+    compareSwapQuoteDesc,
+    ITokenSwapHandler,
+    SwapQuoteWithInstructions,
+} from './index';
+import { DripV2 } from '@dcaf/drip-types';
 import assert from 'assert';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { notEmpty } from '../utils';
+import { DripPosition } from '../positions';
 
 export class MetaAggregator extends PositionHandlerBase {
     constructor(
         provider: AnchorProvider,
-        connection: Connection,
-        dripPosition: Accounts.DripPosition,
+        program: Program<DripV2>,
+        dripPosition: DripPosition,
         private readonly swaps: ITokenSwapHandler[]
     ) {
-        super(provider, connection, dripPosition);
+        super(provider, program, dripPosition);
     }
 
-    async createSwapInstructions(): Promise<DripInstructions> {
-        const quotesWithIxs = (
-            await Promise.all(
-                this.swaps.map((swapImpl) => {
-                    try {
-                        return swapImpl.quote(this.dripPosition);
-                    } catch (e) {
-                        // todo: log unknown errors
-                        console.error(e);
-                        return undefined;
-                    }
-                })
-            )
-        ).filter(notEmpty);
-
+    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
+        const createSwapIxs = this.swaps.map((swapImpl) => {
+            try {
+                return swapImpl.createSwapInstructions(this.dripPosition);
+            } catch (e) {
+                // TODO: log unknown errors
+                console.error(e);
+                return undefined;
+            }
+        });
+        const quotesWithIxs = (await Promise.all(createSwapIxs)).filter(
+            notEmpty
+        );
         // TODO(mocha): define error
         assert(
             quotesWithIxs.length,
             new Error('no valid quotes for meta aggregator')
         );
-
-        // TODO(mocha): impl sort
-        quotesWithIxs.sort((a, b): number => {
-            return 0;
-        });
+        quotesWithIxs.sort(compareSwapQuoteDesc);
         const [quoteWithIxs] = quotesWithIxs;
         return quoteWithIxs;
     }

@@ -1,18 +1,19 @@
-import { Accounts } from '@dcaf/drip-types';
-import { Connection, Signer, TransactionInstruction } from '@solana/web3.js';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { Signer, TransactionInstruction } from '@solana/web3.js';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { MetaAggregator } from './metaAggregator';
 import { JupiterSwap } from './jupiterAggregator';
-import { PrismSwap } from './prismAggregator';
+import { DripPosition } from '../positions';
 
 export type SwapQuote = {
     inputAmount: bigint;
     outputAmount: bigint;
+    minOutputAmount: bigint;
 };
 
-export type SwapQuoteWithInstructions = SwapQuote & DripInstructions;
+export type SwapQuoteWithInstructions = SwapQuote & SwapInstructions;
 
-export type DripInstructions = {
+export type SwapInstructions = {
     preSwapInstructions: TransactionInstruction[];
     preSigners: Signer[];
     swapInstructions: TransactionInstruction[];
@@ -25,34 +26,51 @@ export interface IDripHandler {
 }
 
 export interface ITokenSwapHandler {
-    quote(position: Accounts.DripPosition): Promise<SwapQuoteWithInstructions>;
+    createSwapInstructions(
+        position: DripPosition
+    ): Promise<SwapQuoteWithInstructions>;
 }
 
 export type GetPositionHandler = (
-    position: Accounts.DripPosition
+    position: DripPosition
 ) => Promise<IDripHandler>;
 
 export function getPositionHandler(
     provider: AnchorProvider,
-    connection: Connection
+    program: Program<DripV2>
 ): GetPositionHandler {
-    return async (
-        dripPosition: Accounts.DripPosition
-    ): Promise<IDripHandler> => {
+    return async (dripPosition: DripPosition): Promise<IDripHandler> => {
         const jupiterSwap = new JupiterSwap(
             provider,
-            connection,
+            program,
             dripPosition,
             'mainnet-beta'
         );
-        const prismSwap = new PrismSwap(provider, connection, dripPosition);
+        // const prismSwap = new PrismSwap(
+        //     provider,
+        //     program,
+        //     dripPosition,
+        // );
         const metaAggregator = new MetaAggregator(
             provider,
-            connection,
+            program,
             dripPosition,
-            [jupiterSwap, prismSwap]
+            [jupiterSwap]
         );
         // TODO: return handler based on position and config
         return metaAggregator;
     };
+}
+
+export function compareSwapQuoteDesc(a: SwapQuote, b: SwapQuote): number {
+    const aQuoute = a.minOutputAmount / a.inputAmount;
+    const bQuoute = b.minOutputAmount / b.inputAmount;
+    if (aQuoute > bQuoute) {
+        // sort a before b, e.g. [a, b]
+        return -1;
+    } else if (aQuoute < bQuoute) {
+        // sort a after b, e.g. [b, a]
+        return 1;
+    }
+    return 0;
 }

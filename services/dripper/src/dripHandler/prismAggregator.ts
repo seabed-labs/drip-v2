@@ -1,15 +1,12 @@
-import {
-    DripInstructions,
-    ITokenSwapHandler,
-    SwapQuoteWithInstructions,
-} from './index';
-import { Accounts } from '@dcaf/drip-types';
-import { Connection, Signer, Transaction } from '@solana/web3.js';
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
+import { DripV2 } from '@dcaf/drip-types';
+import { Signer, Transaction } from '@solana/web3.js';
 import assert from 'assert';
 import { PositionHandlerBase } from './abstract';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Prism } from '@prism-hq/prism-ag';
 import Decimal from 'decimal.js';
+import { DripPosition } from '../positions';
 
 // Reverse engineered these types by logging their sdk
 
@@ -47,35 +44,31 @@ export class PrismSwap
 {
     constructor(
         provider: AnchorProvider,
-        connection: Connection,
-        dripPosition: Accounts.DripPosition
+        program: Program<DripV2>,
+        dripPosition: DripPosition
     ) {
-        super(provider, connection, dripPosition);
+        super(provider, program, dripPosition);
     }
 
-    async createSwapInstructions(): Promise<DripInstructions> {
-        return this.quote();
-    }
-
-    async quote(): Promise<SwapQuoteWithInstructions> {
+    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
         const [prism, inputToken] = await Promise.all([
             Prism.init({
                 user: this.provider.publicKey,
-                connection: this.connection,
+                connection: this.provider.connection,
                 // TODO(mocha): use slippage from position
                 slippage: 100,
             }),
-            this.connection.getTokenAccountBalance(
-                this.dripPosition.inputTokenAccount
+            this.provider.connection.getTokenAccountBalance(
+                this.dripPosition.data.inputTokenAccount
             ),
         ]);
         await prism.loadRoutes(
-            this.dripPosition.inputTokenMint.toString(),
-            this.dripPosition.outputTokenMint.toString()
+            this.dripPosition.data.inputTokenMint.toString(),
+            this.dripPosition.data.outputTokenMint.toString()
         );
         // Prism sdk uses UI values
         const [route] = prism.getRoutes(
-            new Decimal(this.dripPosition.dripAmount.toString())
+            new Decimal(this.dripPosition.data.dripAmount.toString())
                 .div(Math.pow(10, inputToken.value.decimals))
                 .toNumber()
         ) as PrismRoute[];
@@ -91,6 +84,10 @@ export class PrismSwap
             ),
             outputAmount: BigInt(
                 route.amountWithFees *
+                    Math.pow(10, route.routeData.toCoin.decimals)
+            ),
+            minOutputAmount: BigInt(
+                route.minimumReceived *
                     Math.pow(10, route.routeData.toCoin.decimals)
             ),
             preSwapInstructions: swapTxRes.preTransaction.instructions,

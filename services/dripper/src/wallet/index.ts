@@ -1,8 +1,5 @@
-import { Wallet as AnchorWallet } from '@coral-xyz/anchor';
-import { dripperKeypair } from '../env';
-
-export class Wallet extends AnchorWallet {
-    constructor() {
-        super(dripperKeypair);
-    }
+import { Wallet } from '@coral-xyz/anchor';
+import { Keypair, PublicKey } from '@solana/web3.js';
+export interface IDripperWallet extends Wallet {
+    derivePositionKeyPair(position: PublicKey, cycle: bigint): Keypair;
 }

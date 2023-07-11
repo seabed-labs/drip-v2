@@ -1,13 +1,17 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { DripWorker } from './workers/dripWorker';
 import { IWorker } from './workers';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Connection } from './solana';
-import { Wallet } from './wallet';
+import { DripperWallet } from './wallet/dripperWallet';
 import { DEFAULT_CONFIRM_OPTIONS } from './utils';
 import { OnChainPositionsFetcher } from './positions/onchain';
 import { PublicKey } from '@solana/web3.js';
-import { programId } from './env';
+import { dripperSeedPhrase, programId } from './env';
 import { getPositionHandler } from './dripHandler';
+import { IDL } from '@dcaf/drip-types';
 
 async function exitHandler(signal: string, worker: IWorker) {
     await worker.stop();
@@ -16,18 +20,26 @@ async function exitHandler(signal: string, worker: IWorker) {
 }
 
 async function main() {
+    if (!programId) {
+        throw new Error('empty programId');
+    }
+    if (!dripperSeedPhrase) {
+        throw new Error('empty seed phrase');
+    }
+
+    const wallet = new DripperWallet(dripperSeedPhrase);
+    const programIdPublicKey = new PublicKey(programId);
     const connection = new Connection();
-    const wallet = new Wallet();
     const provider = new AnchorProvider(
         connection,
         wallet,
         DEFAULT_CONFIRM_OPTIONS
     );
-
+    const program = new Program(IDL, programIdPublicKey, provider);
     const positionFetcher = new OnChainPositionsFetcher(
-        new PublicKey(programId!),
+        programIdPublicKey,
         connection,
-        getPositionHandler(provider, connection)
+        getPositionHandler(provider, program)
     );
     const worker = new DripWorker(connection, provider, positionFetcher);
 

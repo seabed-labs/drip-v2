@@ -1,13 +1,8 @@
-import {
-    DripInstructions,
-    ITokenSwapHandler,
-    SwapQuoteWithInstructions,
-} from './index';
-import { Accounts } from '@dcaf/drip-types';
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
+import { DripV2 } from '@dcaf/drip-types';
 import { Jupiter, SwapMode } from '@jup-ag/core';
 import {
     Cluster,
-    Connection,
     PublicKey,
     TransactionMessage,
     VersionedTransaction,
@@ -15,7 +10,10 @@ import {
 import JSBI from 'jsbi';
 import assert from 'assert';
 import { PositionHandlerBase } from './abstract';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { createTransferInstruction } from '@solana/spl-token-0-3-8';
+import { maybeInitAta } from '../utils';
+import { DripPosition } from '../positions';
 
 export class JupiterSwap
     extends PositionHandlerBase
@@ -25,24 +23,20 @@ export class JupiterSwap
 
     constructor(
         provider: AnchorProvider,
-        connection: Connection,
-        dripPosition: Accounts.DripPosition,
+        program: Program<DripV2>,
+        dripPosition: DripPosition,
         private readonly cluster: Cluster
     ) {
-        super(provider, connection, dripPosition);
+        super(provider, program, dripPosition);
         this.jupiter = undefined;
     }
 
-    async createSwapInstructions(): Promise<DripInstructions> {
-        return this.quote();
-    }
-
-    async quote(): Promise<SwapQuoteWithInstructions> {
+    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
         const jup = await this.initIfNeeded();
         const computeRoutesRes = await jup.computeRoutes({
-            inputMint: new PublicKey(this.dripPosition.inputTokenMint),
-            amount: JSBI.BigInt(this.dripPosition.dripAmount.toString()),
-            outputMint: new PublicKey(this.dripPosition.outputTokenMint),
+            inputMint: new PublicKey(this.dripPosition.data.inputTokenMint),
+            amount: JSBI.BigInt(this.dripPosition.data.dripAmount.toString()),
+            outputMint: new PublicKey(this.dripPosition.data.outputTokenMint),
             // TODO: use position defined position slippage
             slippageBps: 100,
             forceFetch: true,
@@ -59,6 +53,7 @@ export class JupiterSwap
         const { swapTransaction, addressLookupTableAccounts } =
             await jup.exchange({
                 routeInfo: route,
+                wrapUnwrapSOL: false,
                 asLegacyTransaction: false,
             });
         const message = TransactionMessage.decompile(
@@ -67,12 +62,29 @@ export class JupiterSwap
                 addressLookupTableAccounts: addressLookupTableAccounts,
             }
         );
+        const instructions = message.instructions;
+        const { address: dripperOutputTokenAta } = await maybeInitAta(
+            this.provider.connection,
+            this.program.programId,
+            this.dripPosition.data.outputTokenMint,
+            this.provider.publicKey
+        );
+        instructions.push(
+            createTransferInstruction(
+                dripperOutputTokenAta,
+                this.dripPosition.data.outputTokenAccount,
+                this.provider.publicKey,
+                BigInt(route.otherAmountThreshold.toString())
+            )
+        );
         return {
             inputAmount: BigInt(route.inAmount.toString()),
+            // min output because we specify exactIn above
+            minOutputAmount: BigInt(route.otherAmountThreshold.toString()),
             outputAmount: BigInt(route.outAmount.toString()),
             preSwapInstructions: [],
             preSigners: [],
-            swapInstructions: message.instructions,
+            swapInstructions: instructions,
             postSwapInstructions: [],
             postSigners: [],
         };
@@ -81,7 +93,7 @@ export class JupiterSwap
     private async initIfNeeded(): Promise<Jupiter> {
         if (!this.jupiter) {
             this.jupiter = await Jupiter.load({
-                connection: this.connection,
+                connection: this.provider.connection,
                 cluster: this.cluster,
                 user: this.provider.publicKey,
             });

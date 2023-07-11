@@ -13,19 +13,9 @@ import {
     mintTo,
 } from '@solana/spl-token';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import { delay, keyPairToObject, stringifyJSON } from './setup';
 
 const localnet = spawn('anchor', ['localnet']);
-
-function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function keyPairToObject(key: Keypair) {
-    return {
-        pub: key.publicKey.toString(),
-        priv: key.secretKey.toString(),
-    };
-}
 
 async function getRawAccountInfo(address: string) {
     const response = await fetch('http://localhost:8899', {
@@ -67,6 +57,7 @@ async function getRawTransaction(txSig: string) {
     return await response.json();
 }
 
+// TODO: Refactor to use setup.ts
 async function setup() {
     const program = anchor.workspace.DripV2 as Program<DripV2>;
     const provider = anchor.getProvider();
@@ -387,7 +378,3 @@ localnet.stderr.on('data', (data: any) => {
 localnet.on('close', (code: any) => {
     console.log(`child process exited with code ${code}`);
 });
-
-function stringifyJSON(obj: object): string {
-    return JSON.stringify(obj, null, 2);
-}
