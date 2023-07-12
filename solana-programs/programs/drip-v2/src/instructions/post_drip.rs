@@ -17,7 +17,8 @@ use crate::{
 pub struct PostDrip<'info> {
     pub signer: Signer<'info>,
 
-    pub refund_destination: Signer<'info>,
+    /// CHECK: No checks needed for refund destination
+    pub refund_destination: AccountInfo<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
@@ -80,20 +81,17 @@ pub struct PostDrip<'info> {
 }
 
 pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
-    let PostDrip {
-        signer,
-        global_config,
-        pair_config,
-        drip_position,
-        drip_position_signer,
-        drip_position_input_token_account,
-        drip_position_output_token_account,
-        dripper_input_token_account,
-        output_token_fee_account,
-        token_program,
-        ephemeral_drip_state,
-        ..
-    } = ctx.accounts;
+    let global_config = &ctx.accounts.global_config;
+    let signer = &ctx.accounts.signer;
+    let drip_position = &ctx.accounts.drip_position;
+    let pair_config = &ctx.accounts.pair_config;
+    let ephemeral_drip_state = &ctx.accounts.ephemeral_drip_state;
+    let drip_position_input_token_account = &ctx.accounts.drip_position_input_token_account;
+    let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
+    let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
+    let output_token_fee_account = &ctx.accounts.output_token_fee_account;
+
+    validate_pre_drip_ix_present(&ctx)?;
 
     require!(
         signer.is_authorized(global_config, AdminPermission::Drip),
@@ -103,11 +101,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     require!(drip_position.is_activated()?, DripError::DripNotActivated);
 
     require!(
-        pair_config.global_config.eq(&global_config.key()),
-        DripError::GlobalConfigMismatch
-    );
-
-    require!(
         drip_position.global_config.eq(&global_config.key()),
         DripError::GlobalConfigMismatch
     );
@@ -115,6 +108,11 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     require!(
         drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
+    );
+
+    require!(
+        pair_config.global_config.eq(&global_config.key()),
+        DripError::GlobalConfigMismatch
     );
 
     require!(
@@ -153,6 +151,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             .accounts
             .ephemeral_drip_state
             .output_token_account_balance_pre_drip_snapshot;
+
     require!(
         received_output_tokens > 0,
         DripError::ExpectedNonZeroOutputPostDrip
@@ -163,11 +162,23 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         DripError::ExceededSlippage
     );
 
-    let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
-    let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
-    let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
-    let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
-    let output_token_fee_amount = (received_output_tokens * output_drip_fee_bps) / 10_000;
+    validate_price_constraints(
+        &ctx,
+        received_output_tokens,
+        ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
+    )?;
+
+    let output_token_fee_amount = {
+        let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
+        let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
+        let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
+        let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
+        (received_output_tokens * output_drip_fee_bps) / 10_000
+    };
+
+    let token_program = &ctx.accounts.token_program;
+    let drip_position_signer = &ctx.accounts.drip_position_signer;
+    let drip_position = &mut ctx.accounts.drip_position;
 
     token::transfer(
         CpiContext::new_with_signer(
@@ -202,29 +213,22 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         drip_position.drip_amount = 0;
     }
 
-    // TODO(#100): Refactor the function so that it can be called at the top of the handler
-    //       Right now there's issues with borrowing if we try to do that.
-    validate_pre_drip_ix_present(&ctx)?;
-
-    // TODO(#100): Refactor the function so that it can be called at the top of the handler
-    //       Right now there's issues with borrowing if we try to do that.
-    validate_price_constraints(
-        &ctx,
-        received_output_tokens,
-        ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
-    )?;
-
-    // there has to be an easier way to close an account...
-    let ephemeral_drip_state_account = ctx.accounts.ephemeral_drip_state.to_account_info();
-    **ctx.accounts.refund_destination.lamports.borrow_mut() = ctx
+    let ephemeral_drip_state_lamports = &ctx
         .accounts
-        .refund_destination
-        .lamports()
-        .checked_add(ephemeral_drip_state_account.lamports())
-        .unwrap();
-    **ephemeral_drip_state_account.lamports.borrow_mut() = 0;
-    // TODO(#101): Support auto-credit flow (not critical, skipping for now)
+        .ephemeral_drip_state
+        .to_account_info()
+        .lamports();
+    let refund_destination_lamports = &ctx.accounts.refund_destination.to_account_info().lamports();
+    let refund_destination_new_lamports =
+        refund_destination_lamports + ephemeral_drip_state_lamports;
 
+    // close ephemeral state account and refund lamports to refund_destination
+    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
+    let refund_destination = &mut ctx.accounts.refund_destination;
+    **refund_destination.lamports.borrow_mut() = refund_destination_new_lamports;
+    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
+
+    // TODO(#101): Support auto-credit flow (not critical, skipping for now)
     Ok(())
 }
 
@@ -292,7 +296,6 @@ fn validate_pre_drip_ix_present(ctx: &Context<PostDrip>) -> Result<()> {
 
         relative_index_i -= 1;
     }
-
     Ok(())
 }
 
