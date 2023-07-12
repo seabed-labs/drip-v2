@@ -84,7 +84,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     /* Validation */
 
     validate_account_relations(&ctx)?;
-    validate_pre_drip_ix_present(&ctx)?;
 
     let received_output_tokens = ctx.accounts.drip_position_output_token_account.amount
         - ctx
@@ -107,6 +106,8 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         received_output_tokens,
         ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
     )?;
+
+    validate_pre_drip_ix_present(&ctx)?;
 
     /* STATE UPDATES (EFFECTS) */
 

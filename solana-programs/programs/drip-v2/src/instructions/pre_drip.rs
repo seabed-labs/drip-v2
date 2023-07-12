@@ -91,6 +91,98 @@ pub struct PreDripParams {
 }
 
 pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<()> {
+    /* Validation */
+
+    validate_account_relations(&ctx)?;
+
+    require!(
+        params.drip_amount_to_fill
+            <= (ctx.accounts.drip_position.drip_amount
+                - ctx.accounts.drip_position.drip_amount_filled),
+        DripError::DripFillAmountTooHigh
+    );
+
+    validate_post_drip_ix_present(&ctx)?;
+
+    /* STATE UPDATES (EFFECTS) */
+    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
+    let drip_position_input_token_account = &mut ctx.accounts.dripper_input_token_account;
+
+    let drip_position = &ctx.accounts.drip_position;
+    let drip_position_signer = &ctx.accounts.drip_position_signer;
+    let pair_config = &ctx.accounts.pair_config;
+    let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
+    let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
+    let input_token_fee_account = &ctx.accounts.input_token_fee_account;
+    let token_program = &ctx.accounts.token_program;
+
+    // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
+    //       Else switch to checked math functions.
+    // TODO(#105): Move all math here to a custom module to unit test better
+    let partial_drip_amount = params.drip_amount_to_fill;
+    let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
+    let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
+    let input_drip_fee_bps = (drip_fee_bps * input_token_fee_portion_bps) / 10_000;
+    let input_token_fee_amount = (partial_drip_amount * input_drip_fee_bps) / 10_000;
+    let post_fees_partial_drip_amount = partial_drip_amount - input_token_fee_amount;
+
+    ephemeral_drip_state.bump = *ctx.bumps.get("ephemeral_drip_state").unwrap();
+    ephemeral_drip_state.drip_position = drip_position.key();
+    ephemeral_drip_state.output_token_account_balance_pre_drip_snapshot =
+        drip_position_output_token_account.amount;
+    ephemeral_drip_state.minimum_output_expected = params.minimum_output_tokens_expected;
+    ephemeral_drip_state.pre_fees_partial_drip_amount = params.drip_amount_to_fill;
+    ephemeral_drip_state.dripped_input_tokens = post_fees_partial_drip_amount;
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            Transfer {
+                from: drip_position_input_token_account.to_account_info(),
+                to: dripper_input_token_account.to_account_info(),
+                authority: drip_position_signer.to_account_info(),
+            },
+            &[&[
+                b"drip-v2-drip-position-signer".as_ref(),
+                drip_position.key().as_ref(),
+                &[drip_position_signer.bump],
+            ]],
+        ),
+        post_fees_partial_drip_amount,
+    )?;
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            Transfer {
+                from: drip_position_input_token_account.to_account_info(),
+                to: input_token_fee_account.to_account_info(),
+                authority: drip_position_signer.to_account_info(),
+            },
+            &[&[
+                b"drip-v2-drip-position-signer".as_ref(),
+                drip_position.key().as_ref(),
+                &[drip_position_signer.bump],
+            ]],
+        ),
+        input_token_fee_amount,
+    )?;
+
+    /* POST CPI VERIFICATION */
+    let pre_drip_input_token_account_balance = drip_position_input_token_account.amount;
+    drip_position_input_token_account.reload()?;
+
+    require!(
+        pre_drip_input_token_account_balance - drip_position_input_token_account.amount
+            == partial_drip_amount,
+        DripError::PreDripInvariantFailed
+    );
+    /* POST CPI STATE UPDATES (EFFECTS) */
+
+    Ok(())
+}
+
+fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
     let PreDrip {
         signer,
         global_config,
@@ -104,7 +196,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         token_program,
         ephemeral_drip_state,
         ..
-    } = ctx.accounts;
+    } = &ctx.accounts;
 
     require!(
         signer.is_authorized(global_config, AdminPermission::Drip),
@@ -143,12 +235,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     );
 
     require!(
-        params.drip_amount_to_fill
-            <= (drip_position.drip_amount - drip_position.drip_amount_filled),
-        DripError::DripFillAmountTooHigh
-    );
-
-    require!(
         dripper_input_token_account.owner.eq(signer.key),
         DripError::InvalidDripperInputTokenAccount
     );
@@ -159,71 +245,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
             .eq(&global_config.global_config_signer.key()),
         DripError::UnexpectedFeeTokenAccount
     );
-
-    // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
-    //       Else switch to checked math functions.
-    // TODO(#105): Move all math here to a custom module to unit test better
-    let partial_drip_amount = params.drip_amount_to_fill;
-    let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
-    let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
-    let input_drip_fee_bps = (drip_fee_bps * input_token_fee_portion_bps) / 10_000;
-    let input_token_fee_amount = (partial_drip_amount * input_drip_fee_bps) / 10_000;
-    let post_fees_partial_drip_amount = partial_drip_amount - input_token_fee_amount;
-    let pre_drip_input_token_account_balance = drip_position_input_token_account.amount;
-
-    token::transfer(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            Transfer {
-                from: drip_position_input_token_account.to_account_info(),
-                to: dripper_input_token_account.to_account_info(),
-                authority: drip_position_signer.to_account_info(),
-            },
-            &[&[
-                b"drip-v2-drip-position-signer".as_ref(),
-                drip_position.key().as_ref(),
-                &[drip_position_signer.bump],
-            ]],
-        ),
-        post_fees_partial_drip_amount,
-    )?;
-
-    token::transfer(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            Transfer {
-                from: drip_position_input_token_account.to_account_info(),
-                to: input_token_fee_account.to_account_info(),
-                authority: drip_position_signer.to_account_info(),
-            },
-            &[&[
-                b"drip-v2-drip-position-signer".as_ref(),
-                drip_position.key().as_ref(),
-                &[drip_position_signer.bump],
-            ]],
-        ),
-        input_token_fee_amount,
-    )?;
-
-    drip_position_input_token_account.reload()?;
-
-    require!(
-        pre_drip_input_token_account_balance - drip_position_input_token_account.amount
-            == partial_drip_amount,
-        DripError::PreDripInvariantFailed
-    );
-
-    ephemeral_drip_state.bump = *ctx.bumps.get("ephemeral_drip_state").unwrap();
-    ephemeral_drip_state.drip_position = drip_position.key();
-    ephemeral_drip_state.output_token_account_balance_pre_drip_snapshot =
-        drip_position_output_token_account.amount;
-    ephemeral_drip_state.minimum_output_expected = params.minimum_output_tokens_expected;
-    ephemeral_drip_state.pre_fees_partial_drip_amount = params.drip_amount_to_fill;
-    ephemeral_drip_state.dripped_input_tokens = post_fees_partial_drip_amount;
-
-    // TODO(#100): Refactor the function so that it can be called at the top of the handler
-    //       Right now there's issues with borrowing if we try to do that.
-    validate_post_drip_ix_present(&ctx)?;
 
     Ok(())
 }
