@@ -118,4 +118,7 @@ pub enum DripError {
 
     #[msg("Exceeds slippages")]
     ExceededSlippage, // 6038 or 0x1796
+
+    #[msg("Ephemeral drip state and drip position mismatch")]
+    EphemeralDripStateDripPositionMismatch, // 6039 or 0x1797
 }

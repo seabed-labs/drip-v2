@@ -26,8 +26,6 @@ pub struct DripPosition {
     pub drip_max_jitter: u32,               //4
     pub drip_activation_genesis_shift: i64, // 8
     pub drip_activation_timestamp: i64,     // 8
-    // TODO: Separate ephemeral state to its own ephemeral account
-    pub ephemeral_drip_state: Option<EphemeralDripState>, // 1 + 24
 }
 
 impl DripPosition {
@@ -104,13 +102,6 @@ impl DripPosition {
             current_canonical_activation_timestamp + self.drip_activation_genesis_shift;
         Ok(shifted_current_canonical_activation_timestamp)
     }
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Default, InitSpace, Clone)]
-pub struct EphemeralDripState {
-    pub output_token_account_balance_pre_drip_snapshot: u64, // 8
-    pub current_pre_fees_partial_drip_amount: u64,           // 8
-    pub minimum_output_expected: u64,                        // 8
 }
 
 impl DripPosition {
