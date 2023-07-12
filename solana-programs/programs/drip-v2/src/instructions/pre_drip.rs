@@ -252,7 +252,6 @@ fn validate_post_drip_ix_present(ctx: &Context<PreDrip>) -> Result<()> {
             if actual_discriminator.eq(expected_discrimator) {
                 let post_drip_accounts_match_expectation = {
                     ctx.accounts.signer.key().eq(&ix.accounts[0].pubkey)
-                        && ctx.accounts.payer.key().eq(&ix.accounts[1].pubkey)
                         && ctx.accounts.global_config.key().eq(&ix.accounts[2].pubkey)
                         && ctx.accounts.pair_config.key().eq(&ix.accounts[4].pubkey)
                         && ctx.accounts.drip_position.key().eq(&ix.accounts[5].pubkey)

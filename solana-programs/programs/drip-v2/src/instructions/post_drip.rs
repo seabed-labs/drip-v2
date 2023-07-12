@@ -17,7 +17,7 @@ use crate::{
 pub struct PostDrip<'info> {
     pub signer: Signer<'info>,
 
-    pub pre_drip_payer: Signer<'info>,
+    pub refund_destination: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
@@ -59,7 +59,7 @@ pub struct PostDrip<'info> {
         ],
         bump = ephemeral_drip_state.bump,
         has_one = drip_position @ DripError::EphemeralDripStateDripPositionMismatch,
-        close = pre_drip_payer
+        close = refund_destination
     )]
     pub ephemeral_drip_state: Box<Account<'info, EphemeralDripState>>,
 
@@ -216,9 +216,9 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
 
     // there has to be an easier way to close an account...
     let ephemeral_drip_state_account = ctx.accounts.ephemeral_drip_state.to_account_info();
-    **ctx.accounts.pre_drip_payer.lamports.borrow_mut() = ctx
+    **ctx.accounts.refund_destination.lamports.borrow_mut() = ctx
         .accounts
-        .pre_drip_payer
+        .refund_destination
         .lamports()
         .checked_add(ephemeral_drip_state_account.lamports())
         .unwrap();
