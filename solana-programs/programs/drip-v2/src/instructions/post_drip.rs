@@ -81,6 +81,8 @@ pub struct PostDrip<'info> {
 }
 
 pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
+    /* Validation */
+
     validate_account_relations(&ctx)?;
     validate_pre_drip_ix_present(&ctx)?;
 
@@ -106,13 +108,16 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
     )?;
 
+    /* STATE UPDATES (EFFECTS) */
+
     let drip_position = &mut ctx.accounts.drip_position;
+    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
+    let refund_destination = &mut ctx.accounts.refund_destination;
+
     let drip_position_signer = &ctx.accounts.drip_position_signer;
     let pair_config = &ctx.accounts.pair_config;
     let output_token_fee_account = &ctx.accounts.output_token_fee_account;
     let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
-    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
-    let refund_destination = &mut ctx.accounts.refund_destination;
     let token_program = &ctx.accounts.token_program;
 
     let output_token_fee_amount = {
@@ -122,6 +127,23 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
         (received_output_tokens * output_drip_fee_bps) / 10_000
     };
+
+    drip_position.drip_amount_filled += ephemeral_drip_state.pre_fees_partial_drip_amount;
+    drip_position.total_input_token_dripped += ephemeral_drip_state.pre_fees_partial_drip_amount;
+    drip_position.total_output_token_received += received_output_tokens;
+
+    if drip_position.drip_amount_filled == drip_position.drip_amount {
+        drip_position.drip_activation_timestamp =
+            drip_position.get_next_drip_activation_timestamp()?;
+        drip_position.drip_amount = 0;
+    }
+
+    // Refund lamports to refund_destination
+    **refund_destination.lamports.borrow_mut() =
+        refund_destination.lamports() + ephemeral_drip_state.to_account_info().lamports();
+    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
+
+    /* MANUAL CPI (INTERACTIONS) */
 
     token::transfer(
         CpiContext::new_with_signer(
@@ -139,23 +161,11 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         ),
         output_token_fee_amount,
     )?;
-
-    drip_position.drip_amount_filled += ephemeral_drip_state.pre_fees_partial_drip_amount;
-    drip_position.total_input_token_dripped += ephemeral_drip_state.pre_fees_partial_drip_amount;
-    drip_position.total_output_token_received += received_output_tokens;
-
-    if drip_position.drip_amount_filled == drip_position.drip_amount {
-        drip_position.drip_activation_timestamp =
-            drip_position.get_next_drip_activation_timestamp()?;
-        drip_position.drip_amount = 0;
-    }
-
-    // Refund lamports to refund_destination
-    **refund_destination.lamports.borrow_mut() =
-        refund_destination.lamports() + ephemeral_drip_state.to_account_info().lamports();
-    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
-
     // TODO(#101): Support auto-credit flow (not critical, skipping for now)
+
+    /* POST CPI VERIFICATION */
+    /* POST CPI STATE UPDATES (EFFECTS) */
+
     Ok(())
 }
 
