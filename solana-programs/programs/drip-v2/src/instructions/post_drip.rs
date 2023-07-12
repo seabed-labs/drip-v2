@@ -81,17 +81,98 @@ pub struct PostDrip<'info> {
 }
 
 pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
-    let global_config = &ctx.accounts.global_config;
-    let signer = &ctx.accounts.signer;
-    let drip_position = &ctx.accounts.drip_position;
-    let pair_config = &ctx.accounts.pair_config;
-    let ephemeral_drip_state = &ctx.accounts.ephemeral_drip_state;
-    let drip_position_input_token_account = &ctx.accounts.drip_position_input_token_account;
-    let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
-    let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
-    let output_token_fee_account = &ctx.accounts.output_token_fee_account;
-
+    validate_account_relations(&ctx)?;
     validate_pre_drip_ix_present(&ctx)?;
+
+    let received_output_tokens = ctx.accounts.drip_position_output_token_account.amount
+        - ctx
+            .accounts
+            .ephemeral_drip_state
+            .output_token_account_balance_pre_drip_snapshot;
+
+    require!(
+        received_output_tokens > 0,
+        DripError::ExpectedNonZeroOutputPostDrip
+    );
+
+    require!(
+        received_output_tokens >= ctx.accounts.ephemeral_drip_state.minimum_output_expected,
+        DripError::ExceededSlippage
+    );
+
+    validate_price_constraints(
+        &ctx,
+        received_output_tokens,
+        ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
+    )?;
+
+    let drip_position = &mut ctx.accounts.drip_position;
+    let drip_position_signer = &ctx.accounts.drip_position_signer;
+    let pair_config = &ctx.accounts.pair_config;
+    let output_token_fee_account = &ctx.accounts.output_token_fee_account;
+    let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
+    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
+    let refund_destination = &mut ctx.accounts.refund_destination;
+    let token_program = &ctx.accounts.token_program;
+
+    let output_token_fee_amount = {
+        let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
+        let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
+        let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
+        let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
+        (received_output_tokens * output_drip_fee_bps) / 10_000
+    };
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            Transfer {
+                from: drip_position_output_token_account.to_account_info(),
+                to: output_token_fee_account.to_account_info(),
+                authority: drip_position_signer.to_account_info(),
+            },
+            &[&[
+                b"drip-v2-drip-position-signer".as_ref(),
+                drip_position.key().as_ref(),
+                &[drip_position_signer.bump],
+            ]],
+        ),
+        output_token_fee_amount,
+    )?;
+
+    drip_position.drip_amount_filled += ephemeral_drip_state.pre_fees_partial_drip_amount;
+    drip_position.total_input_token_dripped += ephemeral_drip_state.pre_fees_partial_drip_amount;
+    drip_position.total_output_token_received += received_output_tokens;
+
+    if drip_position.drip_amount_filled == drip_position.drip_amount {
+        drip_position.drip_activation_timestamp =
+            drip_position.get_next_drip_activation_timestamp()?;
+        drip_position.drip_amount = 0;
+    }
+
+    // Refund lamports to refund_destination
+    **refund_destination.lamports.borrow_mut() =
+        refund_destination.lamports() + ephemeral_drip_state.to_account_info().lamports();
+    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
+
+    // TODO(#101): Support auto-credit flow (not critical, skipping for now)
+    Ok(())
+}
+
+fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
+    let PostDrip {
+        signer,
+        global_config,
+        pair_config,
+        drip_position,
+        drip_position_signer,
+        drip_position_input_token_account,
+        drip_position_output_token_account,
+        dripper_input_token_account,
+        output_token_fee_account,
+        ephemeral_drip_state,
+        ..
+    } = &ctx.accounts;
 
     require!(
         signer.is_authorized(global_config, AdminPermission::Drip),
@@ -111,13 +192,18 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     );
 
     require!(
-        pair_config.global_config.eq(&global_config.key()),
-        DripError::GlobalConfigMismatch
+        drip_position_signer.drip_position.eq(&drip_position.key()),
+        DripError::DripPositionSignerMismatch
     );
 
     require!(
         ephemeral_drip_state.drip_position.eq(&drip_position.key()),
         DripError::EphemeralDripStateDripPositionMismatch
+    );
+
+    require!(
+        pair_config.global_config.eq(&global_config.key()),
+        DripError::GlobalConfigMismatch
     );
 
     require!(
@@ -145,90 +231,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             .eq(&global_config.global_config_signer.key()),
         DripError::UnexpectedFeeTokenAccount
     );
-
-    let received_output_tokens = drip_position_output_token_account.amount
-        - ctx
-            .accounts
-            .ephemeral_drip_state
-            .output_token_account_balance_pre_drip_snapshot;
-
-    require!(
-        received_output_tokens > 0,
-        DripError::ExpectedNonZeroOutputPostDrip
-    );
-
-    require!(
-        received_output_tokens >= ctx.accounts.ephemeral_drip_state.minimum_output_expected,
-        DripError::ExceededSlippage
-    );
-
-    validate_price_constraints(
-        &ctx,
-        received_output_tokens,
-        ctx.accounts.ephemeral_drip_state.dripped_input_tokens,
-    )?;
-
-    let output_token_fee_amount = {
-        let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
-        let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
-        let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
-        let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
-        (received_output_tokens * output_drip_fee_bps) / 10_000
-    };
-
-    let token_program = &ctx.accounts.token_program;
-    let drip_position_signer = &ctx.accounts.drip_position_signer;
-    let drip_position = &mut ctx.accounts.drip_position;
-
-    token::transfer(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            Transfer {
-                from: drip_position_output_token_account.to_account_info(),
-                to: output_token_fee_account.to_account_info(),
-                authority: drip_position_signer.to_account_info(),
-            },
-            &[&[
-                b"drip-v2-drip-position-signer".as_ref(),
-                drip_position.key().as_ref(),
-                &[drip_position_signer.bump],
-            ]],
-        ),
-        output_token_fee_amount,
-    )?;
-
-    drip_position.drip_amount_filled += ctx
-        .accounts
-        .ephemeral_drip_state
-        .pre_fees_partial_drip_amount;
-    drip_position.total_input_token_dripped += ctx
-        .accounts
-        .ephemeral_drip_state
-        .pre_fees_partial_drip_amount;
-    drip_position.total_output_token_received += received_output_tokens;
-
-    if drip_position.drip_amount_filled == drip_position.drip_amount {
-        drip_position.drip_activation_timestamp =
-            drip_position.get_next_drip_activation_timestamp()?;
-        drip_position.drip_amount = 0;
-    }
-
-    let ephemeral_drip_state_lamports = &ctx
-        .accounts
-        .ephemeral_drip_state
-        .to_account_info()
-        .lamports();
-    let refund_destination_lamports = &ctx.accounts.refund_destination.to_account_info().lamports();
-    let refund_destination_new_lamports =
-        refund_destination_lamports + ephemeral_drip_state_lamports;
-
-    // close ephemeral state account and refund lamports to refund_destination
-    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
-    let refund_destination = &mut ctx.accounts.refund_destination;
-    **refund_destination.lamports.borrow_mut() = refund_destination_new_lamports;
-    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
-
-    // TODO(#101): Support auto-credit flow (not critical, skipping for now)
     Ok(())
 }
 
