@@ -15,7 +15,8 @@ use crate::{
 // NOTE: When changing this struct, also change validation in pre-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PostDrip<'info> {
-    pub signer: Signer<'info>,
+    // This signer must have the `AdminPermission::Drip` in the global_config referenced in this ix.
+    pub drip_authority: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
@@ -57,7 +58,7 @@ pub struct PostDrip<'info> {
         ],
         bump = ephemeral_drip_state.bump,
         has_one = drip_position @ DripError::EphemeralDripStateDripPositionMismatch,
-        close = signer
+        close = drip_authority
     )]
     pub ephemeral_drip_state: Box<Account<'info, EphemeralDripState>>,
 
@@ -79,6 +80,18 @@ pub struct PostDrip<'info> {
 
 pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     /* Validation */
+
+    require!(
+        ctx.accounts
+            .drip_authority
+            .is_authorized(&ctx.accounts.global_config, AdminPermission::Drip),
+        DripError::OperationUnauthorized
+    );
+
+    require!(
+        ctx.accounts.drip_position.is_activated()?,
+        DripError::DripNotActivated
+    );
 
     validate_account_relations(&ctx)?;
 
@@ -163,7 +176,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
 
 fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
     let PostDrip {
-        signer,
+        drip_authority: signer,
         global_config,
         pair_config,
         drip_position,
@@ -175,13 +188,6 @@ fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
         ephemeral_drip_state,
         ..
     } = &ctx.accounts;
-
-    require!(
-        signer.is_authorized(global_config, AdminPermission::Drip),
-        DripError::OperationUnauthorized
-    );
-
-    require!(drip_position.is_activated()?, DripError::DripNotActivated);
 
     require!(
         drip_position.global_config.eq(&global_config.key()),
@@ -259,7 +265,7 @@ fn validate_pre_drip_ix_present(ctx: &Context<PostDrip>) -> Result<()> {
 
             if actual_discriminator.eq(expected_discrimator) {
                 let pre_drip_accounts_match_expectation = {
-                    ctx.accounts.signer.key().eq(&ix.accounts[0].pubkey)
+                    ctx.accounts.drip_authority.key().eq(&ix.accounts[0].pubkey)
                         && ctx.accounts.global_config.key().eq(&ix.accounts[1].pubkey)
                         && ctx.accounts.pair_config.key().eq(&ix.accounts[3].pubkey)
                         && ctx.accounts.drip_position.key().eq(&ix.accounts[4].pubkey)
