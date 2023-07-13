@@ -106,7 +106,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
     /* STATE UPDATES (EFFECTS) */
     let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
-    let drip_position_input_token_account = &mut ctx.accounts.dripper_input_token_account;
+    let drip_position_input_token_account = &mut ctx.accounts.drip_position_input_token_account;
 
     let drip_position = &ctx.accounts.drip_position;
     let drip_position_signer = &ctx.accounts.drip_position_signer;
@@ -193,8 +193,6 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
         drip_position_output_token_account,
         dripper_input_token_account,
         input_token_fee_account,
-        token_program,
-        ephemeral_drip_state,
         ..
     } = &ctx.accounts;
 
@@ -218,6 +216,11 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
     require!(
         drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
+    );
+
+    require!(
+        drip_position_signer.drip_position.eq(&drip_position.key()),
+        DripError::DripPositionSignerMismatch
     );
 
     require!(

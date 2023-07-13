@@ -628,20 +628,6 @@ components:
             enum:
                 - confirmed
                 - finalized
-        types.EphemeralDripStateJSON:
-            properties:
-                outputTokenAccountBalancePreDripSnapshot:
-                    type: string
-                currentPreFeesPartialDripAmount:
-                    type: string
-                minimumOutputExpected:
-                    type: string
-            required:
-                - outputTokenAccountBalancePreDripSnapshot
-                - currentPreFeesPartialDripAmount
-                - minimumOutputExpected
-            type: object
-            additionalProperties: false
         Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__:
             properties:
                 globalConfig:
@@ -678,11 +664,6 @@ components:
                     type: string
                 dripActivationTimestamp:
                     type: string
-                ephemeralDripState:
-                    allOf:
-                        -
-                            $ref: '#/components/schemas/types.EphemeralDripStateJSON'
-                    nullable: true
             required:
                 - globalConfig
                 - dripFeeBps
@@ -700,7 +681,6 @@ components:
                 - dripMaxJitter
                 - dripActivationGenesisShift
                 - dripActivationTimestamp
-                - ephemeralDripState
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
         Omit_DripPositionJSON.owner_:

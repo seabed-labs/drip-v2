@@ -151,7 +151,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            18
+            17
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -187,7 +187,6 @@ describe('SDK - createPosition', () => {
             //       For now we should just unit test this instead
             // dripActivationGenesisShift: '0',
             // dripActivationTimestamp: '0',
-            ephemeralDripState: null,
         });
 
         expect(
@@ -277,7 +276,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            18
+            17
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -313,7 +312,6 @@ describe('SDK - createPosition', () => {
             //       For now we should just unit test this instead
             // dripActivationGenesisShift: '0',
             // dripActivationTimestamp: '0',
-            ephemeralDripState: null,
         });
 
         expect(

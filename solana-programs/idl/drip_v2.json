@@ -830,6 +830,11 @@
           "isSigner": true
         },
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "globalConfig",
           "isMut": false,
           "isSigner": false
@@ -903,6 +908,26 @@
           ]
         },
         {
+          "name": "ephemeralDripState",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-ephemeral-drip-state"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          }
+        },
+        {
           "name": "dripPositionInputTokenAccount",
           "isMut": true,
           "isSigner": false
@@ -926,6 +951,11 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -944,6 +974,11 @@
           "name": "signer",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "refundDestination",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "globalConfig",
@@ -1005,6 +1040,29 @@
                 "kind": "const",
                 "type": "string",
                 "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "ephemeralDripState",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-ephemeral-drip-state"
               },
               {
                 "kind": "account",
@@ -1124,14 +1182,6 @@
           {
             "name": "dripActivationTimestamp",
             "type": "i64"
-          },
-          {
-            "name": "ephemeralDripState",
-            "type": {
-              "option": {
-                "defined": "EphemeralDripState"
-              }
-            }
           }
         ]
       }
@@ -1176,6 +1226,42 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EphemeralDripState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "dripPosition",
+            "type": "publicKey"
+          },
+          {
+            "name": "outputTokenAccountBalancePreDripSnapshot",
+            "type": "u64"
+          },
+          {
+            "name": "minimumOutputExpected",
+            "type": "u64"
+          },
+          {
+            "name": "preFeesPartialDripAmount",
+            "type": "u64"
+          },
+          {
+            "name": "drippedInputTokens",
+            "type": "u64"
           }
         ]
       }
@@ -1421,26 +1507,6 @@
           },
           {
             "name": "withdrawOutputAmount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "EphemeralDripState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "outputTokenAccountBalancePreDripSnapshot",
-            "type": "u64"
-          },
-          {
-            "name": "currentPreFeesPartialDripAmount",
-            "type": "u64"
-          },
-          {
-            "name": "minimumOutputExpected",
             "type": "u64"
           }
         ]
@@ -1741,6 +1807,11 @@
       "code": 6038,
       "name": "ExceededSlippage",
       "msg": "Exceeds slippages"
+    },
+    {
+      "code": 6039,
+      "name": "EphemeralDripStateDripPositionMismatch",
+      "msg": "Ephemeral drip state and drip position mismatch"
     }
   ]
 }
