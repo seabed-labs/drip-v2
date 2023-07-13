@@ -17,9 +17,6 @@ use crate::{
 pub struct PostDrip<'info> {
     pub signer: Signer<'info>,
 
-    /// CHECK: No checks needed for refund destination
-    pub refund_destination: AccountInfo<'info>,
-
     pub global_config: Box<Account<'info, GlobalConfig>>,
 
     #[account(mut)]
@@ -60,7 +57,7 @@ pub struct PostDrip<'info> {
         ],
         bump = ephemeral_drip_state.bump,
         has_one = drip_position @ DripError::EphemeralDripStateDripPositionMismatch,
-        close = refund_destination
+        close = signer
     )]
     pub ephemeral_drip_state: Box<Account<'info, EphemeralDripState>>,
 
@@ -113,7 +110,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
 
     let drip_position = &mut ctx.accounts.drip_position;
     let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
-    let refund_destination = &mut ctx.accounts.refund_destination;
 
     let drip_position_signer = &ctx.accounts.drip_position_signer;
     let pair_config = &ctx.accounts.pair_config;
@@ -264,36 +260,36 @@ fn validate_pre_drip_ix_present(ctx: &Context<PostDrip>) -> Result<()> {
             if actual_discriminator.eq(expected_discrimator) {
                 let pre_drip_accounts_match_expectation = {
                     ctx.accounts.signer.key().eq(&ix.accounts[0].pubkey)
-                        && ctx.accounts.global_config.key().eq(&ix.accounts[2].pubkey)
-                        && ctx.accounts.pair_config.key().eq(&ix.accounts[4].pubkey)
-                        && ctx.accounts.drip_position.key().eq(&ix.accounts[5].pubkey)
+                        && ctx.accounts.global_config.key().eq(&ix.accounts[1].pubkey)
+                        && ctx.accounts.pair_config.key().eq(&ix.accounts[3].pubkey)
+                        && ctx.accounts.drip_position.key().eq(&ix.accounts[4].pubkey)
                         && ctx
                             .accounts
                             .drip_position_signer
                             .key()
-                            .eq(&ix.accounts[6].pubkey)
+                            .eq(&ix.accounts[5].pubkey)
                         && ctx
                             .accounts
                             .ephemeral_drip_state
                             .key()
-                            .eq(&ix.accounts[7].pubkey)
+                            .eq(&ix.accounts[6].pubkey)
                         && ctx
                             .accounts
                             .drip_position_input_token_account
                             .key()
-                            .eq(&ix.accounts[8].pubkey)
+                            .eq(&ix.accounts[7].pubkey)
                         && ctx
                             .accounts
                             .drip_position_output_token_account
                             .key()
-                            .eq(&ix.accounts[9].pubkey)
+                            .eq(&ix.accounts[8].pubkey)
                         && ctx
                             .accounts
                             .dripper_input_token_account
                             .key()
-                            .eq(&ix.accounts[10].pubkey)
-                        && ctx.accounts.instructions.key().eq(&ix.accounts[11].pubkey)
-                        && ctx.accounts.token_program.key().eq(&ix.accounts[12].pubkey)
+                            .eq(&ix.accounts[9].pubkey)
+                        && ctx.accounts.instructions.key().eq(&ix.accounts[10].pubkey)
+                        && ctx.accounts.token_program.key().eq(&ix.accounts[11].pubkey)
                 };
 
                 if pre_drip_accounts_match_expectation {
