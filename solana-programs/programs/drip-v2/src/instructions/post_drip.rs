@@ -139,11 +139,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         drip_position.drip_amount = 0;
     }
 
-    // Refund lamports to refund_destination
-    **refund_destination.lamports.borrow_mut() =
-        refund_destination.lamports() + ephemeral_drip_state.to_account_info().lamports();
-    **ephemeral_drip_state.to_account_info().lamports.borrow_mut() = 0;
-
     /* MANUAL CPI (INTERACTIONS) */
 
     token::transfer(
