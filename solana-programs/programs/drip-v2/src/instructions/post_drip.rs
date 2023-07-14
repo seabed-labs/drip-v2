@@ -128,7 +128,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     );
 
     let dripper_received_output_tokens = dripper_output_token_account.amount
-        - ephemeral_drip_state.drip_position_output_token_account_balance_pre_drip_balance;
+        - ephemeral_drip_state.dripper_output_token_account_balance_pre_drip_balance;
 
     require!(
         dripper_received_output_tokens > 0,
@@ -164,7 +164,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     if drip_position.drip_amount_filled == drip_position.drip_amount {
         drip_position.drip_activation_timestamp =
             drip_position.get_next_drip_activation_timestamp()?;
-        drip_position.drip_amount = 0;
+        drip_position.drip_amount_filled = 0;
     }
 
     /* MANUAL CPI (INTERACTIONS) */
