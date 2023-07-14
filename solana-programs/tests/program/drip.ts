@@ -15,12 +15,18 @@ import {
     createAssociatedTokenAccount, createBurnInstruction,
     getAssociatedTokenAddress,
 } from "@solana/spl-token-0-3-8";
-import {expect} from "chai";
+import {assert, expect} from "chai";
+import {Accounts} from '@dcaf/drip-types';
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 describe.only('Program - drip (pre/post)', () => {
     setProvider(AnchorProvider.env());
     const program = workspace.DripV2 as Program<DripV2>;
     const provider = getProvider() as AnchorProvider;
-
+    // useful for debugging, but changes the error response from hex to number
+    // provider.opts.skipPreflight = true;
 
     let superAdminKeypair: Keypair;
     let mintAuthority: Keypair;
@@ -41,8 +47,6 @@ describe.only('Program - drip (pre/post)', () => {
 
     let inputTokenFeeAccountPublicKey: PublicKey;
     let outputTokenFeeAccountPublicKey: PublicKey;
-
-    const dripAmount = new BN(1_000_000);
 
     beforeEach(async () => {
         dripAuthorityKeypair = new Keypair();
@@ -218,7 +222,7 @@ describe.only('Program - drip (pre/post)', () => {
         await program.methods
             .initDripPosition({
                 owner: positionOwnerKeypair.publicKey,
-                dripAmount: new BN(dripAmount),
+                dripAmount: new BN(1_000_000),
                 frequencyInSeconds: new BN(1),
             })
             .accounts({
@@ -276,12 +280,14 @@ describe.only('Program - drip (pre/post)', () => {
             feePayer: provider.publicKey,
             recentBlockhash: (await provider.connection.getRecentBlockhash()).blockhash,
         }).add(preDripIx);
-        // tx.sign(dripAuthorityKeypair);
+
         await expect(provider.sendAndConfirm(tx)).to.eventually.be.rejectedWith(/0x1774/);
     });
 
     it('should fail if post_drip is not in the same transaction', async () => {
-        await mintTo(provider.connection,mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, BigInt(dripAmount.muln(3).toString()));
+        const dripPosition = await Accounts.DripPosition.fetch(provider.connection, dripPositionPublicKey, program.programId);
+        assert(dripPosition);
+        await mintTo(provider.connection,mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, dripPosition.dripAmount);
         const preDripIx = await program.methods
             .preDrip({
                 minimumOutputTokensExpected: new BN(
@@ -315,7 +321,9 @@ describe.only('Program - drip (pre/post)', () => {
     });
 
     it('should fail if no output tokens are received', async () => {
-        await mintTo(provider.connection,mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, BigInt(dripAmount.muln(3).toString()));
+        const dripPosition = await Accounts.DripPosition.fetch(provider.connection, dripPositionPublicKey, program.programId);
+        assert(dripPosition);
+        await mintTo(provider.connection,mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, dripPosition.dripAmount);
         const commonAccounts = {
             dripAuthority: dripAuthorityKeypair.publicKey,
             globalConfig: globalConfigPublicKey,
@@ -356,56 +364,83 @@ describe.only('Program - drip (pre/post)', () => {
         tx.sign(dripAuthorityKeypair);
         await expect(sendAndConfirmTransaction(provider.connection, tx, [dripAuthorityKeypair])).to.eventually.be.rejectedWith(/0x1795/);
     });
+    
+    [1,2,3].forEach((dripCount) => {
+        it(`should drip ${dripCount} times with the full drip amount each time`, async () => {
 
-    it('should drip once', async () => {
-        // TODO: Derive this
-        const input_token_fee_amount = new BN(dripAmount.muln( 100).divn(10_000));
-        await mintTo(provider.connection,mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, BigInt(dripAmount.muln(3).toString()));
-        const commonAccounts = {
-            dripAuthority: dripAuthorityKeypair.publicKey,
-            globalConfig: globalConfigPublicKey,
-            pairConfig: pairConfigPublicKey,
-            dripPosition: dripPositionPublicKey,
-            ephemeralDripState: ephemeralDripStatePublicKey,
-            dripPositionInputTokenAccount: dripPositionInputTokenAccountPublicKey,
-            dripPositionOutputTokenAccount: dripPositionOutputTokenAccountPublicKey,
-            dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-            dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-        }
-        const preDripIx = await program.methods
-            .preDrip({
-                minimumOutputTokensExpected: new BN(
-                    500_000,
-                ),
-            })
-            .accounts({
-                ...commonAccounts,
-                inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .instruction();
-        const swapIxs = [
-            createBurnInstruction(dripperInputTokenAccountPublicKey, inputMintPublicKey, dripAuthorityKeypair.publicKey, BigInt(dripAmount.sub(input_token_fee_amount).toString())),
-            createMintToInstruction(outputMintPublicKey, dripperOutputTokenAccountPublicKey, mintAuthority.publicKey, BigInt(dripAmount.divn(2).toString())),
-        ];
-        const postDripIx = await program.methods
-            .postDrip()
-            .accounts({
-                ...commonAccounts,
-                outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
-            })
-            .instruction();
+            const dripPositionBefore = await Accounts.DripPosition.fetch(provider.connection, dripPositionPublicKey, program.programId);
+            assert(dripPositionBefore);
+            const dripAmountBefore = BigInt(dripPositionBefore.dripAmount);
+            const dripAmountFilledBefore = (dripPositionBefore.dripAmountFilled);
 
-        const tx = new Transaction({
-            feePayer: dripAuthorityKeypair.publicKey,
-            recentBlockhash: (await provider.connection.getRecentBlockhash()).blockhash,
-        }).add(preDripIx, ...swapIxs, postDripIx);
-        tx.sign(dripAuthorityKeypair, mintAuthority);
+            const input_token_fee_amount = dripAmountBefore * BigInt(100) / BigInt(10_000);
+            const depositAmount = dripAmountBefore * BigInt(dripCount);
+            const outputReceiveAmount = dripAmountBefore / BigInt(2);
+            await mintTo(provider.connection, mintAuthority, inputMintPublicKey, dripPositionInputTokenAccountPublicKey, mintAuthority, depositAmount);
+            const commonAccounts = {
+                dripAuthority: dripAuthorityKeypair.publicKey,
+                globalConfig: globalConfigPublicKey,
+                pairConfig: pairConfigPublicKey,
+                dripPosition: dripPositionPublicKey,
+                ephemeralDripState: ephemeralDripStatePublicKey,
+                dripPositionInputTokenAccount: dripPositionInputTokenAccountPublicKey,
+                dripPositionOutputTokenAccount: dripPositionOutputTokenAccountPublicKey,
+                dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
+                dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
+                instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+                tokenProgram: TOKEN_PROGRAM_ID,
+            }
+            for (let i = 0; i < dripCount; i++) {
+                const [positionInputBalanceBefore, positionOutputBalanceBefore, dripperInputBalanceBefore, dripperOutputBalanceBefore] = await Promise.all([
+                    provider.connection.getTokenAccountBalance(dripPositionInputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripPositionOutputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripperInputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripperOutputTokenAccountPublicKey),
+                ]);
+                const preDripIx = await program.methods
+                    .preDrip({
+                        minimumOutputTokensExpected: new BN(
+                            outputReceiveAmount.toString(),
+                        ),
+                    })
+                    .accounts({
+                        ...commonAccounts,
+                        inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
+                        systemProgram: SystemProgram.programId,
+                    })
+                    .instruction();
+                const swapIxs = [
+                    createBurnInstruction(dripperInputTokenAccountPublicKey, inputMintPublicKey, dripAuthorityKeypair.publicKey, dripAmountBefore - input_token_fee_amount),
+                    createMintToInstruction(outputMintPublicKey, dripperOutputTokenAccountPublicKey, mintAuthority.publicKey, outputReceiveAmount),
+                ];
+                const postDripIx = await program.methods
+                    .postDrip()
+                    .accounts({
+                        ...commonAccounts,
+                        outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
+                    })
+                    .instruction();
 
-        await sendAndConfirmTransaction(provider.connection, tx, [dripAuthorityKeypair, mintAuthority]);
+                const tx = new Transaction({
+                    feePayer: dripAuthorityKeypair.publicKey,
+                    recentBlockhash: (await provider.connection.getRecentBlockhash()).blockhash,
+                }).add(preDripIx, ...swapIxs, postDripIx);
+                tx.sign(dripAuthorityKeypair, mintAuthority);
 
-        // TODO: confirm all token account balances after drip
+                await sendAndConfirmTransaction(provider.connection, tx, [dripAuthorityKeypair, mintAuthority]);
+
+                const [positionInputBalanceAfter, positionOutputBalanceAfter, dripperInputBalanceAfter, dripperOutputBalanceAfter] = await Promise.all([
+                    provider.connection.getTokenAccountBalance(dripPositionInputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripPositionOutputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripperInputTokenAccountPublicKey),
+                    provider.connection.getTokenAccountBalance(dripperOutputTokenAccountPublicKey),
+                ]);
+
+                expect(BigInt(positionInputBalanceAfter.value.amount)).to.equal(BigInt(positionInputBalanceBefore.value.amount) - dripAmountBefore);
+                expect(BigInt(positionOutputBalanceAfter.value.amount)).to.equal(BigInt(positionOutputBalanceBefore.value.amount) + outputReceiveAmount);
+                await delay(Number(dripPositionBefore.frequencyInSeconds) + 500);
+            }
+        });
     });
+
 });
