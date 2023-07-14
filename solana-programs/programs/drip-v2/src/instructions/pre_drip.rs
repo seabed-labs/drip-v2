@@ -75,7 +75,9 @@ pub struct PreDrip<'info> {
     pub token_program: Program<'info, Token>,
 
     /// Accounts not in common with post_drip
-
+    
+    ///
+    // This account must be owned by the gobal_config.global_config_signer.
     #[account(mut)]
     pub input_token_fee_account: Box<Account<'info, TokenAccount>>,
 

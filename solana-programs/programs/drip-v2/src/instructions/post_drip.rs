@@ -70,6 +70,8 @@ pub struct PostDrip<'info> {
 
     /// Accounts not in common with pre_drip
 
+    ///
+    // This account must be owned by the gobal_config.global_config_signer.
     #[account(mut)]
     pub output_token_fee_account: Box<Account<'info, TokenAccount>>,
 }
