@@ -86,8 +86,9 @@ pub enum DripError {
     #[msg("Cannot find post-drip IX")]
     CannotFindPostDripIx, // 6027 or 0x178B
 
-    #[msg("Invalid dripper input token account")]
-    InvalidDripperInputTokenAccount, // 6028 or 0x178C
+    // Error not used, can re-use
+    #[msg("Dripper input token account balance smaller than expected")]
+    DripperInputTokenAccountBalanceSmallerThanExpected, // 6028 or 0x178C
 
     #[msg("Drip already in progress")]
     DripAlreadyInProgress, // 6029 or 0x178D
@@ -121,4 +122,7 @@ pub enum DripError {
 
     #[msg("Ephemeral drip state and drip position mismatch")]
     EphemeralDripStateDripPositionMismatch, // 6039 or 0x1797
+
+    #[msg("Expected non-zero used_input_amount post-drip")]
+    ExpectedNonZeroInputPostDrip, // 6037 or 0x1795
 }

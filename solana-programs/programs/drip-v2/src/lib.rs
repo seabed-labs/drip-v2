@@ -1,3 +1,4 @@
+mod common;
 pub mod errors;
 pub mod instructions;
 pub mod state;
