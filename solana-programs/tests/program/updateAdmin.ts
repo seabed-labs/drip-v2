@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Program } from '@coral-xyz/anchor';
+import {AnchorProvider, Program} from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
 import { expect } from 'chai';
 import '../setup';
@@ -123,6 +123,7 @@ describe('Program - updateAdmin', () => {
     });
 
     it('can give drip permissions to an existing admin', async () => {
+        const provider = anchor.getProvider() as AnchorProvider;
         const newAdminPubkey = PublicKey.unique();
 
         const globalConfigAccountBefore =
@@ -179,10 +180,10 @@ describe('Program - updateAdmin', () => {
         tx.recentBlockhash = (
             await program.provider.connection.getLatestBlockhash()
         ).blockhash;
-        tx.feePayer = anchor.getProvider().publicKey;
+        tx.feePayer = provider.publicKey;
         tx.partialSign(superAdminKeypair);
 
-        await anchor.getProvider().sendAndConfirm(tx);
+        await provider.sendAndConfirm(tx);
 
         const globalConfigAccountAfter =
             await program.account.globalConfig.fetch(globalConfigPubkey);
