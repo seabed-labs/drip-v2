@@ -86,7 +86,6 @@ pub enum DripError {
     #[msg("Cannot find post-drip IX")]
     CannotFindPostDripIx, // 6027 or 0x178B
 
-    // Error not used, can re-use
     #[msg("Dripper input token account balance smaller than expected")]
     DripperInputTokenAccountBalanceSmallerThanExpected, // 6028 or 0x178C
 
@@ -124,5 +123,11 @@ pub enum DripError {
     EphemeralDripStateDripPositionMismatch, // 6039 or 0x1797
 
     #[msg("Expected non-zero used_input_amount post-drip")]
-    ExpectedNonZeroInputPostDrip, // 6037 or 0x1795
+    ExpectedNonZeroInputPostDrip, // 6037 or 0x1798
+
+    #[msg("Expected non-zero input/output drip fees")]
+    ExpectedNonZeroDripFees, // 6038 or 0x1799
+
+    #[msg("Input drip fees larger then reserved")]
+    InputFeesLargerThanReserved, // 6038 or 0x1799
 }

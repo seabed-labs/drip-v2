@@ -3,7 +3,7 @@ use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use solana_program::sysvar::{instructions::get_instruction_relative, SysvarId};
 
 use crate::common::validation::pre_drip_post_drip_have_expected_accounts;
-use crate::state::EphemeralDripState;
+use crate::state::{DripPositionSigner, EphemeralDripState};
 use crate::{
     errors::DripError,
     instruction::PreDrip,
@@ -13,9 +13,6 @@ use crate::{
 // NOTE: When changing this struct, also change validation in pre-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PostDrip<'info> {
-    /// Accounts common with pre_drip
-
-    ///
     // This signer must have the `AdminPermission::Drip` in the global_config referenced in this ix.
     // This signer must have delegate access to the dripper input/output token accounts if they exist.
     pub drip_authority: Signer<'info>,
@@ -35,6 +32,16 @@ pub struct PostDrip<'info> {
 
     #[account(mut)]
     pub drip_position: Box<Account<'info, DripPosition>>,
+
+    #[account(
+        seeds = [
+            b"drip-v2-drip-position-signer",
+            drip_position.key().as_ref(),
+        ],
+        bump = drip_position_signer.bump,
+        has_one = drip_position @ DripError::DripPositionSignerMismatch
+    )]
+    pub drip_position_signer: Account<'info, DripPositionSigner>,
 
     // This account is expected to have been created in the pre_drip instruction.
     #[account(
@@ -69,8 +76,11 @@ pub struct PostDrip<'info> {
     pub token_program: Program<'info, Token>,
 
     /// Accounts not in common with pre_drip
-
     ///
+    // This account must be owned by the gobal_config.global_config_signer.
+    #[account(mut)]
+    pub input_token_fee_account: Box<Account<'info, TokenAccount>>,
+
     // This account must be owned by the gobal_config.global_config_signer.
     #[account(mut)]
     pub output_token_fee_account: Box<Account<'info, TokenAccount>>,
@@ -81,7 +91,9 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let global_config = &ctx.accounts.global_config;
     let drip_authority = &ctx.accounts.drip_authority;
     let drip_position = &ctx.accounts.drip_position;
+    let drip_position_signer = &ctx.accounts.drip_position_signer;
     let ephemeral_drip_state = &ctx.accounts.ephemeral_drip_state;
+    let input_token_fee_account = &ctx.accounts.input_token_fee_account;
     let output_token_fee_account = &ctx.accounts.output_token_fee_account;
     let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
     let dripper_output_token_account = &ctx.accounts.dripper_output_token_account;
@@ -119,13 +131,27 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let position_drip_amount_used =
         ephemeral_drip_state.input_transferred_to_dripper - unused_input_token_amount;
 
-    let position_drip_amount_filled_with_fees =
-        ephemeral_drip_state.input_transferred_to_fee_account + position_drip_amount_used;
+    // ex.
+    // dripAmount = 100
+    // input_drip_fees_bps = 1000
+    // position_drip_amount_used = 80
+    // actual fees = position_drip_amount_used * (input_drip_fees_bps/10_000) / ((10_000 - input_drip_fees_bps)/10_000)
+    // = position_drip_amount_used * input_drip_fees_bps / (10_000-input_drip_fees_bps)
+    // = 80 * 1000 / 9_000 = 80_000 / 9_000 = 8.8 => 8
+    let input_token_amount_to_send_to_fee_account = (position_drip_amount_used
+        * ephemeral_drip_state.input_drip_fees_bps)
+        / (10_000 - ephemeral_drip_state.input_drip_fees_bps);
 
     require!(
-        position_drip_amount_filled_with_fees > 0,
-        DripError::ExpectedNonZeroInputPostDrip
+        input_token_amount_to_send_to_fee_account <= ephemeral_drip_state.input_reserved_for_fees,
+        DripError::InputFeesLargerThanReserved
     );
+
+    let position_drip_amount_filled_with_fees =
+        position_drip_amount_used + input_token_amount_to_send_to_fee_account;
+
+    // TODO: do we want to verify that user input tokens are used in swap?
+    // Edge case: drip amount or so small or drip fee so high that the only amount used is the input fee
 
     let dripper_received_output_tokens = dripper_output_token_account.amount
         - ephemeral_drip_state.dripper_output_token_account_balance_pre_drip_balance;
@@ -152,14 +178,23 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let output_token_amount_to_send_to_position =
         dripper_received_output_tokens - output_token_amount_to_send_to_fee_account;
 
+    require!(
+        input_token_amount_to_send_to_fee_account + output_token_amount_to_send_to_fee_account != 0,
+        DripError::ExpectedNonZeroDripFees
+    );
+
     /* STATE UPDATES (EFFECTS) */
 
     let drip_position = &mut ctx.accounts.drip_position;
 
-    // all totals are before protocol fees
     drip_position.drip_amount_filled += position_drip_amount_filled_with_fees;
     drip_position.total_input_token_dripped += position_drip_amount_filled_with_fees;
     drip_position.total_output_token_received += dripper_received_output_tokens;
+    // TODO: would it be better to "commit" the position data in pre_drip since that's when it was transferred?
+    // I think its better to keep all drip state updates isolated to the min # of ixs
+    // we can move input fee transfer to post_drip as well to keep state consistent.
+    drip_position.total_input_fees_collected += input_token_amount_to_send_to_fee_account;
+    drip_position.total_output_fees_collected += output_token_amount_to_send_to_fee_account;
 
     if drip_position.drip_amount_filled == drip_position.drip_amount {
         drip_position.drip_activation_timestamp =
@@ -214,6 +249,25 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             output_token_amount_to_send_to_fee_account,
         )?;
     }
+
+    if input_token_amount_to_send_to_fee_account != 0 {
+        token::transfer(
+            CpiContext::new_with_signer(
+                token_program.to_account_info(),
+                Transfer {
+                    from: drip_position_input_token_account.to_account_info(),
+                    to: input_token_fee_account.to_account_info(),
+                    authority: drip_position_signer.to_account_info(),
+                },
+                &[&[
+                    b"drip-v2-drip-position-signer".as_ref(),
+                    drip_position.key().as_ref(),
+                    &[drip_position_signer.bump],
+                ]],
+            ),
+            input_token_amount_to_send_to_fee_account,
+        )?;
+    }
     // TODO(#101): Support auto-credit flow (not critical, skipping for now)
 
     /* POST CPI VERIFICATION */
@@ -227,8 +281,10 @@ fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
         global_config,
         pair_config,
         drip_position,
+        drip_position_signer,
         drip_position_input_token_account,
         drip_position_output_token_account,
+        input_token_fee_account,
         output_token_fee_account,
         ephemeral_drip_state,
         ..
@@ -242,6 +298,11 @@ fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
     require!(
         drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
+    );
+
+    require!(
+        drip_position_signer.drip_position.eq(&drip_position.key()),
+        DripError::DripPositionSignerMismatch
     );
 
     require!(
@@ -266,6 +327,13 @@ fn validate_account_relations(ctx: &Context<PostDrip>) -> Result<()> {
             .key()
             .eq(&drip_position.output_token_account),
         DripError::UnexpectedDripPositionOutputTokenAccount
+    );
+
+    require!(
+        input_token_fee_account
+            .owner
+            .eq(&global_config.global_config_signer.key()),
+        DripError::UnexpectedFeeTokenAccount
     );
 
     require!(

@@ -18,9 +18,6 @@ use crate::{
 // NOTE: When changing this struct, also change validation in post-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PreDrip<'info> {
-    /// Accounts common with post_drip
-
-    ///
     // This signer must have the `AdminPermission::Drip` in the global_config referenced in this ix.
     #[account(mut)]
     pub drip_authority: Signer<'info>,
@@ -43,6 +40,16 @@ pub struct PreDrip<'info> {
         has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
     )]
     pub drip_position: Box<Account<'info, DripPosition>>,
+
+    #[account(
+        seeds = [
+            b"drip-v2-drip-position-signer",
+            drip_position.key().as_ref(),
+        ],
+        bump = drip_position_signer.bump,
+        has_one = drip_position @ DripError::DripPositionSignerMismatch
+    )]
+    pub drip_position_signer: Account<'info, DripPositionSigner>,
 
     #[account(
         init,
@@ -75,22 +82,8 @@ pub struct PreDrip<'info> {
     pub token_program: Program<'info, Token>,
 
     /// Accounts not in common with post_drip
-    
     ///
-    // This account must be owned by the gobal_config.global_config_signer.
-    #[account(mut)]
-    pub input_token_fee_account: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        seeds = [
-            b"drip-v2-drip-position-signer",
-            drip_position.key().as_ref(),
-        ],
-        bump = drip_position_signer.bump,
-        has_one = drip_position @ DripError::DripPositionSignerMismatch
-    )]
-    pub drip_position_signer: Account<'info, DripPositionSigner>,
-
+    // The system_program is needed to create the ephemeral state
     pub system_program: Program<'info, System>,
 }
 
@@ -127,7 +120,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
     let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
     let dripper_output_token_account = &ctx.accounts.dripper_output_token_account;
-    let input_token_fee_account = &ctx.accounts.input_token_fee_account;
     let token_program = &ctx.accounts.token_program;
 
     // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
@@ -153,10 +145,11 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     ephemeral_drip_state.drip_position_output_token_account_balance_pre_drip_balance =
         drip_position_output_token_account.amount;
 
-    ephemeral_drip_state.input_transferred_to_fee_account = input_token_fee_amount;
+    ephemeral_drip_state.input_reserved_for_fees = input_token_fee_amount;
     ephemeral_drip_state.input_transferred_to_dripper = post_fees_partial_drip_amount;
     ephemeral_drip_state.minimum_output_expected = params.minimum_output_tokens_expected;
     ephemeral_drip_state.output_drip_fees_bps = output_drip_fee_bps;
+    ephemeral_drip_state.input_drip_fees_bps = input_drip_fee_bps;
 
     token::transfer(
         CpiContext::new_with_signer(
@@ -175,32 +168,14 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         post_fees_partial_drip_amount,
     )?;
 
-    if input_token_fee_amount != 0 {
-        token::transfer(
-            CpiContext::new_with_signer(
-                token_program.to_account_info(),
-                Transfer {
-                    from: drip_position_input_token_account.to_account_info(),
-                    to: input_token_fee_account.to_account_info(),
-                    authority: drip_position_signer.to_account_info(),
-                },
-                &[&[
-                    b"drip-v2-drip-position-signer".as_ref(),
-                    drip_position.key().as_ref(),
-                    &[drip_position_signer.bump],
-                ]],
-            ),
-            input_token_fee_amount,
-        )?;
-    }
-
     /* POST CPI VERIFICATION */
+    // TODO: Do we really need to validate that the token program transfer is working as expected?
     let pre_drip_input_token_account_balance = drip_position_input_token_account.amount;
     drip_position_input_token_account.reload()?;
 
     require!(
         pre_drip_input_token_account_balance - drip_position_input_token_account.amount
-            == partial_drip_amount,
+            == post_fees_partial_drip_amount,
         DripError::PreDripInvariantFailed
     );
     /* POST CPI STATE UPDATES (EFFECTS) */
@@ -216,7 +191,6 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
         drip_position_signer,
         drip_position_input_token_account,
         drip_position_output_token_account,
-        input_token_fee_account,
         ..
     } = &ctx.accounts;
 
@@ -252,13 +226,6 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
             .key()
             .eq(&drip_position.output_token_account),
         DripError::UnexpectedDripPositionOutputTokenAccount
-    );
-
-    require!(
-        input_token_fee_account
-            .owner
-            .eq(&global_config.global_config_signer.key()),
-        DripError::UnexpectedFeeTokenAccount
     );
 
     Ok(())
