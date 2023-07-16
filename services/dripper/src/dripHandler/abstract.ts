@@ -175,7 +175,6 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
             async () => {
                 const dripIxsWithSandwich = await this.createDripSandwich(
                     swapIxs.swapInstructions,
-                    inputAmount,
                     minOutputAmount
                 );
                 const luts = await this.createLookupTables(dripIxsWithSandwich);
@@ -317,7 +316,6 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
 
     private async createDripSandwich(
         swapIxs: TransactionInstruction[],
-        dripAmountToFill: bigint,
         minimumOutputTokensExpected: bigint
     ): Promise<TransactionInstruction[]> {
         const pairConfigAccount = await this.getPairConfig();
@@ -354,15 +352,13 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         ]);
         const preDripIx = await this.program.methods
             .preDrip({
-                dripAmountToFill: new BN(dripAmountToFill.toString()),
                 minimumOutputTokensExpected: new BN(
                     minimumOutputTokensExpected.toString()
                 ),
             })
             .accounts({
-                signer: this.provider.publicKey,
+                dripAuthority: this.provider.publicKey,
                 globalConfig: this.dripPosition.data.globalConfig,
-                inputTokenFeeAccount,
                 pairConfig: this.dripPosition.data.pairConfig,
                 dripPosition: this.dripPosition.address,
                 dripPositionSigner: dripPositionSigner,
@@ -380,8 +376,9 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         const postDripIx = await this.program.methods
             .postDrip()
             .accounts({
-                signer: this.provider.publicKey,
+                dripAuthority: this.provider.publicKey,
                 globalConfig: this.dripPosition.data.globalConfig,
+                inputTokenFeeAccount,
                 outputTokenFeeAccount,
                 pairConfig: this.dripPosition.data.pairConfig,
                 dripPosition: this.dripPosition.address,

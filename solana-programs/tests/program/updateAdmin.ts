@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import {AnchorProvider, Program} from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
 import { expect } from 'chai';
 import '../setup';

@@ -151,7 +151,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            17
+            19
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -181,6 +181,8 @@ describe('SDK - createPosition', () => {
             frequencyInSeconds: '3600',
             totalInputTokenDripped: '0',
             totalOutputTokenReceived: '0',
+            totalInputFeesCollected: '0',
+            totalOutputFeesCollected: '0',
             dripPositionNftMint: null,
             dripMaxJitter: 0,
             // TODO: Not sure how to check correctly (we need to fake the time somehow)
@@ -276,7 +278,7 @@ describe('SDK - createPosition', () => {
         expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            17
+            19
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -306,6 +308,8 @@ describe('SDK - createPosition', () => {
             frequencyInSeconds: '3600',
             totalInputTokenDripped: '0',
             totalOutputTokenReceived: '0',
+            totalInputFeesCollected: '0',
+            totalOutputFeesCollected: '0',
             dripPositionNftMint: null,
             dripMaxJitter: 0,
             // TODO: Not sure how to check correctly (we need to fake the time somehow)

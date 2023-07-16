@@ -632,31 +632,35 @@ components:
             properties:
                 globalConfig:
                     type: string
-                dripFeeBps:
-                    type: string
-                dripPositionSigner:
-                    type: string
-                autoCreditEnabled:
-                    type: boolean
                 pairConfig:
                     type: string
                 inputTokenAccount:
                     type: string
                 outputTokenAccount:
                     type: string
+                dripFeeBps:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                    nullable: true
+                dripPositionSigner:
+                    type: string
+                autoCreditEnabled:
+                    type: boolean
                 dripAmount:
                     type: string
                 dripAmountFilled:
                     type: string
-                frequencyInSeconds:
+                totalInputFeesCollected:
+                    type: string
+                totalOutputFeesCollected:
                     type: string
                 totalInputTokenDripped:
                     type: string
                 totalOutputTokenReceived:
                     type: string
-                dripPositionNftMint:
+                frequencyInSeconds:
                     type: string
-                    nullable: true
                 dripMaxJitter:
                     type: number
                     format: double
@@ -666,18 +670,20 @@ components:
                     type: string
             required:
                 - globalConfig
-                - dripFeeBps
-                - dripPositionSigner
-                - autoCreditEnabled
                 - pairConfig
                 - inputTokenAccount
                 - outputTokenAccount
+                - dripFeeBps
+                - dripPositionNftMint
+                - dripPositionSigner
+                - autoCreditEnabled
                 - dripAmount
                 - dripAmountFilled
-                - frequencyInSeconds
+                - totalInputFeesCollected
+                - totalOutputFeesCollected
                 - totalInputTokenDripped
                 - totalOutputTokenReceived
-                - dripPositionNftMint
+                - frequencyInSeconds
                 - dripMaxJitter
                 - dripActivationGenesisShift
                 - dripActivationTimestamp
