@@ -825,23 +825,13 @@
       "name": "preDrip",
       "accounts": [
         {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
+          "name": "dripAuthority",
           "isMut": true,
           "isSigner": true
         },
         {
           "name": "globalConfig",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inputTokenFeeAccount",
-          "isMut": true,
           "isSigner": false
         },
         {
@@ -939,6 +929,11 @@
         },
         {
           "name": "dripperInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripperOutputTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -955,7 +950,11 @@
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Accounts not in common with post_drip",
+            ""
+          ]
         }
       ],
       "args": [
@@ -971,23 +970,13 @@
       "name": "postDrip",
       "accounts": [
         {
-          "name": "signer",
+          "name": "dripAuthority",
           "isMut": false,
           "isSigner": true
         },
         {
-          "name": "refundDestination",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "globalConfig",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "outputTokenFeeAccount",
-          "isMut": true,
           "isSigner": false
         },
         {
@@ -1025,10 +1014,7 @@
         {
           "name": "dripPosition",
           "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -1092,6 +1078,11 @@
           "isSigner": false
         },
         {
+          "name": "dripperOutputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "instructions",
           "isMut": false,
           "isSigner": false
@@ -1099,6 +1090,20 @@
         {
           "name": "tokenProgram",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputTokenFeeAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Accounts not in common with pre_drip",
+            ""
+          ]
+        },
+        {
+          "name": "outputTokenFeeAccount",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -1116,24 +1121,6 @@
             "type": "publicKey"
           },
           {
-            "name": "owner",
-            "type": {
-              "defined": "DripPositionOwner"
-            }
-          },
-          {
-            "name": "dripFeeBps",
-            "type": "u64"
-          },
-          {
-            "name": "dripPositionSigner",
-            "type": "publicKey"
-          },
-          {
-            "name": "autoCreditEnabled",
-            "type": "bool"
-          },
-          {
             "name": "pairConfig",
             "type": "publicKey"
           },
@@ -1146,6 +1133,30 @@
             "type": "publicKey"
           },
           {
+            "name": "owner",
+            "type": {
+              "defined": "DripPositionOwner"
+            }
+          },
+          {
+            "name": "dripFeeBps",
+            "type": "u64"
+          },
+          {
+            "name": "dripPositionNftMint",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "dripPositionSigner",
+            "type": "publicKey"
+          },
+          {
+            "name": "autoCreditEnabled",
+            "type": "bool"
+          },
+          {
             "name": "dripAmount",
             "type": "u64"
           },
@@ -1154,7 +1165,11 @@
             "type": "u64"
           },
           {
-            "name": "frequencyInSeconds",
+            "name": "totalInputFeesCollected",
+            "type": "u64"
+          },
+          {
+            "name": "totalOutputFeesCollected",
             "type": "u64"
           },
           {
@@ -1166,10 +1181,8 @@
             "type": "u64"
           },
           {
-            "name": "dripPositionNftMint",
-            "type": {
-              "option": "publicKey"
-            }
+            "name": "frequencyInSeconds",
+            "type": "u64"
           },
           {
             "name": "dripMaxJitter",
@@ -1248,7 +1261,23 @@
             "type": "publicKey"
           },
           {
-            "name": "outputTokenAccountBalancePreDripSnapshot",
+            "name": "dripperInputTokenAccountBalancePreDripBalance",
+            "type": "u64"
+          },
+          {
+            "name": "dripperOutputTokenAccountBalancePreDripBalance",
+            "type": "u64"
+          },
+          {
+            "name": "dripPositionInputTokenAccountBalancePreDripBalance",
+            "type": "u64"
+          },
+          {
+            "name": "dripPositionOutputTokenAccountBalancePreDripBalance",
+            "type": "u64"
+          },
+          {
+            "name": "inputTransferredToDripper",
             "type": "u64"
           },
           {
@@ -1256,11 +1285,15 @@
             "type": "u64"
           },
           {
-            "name": "preFeesPartialDripAmount",
+            "name": "inputReservedForFees",
             "type": "u64"
           },
           {
-            "name": "drippedInputTokens",
+            "name": "inputDripFeesBps",
+            "type": "u64"
+          },
+          {
+            "name": "outputDripFeesBps",
             "type": "u64"
           }
         ]
@@ -1443,10 +1476,6 @@
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "dripAmountToFill",
-            "type": "u64"
-          },
           {
             "name": "minimumOutputTokensExpected",
             "type": "u64"
@@ -1755,8 +1784,8 @@
     },
     {
       "code": 6028,
-      "name": "InvalidDripperInputTokenAccount",
-      "msg": "Invalid dripper input token account"
+      "name": "DripperInputTokenAccountBalanceSmallerThanExpected",
+      "msg": "Dripper input token account balance smaller than expected"
     },
     {
       "code": 6029,
@@ -1812,6 +1841,21 @@
       "code": 6039,
       "name": "EphemeralDripStateDripPositionMismatch",
       "msg": "Ephemeral drip state and drip position mismatch"
+    },
+    {
+      "code": 6040,
+      "name": "ExpectedNonZeroInputPostDrip",
+      "msg": "Expected non-zero used_input_amount post-drip"
+    },
+    {
+      "code": 6041,
+      "name": "ExpectedNonZeroDripFees",
+      "msg": "Expected non-zero input/output drip fees"
+    },
+    {
+      "code": 6042,
+      "name": "InputFeesLargerThanReserved",
+      "msg": "Input drip fees larger then reserved"
     }
   ]
 }

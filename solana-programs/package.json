@@ -21,6 +21,7 @@
         "@dcaf/drip": "0.1.0",
         "@dcaf/drip-types": "0.1.0",
         "@solana/spl-token": "0.3.8",
+        "@solana/spl-token-0-3-8": "npm:@solana/spl-token@0.3.8",
         "@solana/web3.js": "^1.77.3",
         "bip39": "^3.1.0",
         "child_process": "^1.0.2",

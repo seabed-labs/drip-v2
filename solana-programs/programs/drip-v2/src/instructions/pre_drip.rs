@@ -5,6 +5,7 @@ use solana_program::sysvar::{
     SysvarId,
 };
 
+use crate::common::validation::pre_drip_post_drip_have_expected_accounts;
 use crate::{
     errors::DripError,
     instruction::PostDrip,
@@ -17,13 +18,11 @@ use crate::{
 // NOTE: When changing this struct, also change validation in post-drip since they are tightly coupled
 #[derive(Accounts)]
 pub struct PreDrip<'info> {
+    // This signer must have the `AdminPermission::Drip` in the global_config referenced in this ix.
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub drip_authority: Signer<'info>,
 
     pub global_config: Box<Account<'info, GlobalConfig>>,
-
-    #[account(mut)]
-    pub input_token_fee_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         seeds = [
@@ -59,7 +58,7 @@ pub struct PreDrip<'info> {
             drip_position.key().as_ref(),
         ],
         bump,
-        payer = signer,
+        payer = drip_authority,
         space = 8 + EphemeralDripState::INIT_SPACE
     )]
     pub ephemeral_drip_state: Box<Account<'info, EphemeralDripState>>,
@@ -73,64 +72,84 @@ pub struct PreDrip<'info> {
     #[account(mut)]
     pub dripper_input_token_account: Account<'info, TokenAccount>,
 
+    #[account(mut)]
+    pub dripper_output_token_account: Account<'info, TokenAccount>,
+
     #[account(address = Instructions::id())]
     /// CHECK: Instructions sysvar
     pub instructions: UncheckedAccount<'info>,
 
     pub token_program: Program<'info, Token>,
 
+    /// Accounts not in common with post_drip
+    ///
+    // The system_program is needed to create the ephemeral state
     pub system_program: Program<'info, System>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct PreDripParams {
-    pub drip_amount_to_fill: u64,
     pub minimum_output_tokens_expected: u64,
 }
 
 pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<()> {
     /* Validation */
 
-    validate_account_relations(&ctx)?;
+    require!(
+        ctx.accounts
+            .drip_authority
+            .is_authorized(&ctx.accounts.global_config, AdminPermission::Drip),
+        DripError::OperationUnauthorized
+    );
 
     require!(
-        params.drip_amount_to_fill
-            <= (ctx.accounts.drip_position.drip_amount
-                - ctx.accounts.drip_position.drip_amount_filled),
-        DripError::DripFillAmountTooHigh
+        ctx.accounts.drip_position.is_activated()?,
+        DripError::DripNotActivated
     );
+
+    validate_account_relations(&ctx)?;
 
     validate_post_drip_ix_present(&ctx)?;
 
     /* STATE UPDATES (EFFECTS) */
-    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
-    let drip_position_input_token_account = &mut ctx.accounts.drip_position_input_token_account;
-
     let drip_position = &ctx.accounts.drip_position;
     let drip_position_signer = &ctx.accounts.drip_position_signer;
+    let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
     let pair_config = &ctx.accounts.pair_config;
+    let drip_position_input_token_account = &mut ctx.accounts.drip_position_input_token_account;
     let drip_position_output_token_account = &ctx.accounts.drip_position_output_token_account;
     let dripper_input_token_account = &ctx.accounts.dripper_input_token_account;
-    let input_token_fee_account = &ctx.accounts.input_token_fee_account;
+    let dripper_output_token_account = &ctx.accounts.dripper_output_token_account;
     let token_program = &ctx.accounts.token_program;
 
     // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
     //       Else switch to checked math functions.
     // TODO(#105): Move all math here to a custom module to unit test better
-    let partial_drip_amount = params.drip_amount_to_fill;
+    let partial_drip_amount = drip_position.drip_amount - drip_position.drip_amount_filled;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
     let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
+    let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
     let input_drip_fee_bps = (drip_fee_bps * input_token_fee_portion_bps) / 10_000;
+    let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
     let input_token_fee_amount = (partial_drip_amount * input_drip_fee_bps) / 10_000;
     let post_fees_partial_drip_amount = partial_drip_amount - input_token_fee_amount;
 
     ephemeral_drip_state.bump = *ctx.bumps.get("ephemeral_drip_state").unwrap();
     ephemeral_drip_state.drip_position = drip_position.key();
-    ephemeral_drip_state.output_token_account_balance_pre_drip_snapshot =
+    ephemeral_drip_state.dripper_input_token_account_balance_pre_drip_balance =
+        dripper_input_token_account.amount;
+    ephemeral_drip_state.dripper_output_token_account_balance_pre_drip_balance =
+        dripper_output_token_account.amount;
+    ephemeral_drip_state.drip_position_input_token_account_balance_pre_drip_balance =
+        drip_position_input_token_account.amount;
+    ephemeral_drip_state.drip_position_output_token_account_balance_pre_drip_balance =
         drip_position_output_token_account.amount;
+
+    ephemeral_drip_state.input_reserved_for_fees = input_token_fee_amount;
+    ephemeral_drip_state.input_transferred_to_dripper = post_fees_partial_drip_amount;
     ephemeral_drip_state.minimum_output_expected = params.minimum_output_tokens_expected;
-    ephemeral_drip_state.pre_fees_partial_drip_amount = params.drip_amount_to_fill;
-    ephemeral_drip_state.dripped_input_tokens = post_fees_partial_drip_amount;
+    ephemeral_drip_state.output_drip_fees_bps = output_drip_fee_bps;
+    ephemeral_drip_state.input_drip_fees_bps = input_drip_fee_bps;
 
     token::transfer(
         CpiContext::new_with_signer(
@@ -149,30 +168,14 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
         post_fees_partial_drip_amount,
     )?;
 
-    token::transfer(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            Transfer {
-                from: drip_position_input_token_account.to_account_info(),
-                to: input_token_fee_account.to_account_info(),
-                authority: drip_position_signer.to_account_info(),
-            },
-            &[&[
-                b"drip-v2-drip-position-signer".as_ref(),
-                drip_position.key().as_ref(),
-                &[drip_position_signer.bump],
-            ]],
-        ),
-        input_token_fee_amount,
-    )?;
-
     /* POST CPI VERIFICATION */
+    // TODO: Do we really need to validate that the token program transfer is working as expected?
     let pre_drip_input_token_account_balance = drip_position_input_token_account.amount;
     drip_position_input_token_account.reload()?;
 
     require!(
         pre_drip_input_token_account_balance - drip_position_input_token_account.amount
-            == partial_drip_amount,
+            == post_fees_partial_drip_amount,
         DripError::PreDripInvariantFailed
     );
     /* POST CPI STATE UPDATES (EFFECTS) */
@@ -182,24 +185,14 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
 fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
     let PreDrip {
-        signer,
         global_config,
         pair_config,
         drip_position,
         drip_position_signer,
         drip_position_input_token_account,
         drip_position_output_token_account,
-        dripper_input_token_account,
-        input_token_fee_account,
         ..
     } = &ctx.accounts;
-
-    require!(
-        signer.is_authorized(global_config, AdminPermission::Drip),
-        DripError::OperationUnauthorized
-    );
-
-    require!(drip_position.is_activated()?, DripError::DripNotActivated);
 
     require!(
         pair_config.global_config.eq(&global_config.key()),
@@ -235,18 +228,6 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
         DripError::UnexpectedDripPositionOutputTokenAccount
     );
 
-    require!(
-        dripper_input_token_account.owner.eq(signer.key),
-        DripError::InvalidDripperInputTokenAccount
-    );
-
-    require!(
-        input_token_fee_account
-            .owner
-            .eq(&global_config.global_config_signer.key()),
-        DripError::UnexpectedFeeTokenAccount
-    );
-
     Ok(())
 }
 
@@ -270,45 +251,10 @@ fn validate_post_drip_ix_present(ctx: &Context<PreDrip>) -> Result<()> {
         if ix.program_id.eq(&crate::id()) && current_ix.program_id.eq(&crate::id()) {
             let actual_discriminator = &ix.data[..8];
             let expected_discrimator = &PostDrip::discriminator();
-
-            if actual_discriminator.eq(expected_discrimator) {
-                let post_drip_accounts_match_expectation = {
-                    ctx.accounts.signer.key().eq(&ix.accounts[0].pubkey)
-                        && ctx.accounts.global_config.key().eq(&ix.accounts[1].pubkey)
-                        && ctx.accounts.pair_config.key().eq(&ix.accounts[3].pubkey)
-                        && ctx.accounts.drip_position.key().eq(&ix.accounts[4].pubkey)
-                        && ctx
-                            .accounts
-                            .drip_position_signer
-                            .key()
-                            .eq(&ix.accounts[5].pubkey)
-                        && ctx
-                            .accounts
-                            .ephemeral_drip_state
-                            .key()
-                            .eq(&ix.accounts[6].pubkey)
-                        && ctx
-                            .accounts
-                            .drip_position_input_token_account
-                            .key()
-                            .eq(&ix.accounts[7].pubkey)
-                        && ctx
-                            .accounts
-                            .drip_position_output_token_account
-                            .key()
-                            .eq(&ix.accounts[8].pubkey)
-                        && ctx
-                            .accounts
-                            .dripper_input_token_account
-                            .key()
-                            .eq(&ix.accounts[9].pubkey)
-                        && ctx.accounts.instructions.key().eq(&ix.accounts[10].pubkey)
-                        && ctx.accounts.token_program.key().eq(&ix.accounts[11].pubkey)
-                };
-
-                if post_drip_accounts_match_expectation {
-                    break;
-                }
+            if actual_discriminator.eq(expected_discrimator)
+                && pre_drip_post_drip_have_expected_accounts(&current_ix, &ix)
+            {
+                break;
             }
         }
 
