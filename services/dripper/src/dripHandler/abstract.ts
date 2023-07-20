@@ -1,4 +1,5 @@
-import { Accounts, DripV2 } from '@dcaf/drip-types';
+import { DripV2 } from '@dcaf/drip-types/src/drip_v2';
+import { PairConfigAccount, PairConfig } from '@dcaf/drip-types/src/accounts';
 import { PriceOracle } from '@dcaf/drip-types/src/types';
 import {
     AddressLookupTableAccount,
@@ -40,7 +41,7 @@ const LUT_NOT_FOUND = new Error(`lut not found`);
 export abstract class PositionHandlerBase implements ITokenSwapHandler {
     readonly logger: Logger;
     readonly positionKeypair: Keypair;
-    pairConfig: Accounts.PairConfig | undefined = undefined;
+    pairConfig: PairConfigAccount | undefined = undefined;
 
     protected constructor(
         baseLogger: Logger,
@@ -74,30 +75,24 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
 
     abstract createSwapInstructions(): Promise<SwapQuoteWithInstructions>;
 
-    async getPairConfig(): Promise<Accounts.PairConfig> {
+    async getPairConfig(): Promise<PairConfigAccount> {
         if (this.pairConfig) {
             return this.pairConfig;
         }
-        const pairConfig = await Accounts.PairConfig.fetch(
+        const pairConfig = await PairConfig.fetchNonNullableData(
             this.provider.connection,
             this.dripPosition.data.pairConfig,
-            this.program.programId
+            this.program.programId,
+            // TODO: Add options
+            undefined,
+            PAIR_CONFIG_NOT_FOUND(this.dripPosition.data.pairConfig)
         );
-        if (!pairConfig) {
-            this.logger
-                .data({
-                    pairConfigPublicKey:
-                        this.dripPosition.data.pairConfig.toString(),
-                })
-                .error('not found');
-            throw PAIR_CONFIG_NOT_FOUND(this.dripPosition.data.pairConfig);
-        }
         this.pairConfig = pairConfig;
         return pairConfig;
     }
 
     async createUpdatePairConfigOracleIx(
-        pairConfig: Accounts.PairConfig
+        pairConfig: PairConfigAccount
     ): Promise<TransactionInstruction | undefined> {
         if (
             pairConfig.inputTokenPriceOracle.kind !==

@@ -29,7 +29,7 @@ import {
     getAssociatedTokenAddress,
 } from '@solana/spl-token-0-3-8';
 import { assert, expect } from 'chai';
-import { Accounts } from '@dcaf/drip-types';
+import { DripPosition } from '@dcaf/drip-types/src/accounts';
 function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -323,7 +323,7 @@ describe('Program - drip (pre/post)', () => {
     });
 
     it('should fail if post_drip is not in the same transaction', async () => {
-        const dripPosition = await Accounts.DripPosition.fetch(
+        const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
             dripPositionPublicKey,
             program.programId
@@ -335,7 +335,7 @@ describe('Program - drip (pre/post)', () => {
             inputMintPublicKey,
             dripPositionInputTokenAccountPublicKey,
             mintAuthority,
-            dripPosition.dripAmount
+            dripPosition.data.dripAmount
         );
         const preDripIx = await program.methods
             .preDrip({
@@ -374,7 +374,7 @@ describe('Program - drip (pre/post)', () => {
     });
 
     it('should fail if no output tokens are received', async () => {
-        const dripPosition = await Accounts.DripPosition.fetch(
+        const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
             dripPositionPublicKey,
             program.programId
@@ -386,7 +386,7 @@ describe('Program - drip (pre/post)', () => {
             inputMintPublicKey,
             dripPositionInputTokenAccountPublicKey,
             mintAuthority,
-            dripPosition.dripAmount
+            dripPosition.data.dripAmount
         );
         const commonAccounts = {
             dripAuthority: dripAuthorityKeypair.publicKey,
@@ -437,15 +437,14 @@ describe('Program - drip (pre/post)', () => {
 
     [1, 2, 3].forEach((dripCount) => {
         it(`should drip ${dripCount} times with the full drip amount each time`, async () => {
-            const dripPosition = await Accounts.DripPosition.fetch(
+            const dripPosition = await DripPosition.fetchNonNullable(
                 provider.connection,
                 dripPositionPublicKey,
                 program.programId
             );
-            assert(dripPosition);
-            expect(dripPosition.dripAmountFilled.toString()).to.equal('0');
+            expect(dripPosition.data.dripAmountFilled.toString()).to.equal('0');
             const depositAmount =
-                BigInt(dripPosition.dripAmount) * BigInt(dripCount);
+                BigInt(dripPosition.data.dripAmount) * BigInt(dripCount);
             await mintTo(
                 provider.connection,
                 mintAuthority,
@@ -479,7 +478,7 @@ describe('Program - drip (pre/post)', () => {
                     dripperInputBalanceBefore,
                     dripperOutputBalanceBefore,
                 ] = await Promise.all([
-                    Accounts.DripPosition.fetch(
+                    DripPosition.fetch(
                         provider.connection,
                         dripPositionPublicKey,
                         program.programId
@@ -499,9 +498,11 @@ describe('Program - drip (pre/post)', () => {
                 ]);
                 assert(dripPositionBefore);
 
-                const dripAmountBefore = BigInt(dripPositionBefore.dripAmount);
+                const dripAmountBefore = BigInt(
+                    dripPositionBefore.data.dripAmount
+                );
                 const dripAmountFilledBefore =
-                    dripPositionBefore.dripAmountFilled;
+                    dripPositionBefore.data.dripAmountFilled;
                 expect(dripAmountFilledBefore.toString()).to.equal('0');
                 const input_token_fee_amount =
                     (dripAmountBefore * BigInt(inputTokenFeeBps)) /
@@ -589,20 +590,20 @@ describe('Program - drip (pre/post)', () => {
                 );
 
                 await delay(
-                    Number(dripPositionBefore.frequencyInSeconds) + 500
+                    Number(dripPositionBefore.data.frequencyInSeconds) + 500
                 );
             }
         });
     });
 
     it('should drip twice in the same cycle with partial drips', async () => {
-        const dripPosition = await Accounts.DripPosition.fetch(
+        const dripPosition = await DripPosition.fetch(
             provider.connection,
             dripPositionPublicKey,
             program.programId
         );
         assert(dripPosition);
-        const dripAmountBefore = BigInt(dripPosition.dripAmount);
+        const dripAmountBefore = BigInt(dripPosition.data.dripAmount);
         const depositAmount = dripAmountBefore * BigInt(1);
         await mintTo(
             provider.connection,
@@ -638,7 +639,7 @@ describe('Program - drip (pre/post)', () => {
                 dripperInputBalanceBefore,
                 dripperOutputBalanceBefore,
             ] = await Promise.all([
-                Accounts.DripPosition.fetch(
+                DripPosition.fetchNonNullable(
                     provider.connection,
                     dripPositionPublicKey,
                     program.programId
@@ -657,8 +658,9 @@ describe('Program - drip (pre/post)', () => {
                 ),
             ]);
             assert(dripPositionBefore);
-            const dripAmountBefore = BigInt(dripPositionBefore.dripAmount);
-            const dripAmountFilledBefore = dripPositionBefore.dripAmountFilled;
+            const dripAmountBefore = BigInt(dripPositionBefore.data.dripAmount);
+            const dripAmountFilledBefore =
+                dripPositionBefore.data.dripAmountFilled;
             if (i == 0) {
                 expect(dripAmountFilledBefore.toString()).equal('0');
             }
@@ -734,7 +736,7 @@ describe('Program - drip (pre/post)', () => {
                 dripperInputBalanceAfter,
                 dripperOutputBalanceAfter,
             ] = await Promise.all([
-                Accounts.DripPosition.fetch(
+                DripPosition.fetch(
                     provider.connection,
                     dripPositionPublicKey,
                     program.programId
@@ -797,20 +799,22 @@ describe('Program - drip (pre/post)', () => {
                 expect(dripPositionAfterJSON.dripAmountFilled).to.equal('0');
                 expect(dripPositionAfterJSON.totalInputTokenDripped).to.equal(
                     (
-                        BigInt(dripPositionBefore.totalInputTokenDripped) +
+                        BigInt(dripPositionBefore.data.totalInputTokenDripped) +
                         BigInt(partialDripAmountBeforeFees)
                     ).toString()
                 );
                 expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
                     (
-                        BigInt(dripPositionBefore.totalInputFeesCollected) +
-                        BigInt(expectedInputFees)
+                        BigInt(
+                            dripPositionBefore.data.totalInputFeesCollected
+                        ) + BigInt(expectedInputFees)
                     ).toString()
                 );
                 expect(dripPositionAfterJSON.totalOutputFeesCollected).to.equal(
                     (
-                        BigInt(dripPositionBefore.totalOutputFeesCollected) +
-                        BigInt(expectedOutputFees)
+                        BigInt(
+                            dripPositionBefore.data.totalOutputFeesCollected
+                        ) + BigInt(expectedOutputFees)
                     ).toString()
                 );
                 // should advance the cycle
@@ -819,7 +823,7 @@ describe('Program - drip (pre/post)', () => {
                 ).to.not.equal(dripPositionBeforeJSON.dripActivationTimestamp);
             }
             if (i !== dripCount - 1) {
-                await delay(Number(dripPosition.frequencyInSeconds) + 500);
+                await delay(Number(dripPosition.data.frequencyInSeconds) + 500);
             }
         }
     });

@@ -1,9 +1,9 @@
-import { Accounts } from '@dcaf/drip-types';
+import { DripPositionAccount } from '@dcaf/drip-types/src/accounts/DripPosition';
 import { PublicKey } from '@solana/web3.js';
 
 export type DripPosition = {
     address: PublicKey;
-    data: Accounts.DripPositionFields;
+    data: DripPositionAccount;
 };
 export interface IPositionsFetcher {
     getPositionsPendingDrip(limit?: number): Promise<IPosition[]>;

@@ -1,7 +1,7 @@
-import { AnchorErrorTypes, DripErrorTypes } from '@dcaf/drip-types';
+import { AnchorErrors, CustomErrors } from '@dcaf/drip-types';
 
-type DripError = DripErrorTypes.CustomError;
-type AnchorError = AnchorErrorTypes.CustomError;
+type DripError = CustomErrors.CustomError;
+type AnchorError = AnchorErrors.AnchorError;
 
 export type TxSuccessful<T> = {
     value: T;
