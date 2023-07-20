@@ -59,8 +59,9 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         const instructions: TransactionInstruction[] = [];
 
         if (!pairConfigAccount) {
-            const initPairConfigIx = new Instructions.InitPairConfig(
-                {
+            const initPairConfigIx = new Instructions.InitPairConfig({
+                args: null,
+                accounts:{
                     payer,
                     globalConfig: this.globalConfig,
                     inputTokenMint: inputMint,
@@ -68,10 +69,10 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                     pairConfig: pairConfigPubkey,
                     systemProgram: SystemProgram.programId,
                 },
-                this.programId
+            },
             );
 
-            instructions.push(initPairConfigIx.build());
+            instructions.push(initPairConfigIx.build(this.programId));
         }
 
         const dripPositionSignerPubkey = DripPDA.deriveDripPositionSigner(
@@ -90,55 +91,55 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 )
             );
 
-        const initDripPositionIx = new Instructions.InitDripPosition(
-            {
-                params: {
-                    owner,
-                    dripAmount,
-                    frequencyInSeconds: BigInt(dripFrequencyInSeconds),
+        const initDripPositionIx = new Instructions.InitDripPosition({
+                args: {
+                    params: {
+                        owner,
+                        dripAmount,
+                        frequencyInSeconds: BigInt(dripFrequencyInSeconds),
+                    }
                 },
-            },
-            {
-                payer,
-                globalConfig: this.globalConfig,
-                pairConfig: pairConfigPubkey,
-                inputTokenMint: inputMint,
-                outputTokenMint: outputMint,
-                inputTokenAccount: dripPositionInputTokenAccount,
-                outputTokenAccount: dripPositionOutputTokenAccount,
-                dripPosition: dripPositionKeypair.publicKey,
-                dripPositionSigner: dripPositionSignerPubkey,
-                systemProgram: SystemProgram.programId,
-                tokenProgram: TOKEN_PROGRAM_ID,
-                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            },
-            this.programId
+                accounts: {
+                    payer,
+                    globalConfig: this.globalConfig,
+                    pairConfig: pairConfigPubkey,
+                    inputTokenMint: inputMint,
+                    outputTokenMint: outputMint,
+                    inputTokenAccount: dripPositionInputTokenAccount,
+                    outputTokenAccount: dripPositionOutputTokenAccount,
+                    dripPosition: dripPositionKeypair.publicKey,
+                    dripPositionSigner: dripPositionSignerPubkey,
+                    systemProgram: SystemProgram.programId,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                },
+            }
         );
 
-        instructions.push(initDripPositionIx.build());
+        instructions.push(initDripPositionIx.build(this.programId));
 
         if (initialDeposit) {
             // TODO: Support wSOL
 
-            const depositIx = new Instructions.Deposit(
-                {
-                    params: {
-                        depositAmount: initialDeposit.amount,
-                    },
-                },
-                {
+            const depositIx = new Instructions.Deposit({
+              args: {
+                  params: {
+                      depositAmount: initialDeposit.amount,
+                  }
+              },
+                accounts: {
                     signer: initialDeposit.depositor,
                     sourceInputTokenAccount:
-                        initialDeposit.depositorTokenAccount,
+                    initialDeposit.depositorTokenAccount,
                     dripPositionInputTokenAccount:
-                        dripPositionInputTokenAccount,
+                    dripPositionInputTokenAccount,
                     dripPosition: dripPositionKeypair.publicKey,
                     tokenProgram: TOKEN_PROGRAM_ID,
-                },
-                this.programId
+                }
+            },
             );
 
-            instructions.push(depositIx.build());
+            instructions.push(depositIx.build(this.programId));
         }
 
         return {
