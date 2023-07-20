@@ -130,10 +130,7 @@ function parseDeposit(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedDeposit: ParsedDeposit } {
-    const parsedIx = Deposit.fromDecoded(
-        ixData.data as DepositArgs,
-        accounts
-    );
+    const parsedIx = Deposit.fromDecoded(ixData.data as DepositArgs, accounts);
     return {
         parsedDeposit: {
             name: DripV2InstructionNames.deposit,

@@ -61,7 +61,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         if (!pairConfigAccount) {
             const initPairConfigIx = new Instructions.InitPairConfig({
                 args: null,
-                accounts:{
+                accounts: {
                     payer,
                     globalConfig: this.globalConfig,
                     inputTokenMint: inputMint,
@@ -69,8 +69,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                     pairConfig: pairConfigPubkey,
                     systemProgram: SystemProgram.programId,
                 },
-            },
-            );
+            });
 
             instructions.push(initPairConfigIx.build(this.programId));
         }
@@ -92,29 +91,28 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             );
 
         const initDripPositionIx = new Instructions.InitDripPosition({
-                args: {
-                    params: {
-                        owner,
-                        dripAmount,
-                        frequencyInSeconds: BigInt(dripFrequencyInSeconds),
-                    }
+            args: {
+                params: {
+                    owner,
+                    dripAmount,
+                    frequencyInSeconds: BigInt(dripFrequencyInSeconds),
                 },
-                accounts: {
-                    payer,
-                    globalConfig: this.globalConfig,
-                    pairConfig: pairConfigPubkey,
-                    inputTokenMint: inputMint,
-                    outputTokenMint: outputMint,
-                    inputTokenAccount: dripPositionInputTokenAccount,
-                    outputTokenAccount: dripPositionOutputTokenAccount,
-                    dripPosition: dripPositionKeypair.publicKey,
-                    dripPositionSigner: dripPositionSignerPubkey,
-                    systemProgram: SystemProgram.programId,
-                    tokenProgram: TOKEN_PROGRAM_ID,
-                    associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-                },
-            }
-        );
+            },
+            accounts: {
+                payer,
+                globalConfig: this.globalConfig,
+                pairConfig: pairConfigPubkey,
+                inputTokenMint: inputMint,
+                outputTokenMint: outputMint,
+                inputTokenAccount: dripPositionInputTokenAccount,
+                outputTokenAccount: dripPositionOutputTokenAccount,
+                dripPosition: dripPositionKeypair.publicKey,
+                dripPositionSigner: dripPositionSignerPubkey,
+                systemProgram: SystemProgram.programId,
+                tokenProgram: TOKEN_PROGRAM_ID,
+                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            },
+        });
 
         instructions.push(initDripPositionIx.build(this.programId));
 
@@ -122,22 +120,21 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             // TODO: Support wSOL
 
             const depositIx = new Instructions.Deposit({
-              args: {
-                  params: {
-                      depositAmount: initialDeposit.amount,
-                  }
-              },
+                args: {
+                    params: {
+                        depositAmount: initialDeposit.amount,
+                    },
+                },
                 accounts: {
                     signer: initialDeposit.depositor,
                     sourceInputTokenAccount:
-                    initialDeposit.depositorTokenAccount,
+                        initialDeposit.depositorTokenAccount,
                     dripPositionInputTokenAccount:
-                    dripPositionInputTokenAccount,
+                        dripPositionInputTokenAccount,
                     dripPosition: dripPositionKeypair.publicKey,
                     tokenProgram: TOKEN_PROGRAM_ID,
-                }
-            },
-            );
+                },
+            });
 
             instructions.push(depositIx.build(this.programId));
         }

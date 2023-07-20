@@ -1,5 +1,9 @@
 import { DripPosition, IPosition, IPositionsFetcher } from './index';
-import { Accounts } from '@dcaf/drip-types';
+import {
+    DripPosition as DripPositionClass,
+    DripPositionAccount,
+    DripPositionAccountJSON,
+} from '@dcaf/drip-types/src/accounts';
 import { GetPositionHandler, IDripHandler } from '../dripHandler';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
@@ -34,9 +38,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                             /** offset into program account data to start comparison */
                             offset: 0,
                             /** data to match, as base-58 encoded string and limited to less than 129 bytes */
-                            bytes: bs58.encode(
-                                Accounts.DripPosition.discriminator
-                            ),
+                            bytes: bs58.encode(DripPositionClass.discriminator),
                         },
                     },
                 ],
@@ -55,11 +57,11 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
         while (i < positionKeys.length && res.length < limit) {
             const positionKey = positionKeys[i];
             i += 1;
-            const dripPositionAccount = await Accounts.DripPosition.fetch(
+            const dripPositionAccount = await DripPositionClass.fetch(
                 this.connection,
                 positionKey,
                 this.programId
-            );
+            ).then((a) => a?.data);
             if (!dripPositionAccount) {
                 continue;
             }
@@ -91,7 +93,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
 
 export class Position implements IPosition {
     constructor(
-        private readonly value: Accounts.DripPosition,
+        private readonly value: DripPositionAccount,
         private readonly address: PublicKey,
         private readonly handler: IDripHandler
     ) {}
@@ -100,8 +102,8 @@ export class Position implements IPosition {
         return this.handler.drip();
     }
 
-    toJSON(): Accounts.DripPositionJSON {
-        return this.value.toJSON();
+    toJSON(): DripPositionAccountJSON {
+        return DripPositionClass.toJSON(this.value);
     }
 
     getData(): DripPosition {

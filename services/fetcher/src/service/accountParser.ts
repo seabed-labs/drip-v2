@@ -1,4 +1,15 @@
-import { DripPosition,DripPositionNftMapping,DripPositionSigner,GlobalConfig, GlobalConfigSigner, PairConfig,  DripPositionNftMappingAccountJSON, DripPositionSignerAccountJSON, GlobalConfigAccountJSON, GlobalConfigSignerAccountJSON } from '@dcaf/drip-types/src/accounts';
+import {
+    DripPosition,
+    DripPositionNftMapping,
+    DripPositionSigner,
+    GlobalConfig,
+    GlobalConfigSigner,
+    PairConfig,
+    DripPositionNftMappingAccountJSON,
+    DripPositionSignerAccountJSON,
+    GlobalConfigAccountJSON,
+    GlobalConfigSignerAccountJSON,
+} from '@dcaf/drip-types/src/accounts';
 import {
     DripPositionJSONWrapper,
     PairConfigJSONWrapper,
@@ -59,34 +70,26 @@ export function tryDecodeToParsedDripAccount(
                 ownerType: decodedData.owner.kind,
             },
         };
-    } else if (
-        discriminator.equals(DripPosition.discriminator)
-    ) {
+    } else if (discriminator.equals(DripPosition.discriminator)) {
         return {
             name: 'DripPositionNftMapping',
             parsedDripPositionNftMapping:
                 DripPositionNftMapping.decode(data).toJSON(),
         };
-    } else if (
-        discriminator.equals(DripPositionSigner.discriminator)
-    ) {
+    } else if (discriminator.equals(DripPositionSigner.discriminator)) {
         return {
             name: 'DripPositionSigner',
-            parsedDripPositionSigner:
-                DripPositionSigner.decode(data).toJSON(),
+            parsedDripPositionSigner: DripPositionSigner.decode(data).toJSON(),
         };
     } else if (discriminator.equals(GlobalConfig.discriminator)) {
         return {
             name: 'GlobalConfig',
             parsedGlobalConfig: GlobalConfig.decode(data).toJSON(),
         };
-    } else if (
-        discriminator.equals(GlobalConfigSigner.discriminator)
-    ) {
+    } else if (discriminator.equals(GlobalConfigSigner.discriminator)) {
         return {
             name: 'GlobalConfigSigner',
-            parsedGlobalConfigSigner:
-                GlobalConfigSigner.decode(data).toJSON(),
+            parsedGlobalConfigSigner: GlobalConfigSigner.decode(data).toJSON(),
         };
     } else if (discriminator.equals(PairConfig.discriminator)) {
         const decodedData = PairConfig.decode(data).toJSON();
