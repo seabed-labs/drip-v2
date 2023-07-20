@@ -37,7 +37,7 @@ components:
                 - depositAmount
             type: object
             additionalProperties: false
-        DepositFieldsJSON:
+        DepositArgsJSON:
             properties:
                 params:
                     $ref: '#/components/schemas/types.DepositParamsJSON'
@@ -48,7 +48,7 @@ components:
         ParsedDeposit:
             properties:
                 data:
-                    $ref: '#/components/schemas/DepositFieldsJSON'
+                    $ref: '#/components/schemas/DepositArgsJSON'
                 accounts:
                     $ref: '#/components/schemas/DepositAccountsJSON'
                 name:
@@ -160,7 +160,7 @@ components:
                 - frequencyInSeconds
             type: object
             additionalProperties: false
-        InitDripPositionFieldsJSON:
+        InitDripPositionArgsJSON:
             properties:
                 params:
                     $ref: '#/components/schemas/types.InitDripPositionParamsJSON'
@@ -171,7 +171,7 @@ components:
         ParsedInitDripPosition:
             properties:
                 data:
-                    $ref: '#/components/schemas/InitDripPositionFieldsJSON'
+                    $ref: '#/components/schemas/InitDripPositionArgsJSON'
                 accounts:
                     $ref: '#/components/schemas/InitDripPositionAccountsJSON'
                 name:
@@ -253,7 +253,7 @@ components:
                 - defaultDripFeeBps
             type: object
             additionalProperties: false
-        InitGlobalConfigFieldsJSON:
+        InitGlobalConfigArgsJSON:
             properties:
                 params:
                     $ref: '#/components/schemas/types.InitGlobalConfigParamsJSON'
@@ -264,7 +264,7 @@ components:
         ParsedInitGlobalConfig:
             properties:
                 data:
-                    $ref: '#/components/schemas/InitGlobalConfigFieldsJSON'
+                    $ref: '#/components/schemas/InitGlobalConfigArgsJSON'
                 accounts:
                     $ref: '#/components/schemas/InitGlobalConfigAccountsJSON'
                 name:
@@ -429,7 +429,7 @@ components:
                 - newDefaultDripFeesBps
             type: object
             additionalProperties: false
-        UpdateDefaultDripFeesFieldsJSON:
+        UpdateDefaultDripFeesArgsJSON:
             properties:
                 params:
                     $ref: '#/components/schemas/types.UpdateDefaultDripFeesParamsJSON'
@@ -440,7 +440,7 @@ components:
         ParsedUpdateDefaultDripFees:
             properties:
                 data:
-                    $ref: '#/components/schemas/UpdateDefaultDripFeesFieldsJSON'
+                    $ref: '#/components/schemas/UpdateDefaultDripFeesArgsJSON'
                 accounts:
                     $ref: '#/components/schemas/UpdateDefaultDripFeesAccountsJSON'
                 name:
@@ -476,7 +476,7 @@ components:
                 - newDefaultPairDripFeesBps
             type: object
             additionalProperties: false
-        UpdateDefaultPairDripFeesFieldsJSON:
+        UpdateDefaultPairDripFeesArgsJSON:
             properties:
                 params:
                     $ref: '#/components/schemas/types.UpdateDefaultPairDripFeesParamsJSON'
@@ -487,7 +487,7 @@ components:
         ParsedUpdateDefaultPairDripFees:
             properties:
                 data:
-                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesFieldsJSON'
+                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesArgsJSON'
                 accounts:
                     $ref: '#/components/schemas/UpdateDefaultPairDripFeesAccountsJSON'
                 name:
@@ -628,7 +628,7 @@ components:
             enum:
                 - confirmed
                 - finalized
-        Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__:
+        Pick_DripPositionAccountJSON.Exclude_keyofDripPositionAccountJSON.owner__:
             properties:
                 globalConfig:
                     type: string
@@ -689,13 +689,13 @@ components:
                 - dripActivationTimestamp
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
-        Omit_DripPositionJSON.owner_:
-            $ref: '#/components/schemas/Pick_DripPositionJSON.Exclude_keyofDripPositionJSON.owner__'
+        Omit_DripPositionAccountJSON.owner_:
+            $ref: '#/components/schemas/Pick_DripPositionAccountJSON.Exclude_keyofDripPositionAccountJSON.owner__'
             description: 'Construct a type with the properties of T except for those in type K.'
         DripPositionJSONWrapper:
             allOf:
                 -
-                    $ref: '#/components/schemas/Omit_DripPositionJSON.owner_'
+                    $ref: '#/components/schemas/Omit_DripPositionAccountJSON.owner_'
                 -
                     properties:
                         owner:
@@ -708,7 +708,7 @@ components:
                     required:
                         - ownerType
                     type: object
-        DripPositionNftMappingJSON:
+        DripPositionNftMappingAccountJSON:
             properties:
                 version:
                     type: number
@@ -727,7 +727,7 @@ components:
                 - bump
             type: object
             additionalProperties: false
-        DripPositionSignerJSON:
+        DripPositionSignerAccountJSON:
             properties:
                 version:
                     type: number
@@ -743,7 +743,7 @@ components:
                 - bump
             type: object
             additionalProperties: false
-        GlobalConfigJSON:
+        GlobalConfigAccountJSON:
             properties:
                 version:
                     type: number
@@ -771,7 +771,7 @@ components:
                 - globalConfigSigner
             type: object
             additionalProperties: false
-        GlobalConfigSignerJSON:
+        GlobalConfigSignerAccountJSON:
             properties:
                 version:
                     type: number
@@ -787,7 +787,7 @@ components:
                 - bump
             type: object
             additionalProperties: false
-        Pick_PairConfigJSON.Exclude_keyofPairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__:
+        Pick_PairConfigAccountJSON.Exclude_keyofPairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__:
             properties:
                 globalConfig:
                     type: string
@@ -815,8 +815,8 @@ components:
                 - inputTokenDripFeePortionBps
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
-        Omit_PairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_:
-            $ref: '#/components/schemas/Pick_PairConfigJSON.Exclude_keyofPairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__'
+        Omit_PairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_:
+            $ref: '#/components/schemas/Pick_PairConfigAccountJSON.Exclude_keyofPairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__'
             description: 'Construct a type with the properties of T except for those in type K.'
         PriceOracleJSON:
             properties:
@@ -831,7 +831,7 @@ components:
         PairConfigJSONWrapper:
             allOf:
                 -
-                    $ref: '#/components/schemas/Omit_PairConfigJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_'
+                    $ref: '#/components/schemas/Omit_PairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_'
                 -
                     properties:
                         outputTokenPriceOracle:
@@ -847,13 +847,13 @@ components:
                 parsedPairConfig:
                     $ref: '#/components/schemas/PairConfigJSONWrapper'
                 parsedGlobalConfigSigner:
-                    $ref: '#/components/schemas/GlobalConfigSignerJSON'
+                    $ref: '#/components/schemas/GlobalConfigSignerAccountJSON'
                 parsedGlobalConfig:
-                    $ref: '#/components/schemas/GlobalConfigJSON'
+                    $ref: '#/components/schemas/GlobalConfigAccountJSON'
                 parsedDripPositionSigner:
-                    $ref: '#/components/schemas/DripPositionSignerJSON'
+                    $ref: '#/components/schemas/DripPositionSignerAccountJSON'
                 parsedDripPositionNftMapping:
-                    $ref: '#/components/schemas/DripPositionNftMappingJSON'
+                    $ref: '#/components/schemas/DripPositionNftMappingAccountJSON'
                 parsedDripPosition:
                     $ref: '#/components/schemas/DripPositionJSONWrapper'
                 name:

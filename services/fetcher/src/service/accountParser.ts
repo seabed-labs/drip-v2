@@ -1,4 +1,4 @@
-import { Accounts } from '@dcaf/drip-types';
+import { DripPosition,DripPositionNftMapping,DripPositionSigner,GlobalConfig, GlobalConfigSigner, PairConfig,  DripPositionNftMappingAccountJSON, DripPositionSignerAccountJSON, GlobalConfigAccountJSON, GlobalConfigSignerAccountJSON } from '@dcaf/drip-types/src/accounts';
 import {
     DripPositionJSONWrapper,
     PairConfigJSONWrapper,
@@ -15,19 +15,19 @@ export type DripAccountDecodeResponse =
       }
     | {
           name: 'DripPositionNftMapping';
-          parsedDripPositionNftMapping: Accounts.DripPositionNftMappingJSON;
+          parsedDripPositionNftMapping: DripPositionNftMappingAccountJSON;
       }
     | {
           name: 'DripPositionSigner';
-          parsedDripPositionSigner: Accounts.DripPositionSignerJSON;
+          parsedDripPositionSigner: DripPositionSignerAccountJSON;
       }
     | {
           name: 'GlobalConfig';
-          parsedGlobalConfig: Accounts.GlobalConfigJSON;
+          parsedGlobalConfig: GlobalConfigAccountJSON;
       }
     | {
           name: 'GlobalConfigSigner';
-          parsedGlobalConfigSigner: Accounts.GlobalConfigSignerJSON;
+          parsedGlobalConfigSigner: GlobalConfigSignerAccountJSON;
       }
     | {
           name: 'PairConfig';
@@ -38,8 +38,8 @@ export function tryDecodeToParsedDripAccount(
     data: Buffer
 ): DripAccountDecodeResponse {
     const discriminator = data.slice(0, 8);
-    if (discriminator.equals(Accounts.DripPosition.discriminator)) {
-        const decodedData = Accounts.DripPosition.decode(data).toJSON();
+    if (discriminator.equals(DripPosition.discriminator)) {
+        const decodedData = DripPosition.decode(data).toJSON();
         const owner =
             decodedData.owner.kind === 'Direct'
                 ? decodedData.owner.value.owner
@@ -60,36 +60,36 @@ export function tryDecodeToParsedDripAccount(
             },
         };
     } else if (
-        discriminator.equals(Accounts.DripPositionNftMapping.discriminator)
+        discriminator.equals(DripPosition.discriminator)
     ) {
         return {
             name: 'DripPositionNftMapping',
             parsedDripPositionNftMapping:
-                Accounts.DripPositionNftMapping.decode(data).toJSON(),
+                DripPositionNftMapping.decode(data).toJSON(),
         };
     } else if (
-        discriminator.equals(Accounts.DripPositionSigner.discriminator)
+        discriminator.equals(DripPositionSigner.discriminator)
     ) {
         return {
             name: 'DripPositionSigner',
             parsedDripPositionSigner:
-                Accounts.DripPositionSigner.decode(data).toJSON(),
+                DripPositionSigner.decode(data).toJSON(),
         };
-    } else if (discriminator.equals(Accounts.GlobalConfig.discriminator)) {
+    } else if (discriminator.equals(GlobalConfig.discriminator)) {
         return {
             name: 'GlobalConfig',
-            parsedGlobalConfig: Accounts.GlobalConfig.decode(data).toJSON(),
+            parsedGlobalConfig: GlobalConfig.decode(data).toJSON(),
         };
     } else if (
-        discriminator.equals(Accounts.GlobalConfigSigner.discriminator)
+        discriminator.equals(GlobalConfigSigner.discriminator)
     ) {
         return {
             name: 'GlobalConfigSigner',
             parsedGlobalConfigSigner:
-                Accounts.GlobalConfigSigner.decode(data).toJSON(),
+                GlobalConfigSigner.decode(data).toJSON(),
         };
-    } else if (discriminator.equals(Accounts.PairConfig.discriminator)) {
-        const decodedData = Accounts.PairConfig.decode(data).toJSON();
+    } else if (discriminator.equals(PairConfig.discriminator)) {
+        const decodedData = PairConfig.decode(data).toJSON();
         return {
             name: 'PairConfig',
             parsedPairConfig: {

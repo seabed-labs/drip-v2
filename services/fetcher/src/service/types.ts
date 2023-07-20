@@ -1,29 +1,29 @@
 import {
-    DripPositionJSON,
-    DripPositionNftMappingJSON,
-    DripPositionSignerJSON,
-    GlobalConfigJSON,
-    GlobalConfigSignerJSON,
-    PairConfigJSON,
+    DripPositionAccountJSON,
+    DripPositionNftMappingAccountJSON,
+    DripPositionSignerAccountJSON,
+    GlobalConfigAccountJSON,
+    GlobalConfigSignerAccountJSON,
+    PairConfigAccountJSON,
 } from '../generated/anchor/accounts';
 import {
     DepositAccountsJSON,
-    DepositFieldsJSON,
+    DepositArgsJSON,
     DetokenizeDripPositionAccountsJSON,
     DripV2InstructionNames,
     InitDripPositionAccountsJSON,
-    InitDripPositionFieldsJSON,
+    InitDripPositionArgsJSON,
     UpdateDefaultPairDripFeesAccountsJSON,
-    UpdateDefaultPairDripFeesFieldsJSON,
+    UpdateDefaultPairDripFeesArgsJSON,
     InitDripPositionNftAccountsJSON,
     InitGlobalConfigAccountsJSON,
-    InitGlobalConfigFieldsJSON,
+    InitGlobalConfigArgsJSON,
     InitPairConfigAccountsJSON,
     ToggleAutoCreditAccountsJSON,
     TokenizeDripPositionAccountsJSON,
     UpdateAdminAccountsJSON,
     UpdateDefaultDripFeesAccountsJSON,
-    UpdateDefaultDripFeesFieldsJSON,
+    UpdateDefaultDripFeesArgsJSON,
     UpdatePythPriceFeedAccountsJSON,
     UpdateSuperAdminAccountsJSON,
 } from '../generated/anchor/instructions';
@@ -93,10 +93,10 @@ export type ParsedAccountResponse = {
     publicKey: string;
     name: string;
     parsedDripPosition?: DripPositionJSONWrapper;
-    parsedDripPositionNftMapping?: DripPositionNftMappingJSON;
-    parsedDripPositionSigner?: DripPositionSignerJSON;
-    parsedGlobalConfig?: GlobalConfigJSON;
-    parsedGlobalConfigSigner?: GlobalConfigSignerJSON;
+    parsedDripPositionNftMapping?: DripPositionNftMappingAccountJSON;
+    parsedDripPositionSigner?: DripPositionSignerAccountJSON;
+    parsedGlobalConfig?: GlobalConfigAccountJSON;
+    parsedGlobalConfigSigner?: GlobalConfigSignerAccountJSON;
     parsedPairConfig?: PairConfigJSONWrapper;
 };
 
@@ -114,14 +114,14 @@ export type PriceOracleJSON = {
     priceOracleJsonIsPyth: boolean;
 };
 export type PairConfigJSONWrapper = Omit<
-    PairConfigJSON,
+    PairConfigAccountJSON,
     'inputTokenPriceOracle' | 'outputTokenPriceOracle'
 > & {
     inputTokenPriceOracle: PriceOracleJSON;
     outputTokenPriceOracle: PriceOracleJSON;
 };
 
-export type DripPositionJSONWrapper = Omit<DripPositionJSON, 'owner'> & {
+export type DripPositionJSONWrapper = Omit<DripPositionAccountJSON, 'owner'> & {
     ownerType: 'Direct' | 'Tokenized';
     owner: string | undefined;
 };
@@ -129,7 +129,7 @@ export type DripPositionJSONWrapper = Omit<DripPositionJSON, 'owner'> & {
 export type ParsedDeposit = {
     name: DripV2InstructionNames.deposit;
     accounts: DepositAccountsJSON;
-    data: DepositFieldsJSON;
+    data: DepositArgsJSON;
 };
 
 export type ParsedDetokenizeDripPosition = {
@@ -140,7 +140,7 @@ export type ParsedDetokenizeDripPosition = {
 export type ParsedInitDripPosition = {
     name: DripV2InstructionNames.initDripPosition;
     accounts: InitDripPositionAccountsJSON;
-    data: InitDripPositionFieldsJSON;
+    data: InitDripPositionArgsJSON;
 };
 
 export type ParsedInitDripPositionNft = {
@@ -151,7 +151,7 @@ export type ParsedInitDripPositionNft = {
 export type ParsedInitGlobalConfig = {
     name: DripV2InstructionNames.initGlobalConfig;
     accounts: InitGlobalConfigAccountsJSON;
-    data: InitGlobalConfigFieldsJSON;
+    data: InitGlobalConfigArgsJSON;
 };
 
 export type ParsedInitPairConfig = {
@@ -179,14 +179,14 @@ export type ParsedUpdateAdmin = {
 export type ParsedUpdateDefaultDripFees = {
     name: DripV2InstructionNames.updateDefaultDripFees;
     accounts: UpdateDefaultDripFeesAccountsJSON;
-    data: UpdateDefaultDripFeesFieldsJSON;
+    data: UpdateDefaultDripFeesArgsJSON;
 };
 
 export type ParsedUpdateDefaultPairDripFees = {
     name: DripV2InstructionNames.updateDefaultPairDripFees;
 
     accounts: UpdateDefaultPairDripFeesAccountsJSON;
-    data: UpdateDefaultPairDripFeesFieldsJSON;
+    data: UpdateDefaultPairDripFeesArgsJSON;
 };
 
 export type ParsedUpdatePythPriceFeed = {

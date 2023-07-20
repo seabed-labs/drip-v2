@@ -1,5 +1,5 @@
 import { BorshCoder, Instruction } from '@coral-xyz/anchor';
-import { IDL } from '@dcaf/drip-types';
+import { IDL } from '@dcaf/drip-types/src/drip_v2';
 import {
     MessageAccountKeys,
     MessageCompiledInstruction,
@@ -24,17 +24,17 @@ import {
     RestError,
 } from './types';
 import {
-    DepositFields,
+    DepositArgs,
     InitDripPosition,
     InitGlobalConfig,
-    UpdateAdminFields,
-    UpdateDefaultDripFeesFields,
+    UpdateAdminArgs,
+    UpdateDefaultDripFeesArgs,
     UpdateDefaultPairDripFees,
-    UpdateDefaultPairDripFeesFields,
+    UpdateDefaultPairDripFeesArgs,
     UpdatePythPriceFeed,
     DripV2InstructionNames,
-    InitDripPositionFields,
-    InitGlobalConfigFields,
+    InitDripPositionArgs,
+    InitGlobalConfigArgs,
     InitPairConfig,
     UpdateSuperAdmin,
     UpdateAdmin,
@@ -44,7 +44,7 @@ import {
     DetokenizeDripPosition,
     ToggleAutoCredit,
     Deposit,
-} from '../generated/anchor/instructions';
+} from '@dcaf/drip-types/src/instructions';
 import assert from 'assert';
 import { programId } from './env';
 
@@ -131,7 +131,7 @@ function parseDeposit(
     accounts: PublicKey[]
 ): { parsedDeposit: ParsedDeposit } {
     const parsedIx = Deposit.fromDecoded(
-        ixData.data as DepositFields,
+        ixData.data as DepositArgs,
         accounts
     );
     return {
@@ -202,7 +202,7 @@ function parseInitDripPosition(
     accounts: PublicKey[]
 ): { parsedInitDripPosition: ParsedInitDripPosition } {
     const parsedIx = InitDripPosition.fromDecoded(
-        ixData.data as InitDripPositionFields,
+        ixData.data as InitDripPositionArgs,
         accounts
     );
     return {
@@ -219,7 +219,7 @@ function parseUpdateDefaultPairDripFees(
     accounts: PublicKey[]
 ): { parsedUpdateDefaultPairDripFees: ParsedUpdateDefaultPairDripFees } {
     const parsedIx = UpdateDefaultPairDripFees.fromDecoded(
-        ixData.data as UpdateDefaultPairDripFeesFields,
+        ixData.data as UpdateDefaultPairDripFeesArgs,
         accounts
     );
     return {
@@ -249,7 +249,7 @@ function parseUpdateDefaultDripFees(
     accounts: PublicKey[]
 ): { parsedUpdateDefaultDripFees: ParsedUpdateDefaultDripFees } {
     const parsedIx = UpdateDefaultDripFees.fromDecoded(
-        ixData.data as UpdateDefaultDripFeesFields,
+        ixData.data as UpdateDefaultDripFeesArgs,
         accounts
     );
     return {
@@ -266,7 +266,7 @@ function parseUpdateAdmin(
     accounts: PublicKey[]
 ): { parsedUpdateAdmin: ParsedUpdateAdmin } {
     const parsedIx = UpdateAdmin.fromDecoded(
-        ixData.data as UpdateAdminFields,
+        ixData.data as UpdateAdminArgs,
         accounts
     );
     return {
@@ -309,7 +309,7 @@ function parseInitGlobalConfig(
     accounts: PublicKey[]
 ): { parsedInitGlobalConfig: ParsedInitGlobalConfig } {
     const parsedIx = InitGlobalConfig.fromDecoded(
-        ixData.data as InitGlobalConfigFields,
+        ixData.data as InitGlobalConfigArgs,
         accounts
     );
     return {
