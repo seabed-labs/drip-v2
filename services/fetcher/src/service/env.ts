@@ -1,4 +1,6 @@
-export const programId: string | undefined = process.env.DRIP_PROGRAM_ID;
+import { PublicKey } from '@solana/web3.js';
+
+export const programId: PublicKey = new PublicKey(process.env.DRIP_PROGRAM_ID!);
 
 export const rpcUrl: string =
     process.env.FETCHER_RPC_URL ||

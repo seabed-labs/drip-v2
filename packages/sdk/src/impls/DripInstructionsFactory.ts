@@ -14,12 +14,17 @@ import {
     WithdrawParams,
 } from '../types';
 import { DripPDA } from '../utils';
-import { Accounts, Instructions } from '@dcaf/drip-types';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import {
+    Deposit,
+    InitDripPosition,
+    InitPairConfig,
+    PairConfig,
+} from '@dcaf/drip-types';
 
 export class DripInstructionsFactory implements IDripInstructionsFactory {
     public constructor(
@@ -50,7 +55,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             this.programId
         );
 
-        const pairConfigAccount = await Accounts.PairConfig.fetch(
+        const pairConfigAccount = await PairConfig.fetch(
             this.connection,
             pairConfigPubkey,
             this.programId
@@ -59,7 +64,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         const instructions: TransactionInstruction[] = [];
 
         if (!pairConfigAccount) {
-            const initPairConfigIx = new Instructions.InitPairConfig({
+            const initPairConfigIx = new InitPairConfig({
                 args: null,
                 accounts: {
                     payer,
@@ -90,7 +95,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 )
             );
 
-        const initDripPositionIx = new Instructions.InitDripPosition({
+        const initDripPositionIx = new InitDripPosition({
             args: {
                 params: {
                     owner,
@@ -119,7 +124,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         if (initialDeposit) {
             // TODO: Support wSOL
 
-            const depositIx = new Instructions.Deposit({
+            const depositIx = new Deposit({
                 args: {
                     params: {
                         depositAmount: initialDeposit.amount,

@@ -14,7 +14,7 @@ import {
 import { assert, expect } from 'chai';
 import { newTransaction } from './utils';
 import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
-import { DripV2, Instructions } from '@dcaf/drip-types';
+import { DripV2, InitGlobalConfig } from '@dcaf/drip-types';
 import { DripPosition } from '@dcaf/drip-types/src/accounts';
 
 describe('SDK - createPosition', () => {
@@ -70,7 +70,7 @@ describe('SDK - createPosition', () => {
             program.programId
         );
 
-        const initGlobalConfigIx = new Instructions.InitGlobalConfig({
+        const initGlobalConfigIx = new InitGlobalConfig({
             args: {
                 params: {
                     superAdmin: superAdminKeypair.publicKey,

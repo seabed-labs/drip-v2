@@ -7,7 +7,6 @@ import {
     Connection as Web3Conn,
 } from '@solana/web3.js';
 import { Address, translateAddress } from '@coral-xyz/anchor';
-import { PROGRAM_ID } from '@dcaf/drip-types';
 import { RestError } from './types';
 import { getErrMessage } from './common';
 import { rpcUrl } from './env';
@@ -24,7 +23,7 @@ export class Connection extends Web3Conn {
     async getNonNullableAccountInfo(
         address: Address,
         commitment: Commitment = 'finalized',
-        owner: PublicKey = PROGRAM_ID
+        owner: PublicKey
     ): Promise<AccountInfo<Buffer>> {
         let accountInfo: AccountInfo<Buffer> | null;
         try {

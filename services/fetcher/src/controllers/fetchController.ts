@@ -79,7 +79,7 @@ export class FetchController extends Controller {
         const accountInfo = await this.connection.getNonNullableAccountInfo(
             accountPublicKey,
             commitment,
-            programId ? new PublicKey(programId) : undefined
+            programId
         );
         const parsedAccount = tryDecodeToParsedDripAccount(accountInfo.data);
         this.setStatus(200);

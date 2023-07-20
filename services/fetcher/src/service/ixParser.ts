@@ -56,7 +56,7 @@ export function tryDecodeIx(
     ix: MessageCompiledInstruction
 ): ParsedDripIx | undefined {
     const ixProgram = accountKeys.get(ix.programIdIndex);
-    if (ixProgram?.toString() === programId) {
+    if (ixProgram?.toString() === programId.toString()) {
         try {
             return decodeIxToParsedDripIx(tx, ix);
         } catch (e) {
