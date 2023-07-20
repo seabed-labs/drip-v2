@@ -79,14 +79,14 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         if (this.pairConfig) {
             return this.pairConfig;
         }
-        const pairConfig = await PairConfig.fetchNonNullable(
+        const pairConfig = await PairConfig.fetchNonNullableData(
             this.provider.connection,
             this.dripPosition.data.pairConfig,
             this.program.programId,
             // TODO: Add options
             undefined,
             PAIR_CONFIG_NOT_FOUND(this.dripPosition.data.pairConfig)
-        ).then((a) => a.data);
+        );
         this.pairConfig = pairConfig;
         return pairConfig;
     }

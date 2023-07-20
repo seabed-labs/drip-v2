@@ -1,8 +1,6 @@
 import '../setup';
 import * as anchor from '@coral-xyz/anchor';
-import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Accounts, DripV2, Instructions } from '@dcaf/drip-types';
 import { AnchorProvider } from '@coral-xyz/anchor';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -15,6 +13,9 @@ import {
 } from '@solana/spl-token';
 import { assert, expect } from 'chai';
 import { newTransaction } from './utils';
+import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
+import { DripV2, Instructions } from '@dcaf/drip-types';
+import { DripPosition } from '@dcaf/drip-types/src/accounts';
 
 describe('SDK - createPosition', () => {
     // TODO: for debugging with yarn run localnet
@@ -69,26 +70,25 @@ describe('SDK - createPosition', () => {
             program.programId
         );
 
-        const initGlobalConfigIx = new Instructions.InitGlobalConfig(
-            {
+        const initGlobalConfigIx = new Instructions.InitGlobalConfig({
+            args: {
                 params: {
                     superAdmin: superAdminKeypair.publicKey,
                     defaultDripFeeBps: BigInt(100),
                 },
             },
-            {
+            accounts: {
                 payer: provider.publicKey,
                 globalConfig: globalConfigKeypair.publicKey,
                 globalConfigSigner: globalConfigSignerPubkey,
                 systemProgram: SystemProgram.programId,
             },
-            program.programId
-        );
+        });
 
         await provider.sendAndConfirm(
             (
                 await newTransaction(provider.connection)
-            ).add(initGlobalConfigIx.build()),
+            ).add(initGlobalConfigIx.build(program.programId)),
             [globalConfigKeypair],
             { maxRetries: 3 }
         );
@@ -115,11 +115,13 @@ describe('SDK - createPosition', () => {
         assert(isTxSuccessful(txResult), 'Expected TX to be successful');
         const dripPositionPubkey = txResult.value.pubkey;
 
-        const dripPositionAccount = await Accounts.DripPosition.fetch(
+        const dripPositionAccount = await DripPosition.fetch(
             provider.connection,
             dripPositionPubkey,
             program.programId
         );
+        assert(dripPositionAccount);
+        expect(dripPositionAccount.toJSON()).to.exist;
 
         const expectedDripPositionSignerPubkey =
             PublicKey.findProgramAddressSync(
@@ -147,8 +149,6 @@ describe('SDK - createPosition', () => {
                 TOKEN_PROGRAM_ID,
                 ASSOCIATED_TOKEN_PROGRAM_ID
             );
-
-        expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
             19
@@ -192,15 +192,15 @@ describe('SDK - createPosition', () => {
         });
 
         expect(
-            Number(dripPositionAccount?.dripActivationGenesisShift)
+            Number(dripPositionAccount.data.dripActivationGenesisShift)
         ).greaterThanOrEqual(0);
 
         expect(
-            Number(dripPositionAccount?.dripActivationGenesisShift)
+            Number(dripPositionAccount.data.dripActivationGenesisShift)
         ).lessThan(3600);
 
         expect(
-            Number(dripPositionAccount?.dripActivationTimestamp)
+            Number(dripPositionAccount.data.dripActivationTimestamp)
         ).greaterThan(0);
     });
 
@@ -242,11 +242,13 @@ describe('SDK - createPosition', () => {
         assert(isTxSuccessful(txResult), 'Expected TX to be successful');
         const dripPositionPubkey = txResult.value.pubkey;
 
-        const dripPositionAccount = await Accounts.DripPosition.fetch(
+        const dripPositionAccount = await DripPosition.fetch(
             provider.connection,
             dripPositionPubkey,
             program.programId
         );
+        assert(dripPositionAccount);
+        expect(dripPositionAccount?.toJSON()).to.exist;
 
         const expectedDripPositionSignerPubkey =
             PublicKey.findProgramAddressSync(
@@ -275,7 +277,6 @@ describe('SDK - createPosition', () => {
                 ASSOCIATED_TOKEN_PROGRAM_ID
             );
 
-        expect(dripPositionAccount?.toJSON()).to.exist;
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
             19
@@ -319,15 +320,15 @@ describe('SDK - createPosition', () => {
         });
 
         expect(
-            Number(dripPositionAccount?.dripActivationGenesisShift)
+            Number(dripPositionAccount.data.dripActivationGenesisShift)
         ).greaterThanOrEqual(0);
 
         expect(
-            Number(dripPositionAccount?.dripActivationGenesisShift)
+            Number(dripPositionAccount.data.dripActivationGenesisShift)
         ).lessThan(3600);
 
         expect(
-            Number(dripPositionAccount?.dripActivationTimestamp)
+            Number(dripPositionAccount.data.dripActivationTimestamp)
         ).greaterThan(0);
 
         const dripInputTokenAccount = await getAccount(

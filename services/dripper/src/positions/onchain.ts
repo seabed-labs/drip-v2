@@ -57,11 +57,12 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
         while (i < positionKeys.length && res.length < limit) {
             const positionKey = positionKeys[i];
             i += 1;
-            const dripPositionAccount = await DripPositionClass.fetch(
-                this.connection,
-                positionKey,
-                this.programId
-            ).then((a) => a?.data);
+            const dripPositionAccount =
+                await DripPositionClass.fetchNullableData(
+                    this.connection,
+                    positionKey,
+                    this.programId
+                );
             if (!dripPositionAccount) {
                 continue;
             }
