@@ -1477,6 +1477,10 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "dripAmountToFill",
+            "type": "u64"
+          },
+          {
             "name": "minimumOutputTokensExpected",
             "type": "u64"
           }
@@ -1856,6 +1860,11 @@
       "code": 6042,
       "name": "InputFeesLargerThanReserved",
       "msg": "Input drip fees larger then reserved"
+    },
+    {
+      "code": 6043,
+      "name": "RequestedDripAmountExceedsMaxForPosition",
+      "msg": "The requested drip amount is larger then the maximum allowable amount for this position cycle"
     }
   ]
 }

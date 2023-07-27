@@ -89,6 +89,7 @@ pub struct PreDrip<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct PreDripParams {
+    pub drip_amount_to_fill: u64,
     pub minimum_output_tokens_expected: u64,
 }
 
@@ -111,8 +112,12 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
 
     validate_post_drip_ix_present(&ctx)?;
 
-    /* STATE UPDATES (EFFECTS) */
     let drip_position = &ctx.accounts.drip_position;
+    require!(
+        params.drip_amount_to_fill <= drip_position.drip_amount - drip_position.drip_amount_filled,
+        DripError::RequestedDripAmountExceedsMaxForPosition
+    );
+
     let drip_position_signer = &ctx.accounts.drip_position_signer;
     let ephemeral_drip_state = &mut ctx.accounts.ephemeral_drip_state;
     let pair_config = &ctx.accounts.pair_config;
@@ -125,7 +130,7 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     // TODO(#104): Make sure overflow-checks work in bpf compilation profile too (not just x86 or apple silicon targets)
     //       Else switch to checked math functions.
     // TODO(#105): Move all math here to a custom module to unit test better
-    let partial_drip_amount = drip_position.drip_amount - drip_position.drip_amount_filled;
+    let partial_drip_amount = params.drip_amount_to_fill;
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
     let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
     let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
@@ -133,6 +138,8 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
     let input_token_fee_amount = (partial_drip_amount * input_drip_fee_bps) / 10_000;
     let post_fees_partial_drip_amount = partial_drip_amount - input_token_fee_amount;
+
+    /* STATE UPDATES (EFFECTS) */
 
     ephemeral_drip_state.bump = *ctx.bumps.get("ephemeral_drip_state").unwrap();
     ephemeral_drip_state.drip_position = drip_position.key();

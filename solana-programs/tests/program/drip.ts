@@ -290,6 +290,7 @@ describe('Program - drip (pre/post)', () => {
     it('should fail if signer does not have permission', async () => {
         const preDripIx = await program.methods
             .preDrip({
+                dripAmountToFill: new BN(0),
                 minimumOutputTokensExpected: new BN(500_000),
             })
             .accounts({
@@ -339,6 +340,7 @@ describe('Program - drip (pre/post)', () => {
         );
         const preDripIx = await program.methods
             .preDrip({
+                dripAmountToFill: new BN(0),
                 minimumOutputTokensExpected: new BN(500_000),
             })
             .accounts({
@@ -406,6 +408,7 @@ describe('Program - drip (pre/post)', () => {
         };
         const preDripIx = await program.methods
             .preDrip({
+                dripAmountToFill: new BN(1),
                 minimumOutputTokensExpected: new BN(500_000),
             })
             .accounts({
@@ -509,8 +512,14 @@ describe('Program - drip (pre/post)', () => {
                     BigInt(10_000);
                 const outputReceiveAmount = dripAmountBefore / BigInt(2);
 
+                const requestedDripAmount = dripAmountBefore;
+                const expectedReceiveAmount =
+                    dripAmountBefore - input_token_fee_amount;
                 const preDripIx = await program.methods
                     .preDrip({
+                        dripAmountToFill: new BN(
+                            requestedDripAmount.toString()
+                        ),
                         minimumOutputTokensExpected: new BN(
                             outputReceiveAmount.toString()
                         ),
@@ -525,7 +534,7 @@ describe('Program - drip (pre/post)', () => {
                         dripperInputTokenAccountPublicKey,
                         inputMintPublicKey,
                         dripAuthorityKeypair.publicKey,
-                        dripAmountBefore - input_token_fee_amount
+                        expectedReceiveAmount
                     ),
                     createMintToInstruction(
                         outputMintPublicKey,
@@ -682,6 +691,9 @@ describe('Program - drip (pre/post)', () => {
 
             const preDripIx = await program.methods
                 .preDrip({
+                    dripAmountToFill: new BN(
+                        partialDripAmountBeforeFees.toString()
+                    ),
                     minimumOutputTokensExpected: new BN(
                         outputReceiveAmount.toString()
                     ),
