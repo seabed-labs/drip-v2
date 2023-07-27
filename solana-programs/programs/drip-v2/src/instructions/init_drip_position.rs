@@ -1,4 +1,5 @@
 use crate::{
+    common::math::split_drip_amount_from_fees,
     errors::DripError,
     state::{DripPosition, DripPositionOwner, DripPositionSigner, GlobalConfig, PairConfig},
 };
@@ -106,29 +107,40 @@ pub fn handle_init_drip_position(
         DripError::PairConfigMismatch
     );
 
+    let drip_position_signer = &mut ctx.accounts.drip_position_signer;
+
+    drip_position_signer.drip_position = ctx.accounts.drip_position.key();
+    drip_position_signer.bump = *ctx.bumps.get("drip_position_signer").unwrap();
+
     let drip_position = &mut ctx.accounts.drip_position;
+
+    let drip_amounts = split_drip_amount_from_fees(
+        &params.drip_amount,
+        &ctx.accounts.pair_config.default_pair_drip_fee_bps,
+        &ctx.accounts.pair_config.input_token_drip_fee_portion_bps,
+    );
+
     drip_position.global_config = ctx.accounts.global_config.key();
     drip_position.owner = DripPositionOwner::Direct {
         owner: params.owner,
     };
-
-    drip_position.drip_fee_bps = ctx.accounts.pair_config.default_pair_drip_fee_bps;
-
     drip_position.drip_position_signer = ctx.accounts.drip_position_signer.key();
-    // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
-    drip_position.auto_credit_enabled = false;
     drip_position.input_token_account = ctx.accounts.input_token_account.key();
     drip_position.output_token_account = ctx.accounts.output_token_account.key();
-    drip_position.drip_amount = params.drip_amount;
     drip_position.pair_config = ctx.accounts.pair_config.key();
-    drip_position.frequency_in_seconds = params.frequency_in_seconds;
-    drip_position.total_input_token_dripped = 0;
-    drip_position.total_output_token_received = 0;
-    drip_position.init_drip_timestamps()?;
 
-    let drip_position_signer = &mut ctx.accounts.drip_position_signer;
-    drip_position_signer.drip_position = ctx.accounts.drip_position.key();
-    drip_position_signer.bump = *ctx.bumps.get("drip_position_signer").unwrap();
+    drip_position.drip_fee_bps = ctx.accounts.pair_config.default_pair_drip_fee_bps;
+    // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
+    drip_position.drip_amount_pre_fees = params.drip_amount;
+    drip_position.drip_amount_remaining_post_fees_in_current_cycle =
+        drip_amounts.drip_amount_post_fees;
+    drip_position.drip_input_fees_remaining_for_current_cycle = drip_amounts.input_token_fee_amount;
+    drip_position.frequency_in_seconds = params.frequency_in_seconds;
+    drip_position.total_input_token_dripped_post_fees = 0;
+    drip_position.total_output_token_received_post_fees = 0;
+    drip_position.auto_credit_enabled = false;
+
+    drip_position.init_drip_timestamps()?;
 
     Ok(())
 }

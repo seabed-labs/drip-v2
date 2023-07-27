@@ -647,17 +647,19 @@ components:
                     type: string
                 autoCreditEnabled:
                     type: boolean
-                dripAmount:
+                dripAmountPreFees:
                     type: string
-                dripAmountFilled:
+                dripAmountRemainingPostFeesInCurrentCycle:
+                    type: string
+                dripInputFeesRemainingForCurrentCycle:
                     type: string
                 totalInputFeesCollected:
                     type: string
                 totalOutputFeesCollected:
                     type: string
-                totalInputTokenDripped:
+                totalInputTokenDrippedPostFees:
                     type: string
-                totalOutputTokenReceived:
+                totalOutputTokenReceivedPostFees:
                     type: string
                 frequencyInSeconds:
                     type: string
@@ -677,12 +679,13 @@ components:
                 - dripPositionNftMint
                 - dripPositionSigner
                 - autoCreditEnabled
-                - dripAmount
-                - dripAmountFilled
+                - dripAmountPreFees
+                - dripAmountRemainingPostFeesInCurrentCycle
+                - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected
                 - totalOutputFeesCollected
-                - totalInputTokenDripped
-                - totalOutputTokenReceived
+                - totalInputTokenDrippedPostFees
+                - totalOutputTokenReceivedPostFees
                 - frequencyInSeconds
                 - dripMaxJitter
                 - dripActivationGenesisShift

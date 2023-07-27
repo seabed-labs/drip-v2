@@ -1157,11 +1157,15 @@
             "type": "bool"
           },
           {
-            "name": "dripAmount",
+            "name": "dripAmountPreFees",
             "type": "u64"
           },
           {
-            "name": "dripAmountFilled",
+            "name": "dripAmountRemainingPostFeesInCurrentCycle",
+            "type": "u64"
+          },
+          {
+            "name": "dripInputFeesRemainingForCurrentCycle",
             "type": "u64"
           },
           {
@@ -1173,11 +1177,11 @@
             "type": "u64"
           },
           {
-            "name": "totalInputTokenDripped",
+            "name": "totalInputTokenDrippedPostFees",
             "type": "u64"
           },
           {
-            "name": "totalOutputTokenReceived",
+            "name": "totalOutputTokenReceivedPostFees",
             "type": "u64"
           },
           {
@@ -1282,10 +1286,6 @@
           },
           {
             "name": "minimumOutputExpected",
-            "type": "u64"
-          },
-          {
-            "name": "inputReservedForFees",
             "type": "u64"
           },
           {

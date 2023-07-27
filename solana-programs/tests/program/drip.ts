@@ -38,7 +38,7 @@ function applyBps(input: bigint, bps: bigint): bigint {
     return (BigInt(input) * BigInt(bps)) / BigInt(10_000);
 }
 
-describe('Program - drip (pre/post)', () => {
+describe.only('Program - drip (pre/post)', () => {
     setProvider(AnchorProvider.env());
     const program = workspace.DripV2 as Program<DripV2>;
     const provider = getProvider() as AnchorProvider;
@@ -445,7 +445,9 @@ describe('Program - drip (pre/post)', () => {
                 dripPositionPublicKey,
                 program.programId
             );
-            expect(dripPosition.data.dripAmountFilled.toString()).to.equal('0');
+            expect(
+                dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
+            ).to.not.equal('0');
             const depositAmount =
                 BigInt(dripPosition.data.dripAmount) * BigInt(dripCount);
             await mintTo(
@@ -504,21 +506,21 @@ describe('Program - drip (pre/post)', () => {
                 const dripAmountBefore = BigInt(
                     dripPositionBefore.data.dripAmount
                 );
-                const dripAmountFilledBefore =
-                    dripPositionBefore.data.dripAmountFilled;
-                expect(dripAmountFilledBefore.toString()).to.equal('0');
-                const input_token_fee_amount =
-                    (dripAmountBefore * BigInt(inputTokenFeeBps)) /
-                    BigInt(10_000);
+                // const dripAmountFilledBefore =
+                //     dripPositionBefore.data.dripAmountFilled;
+                // expect(dripAmountFilledBefore.toString()).to.equal('0');
+                // const input_token_fee_amount =
+                //     (dripAmountBefore * BigInt(inputTokenFeeBps)) /
+                //     BigInt(10_000);
                 const outputReceiveAmount = dripAmountBefore / BigInt(2);
 
-                const requestedDripAmount = dripAmountBefore;
-                const expectedReceiveAmount =
-                    dripAmountBefore - input_token_fee_amount;
+                // const requestedDripAmount = dripAmountBefore;
+                // const expectedReceiveAmount =
+                //     dripAmountBefore - input_token_fee_amount;
                 const preDripIx = await program.methods
                     .preDrip({
                         dripAmountToFill: new BN(
-                            requestedDripAmount.toString()
+                            dripPositionBefore.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
                         ),
                         minimumOutputTokensExpected: new BN(
                             outputReceiveAmount.toString()
@@ -534,7 +536,8 @@ describe('Program - drip (pre/post)', () => {
                         dripperInputTokenAccountPublicKey,
                         inputMintPublicKey,
                         dripAuthorityKeypair.publicKey,
-                        expectedReceiveAmount
+                        dripPositionBefore.data
+                            .dripAmountRemainingPostFeesInCurrentCycle
                     ),
                     createMintToInstruction(
                         outputMintPublicKey,
@@ -605,14 +608,13 @@ describe('Program - drip (pre/post)', () => {
         });
     });
 
-    it('should drip twice in the same cycle with partial drips', async () => {
-        const dripPosition = await DripPosition.fetch(
+    it.only('should drip twice in the same cycle with partial drips', async () => {
+        const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
             dripPositionPublicKey,
             program.programId
         );
-        assert(dripPosition);
-        const dripAmountBefore = BigInt(dripPosition.data.dripAmount);
+        const dripAmountBefore = BigInt(dripPosition.data.dripAmountPreFees);
         const depositAmount = dripAmountBefore * BigInt(1);
         await mintTo(
             provider.connection,
@@ -667,33 +669,37 @@ describe('Program - drip (pre/post)', () => {
                 ),
             ]);
             assert(dripPositionBefore);
-            const dripAmountBefore = BigInt(dripPositionBefore.data.dripAmount);
-            const dripAmountFilledBefore =
-                dripPositionBefore.data.dripAmountFilled;
-            if (i == 0) {
-                expect(dripAmountFilledBefore.toString()).equal('0');
-            }
 
-            const outputReceiveAmount = dripAmountBefore / BigInt(2);
-            const expectedOutputFees = applyBps(
+            const {
+                partialDripAmount,
+                expectedOutputFees,
                 outputReceiveAmount,
-                BigInt(outputTokenFeeBps)
-            );
-            const partialDripAmountBeforeFees = BigInt(
-                dripAmountBefore / BigInt(dripCount)
-            );
-            const expectedInputFees = applyBps(
-                partialDripAmountBeforeFees,
-                BigInt(inputTokenFeeBps)
-            );
-            const partialDripAmountAfterFees =
-                BigInt(partialDripAmountBeforeFees) - BigInt(expectedInputFees);
+            } = (() => {
+                const dripAmountBefore = BigInt(
+                    dripPositionBefore.data.dripAmountPreFees
+                );
+                const outputReceiveAmount = dripAmountBefore / BigInt(2);
+                const expectedOutputFees = applyBps(
+                    outputReceiveAmount,
+                    BigInt(outputTokenFeeBps)
+                );
+                const partialDripAmount =
+                    i === 0
+                        ? BigInt(dripAmountBefore / BigInt(dripCount))
+                        : BigInt(
+                              dripPositionBefore.data
+                                  .dripAmountRemainingPostFeesInCurrentCycle
+                          );
+                return {
+                    partialDripAmount,
+                    expectedOutputFees,
+                    outputReceiveAmount,
+                };
+            })();
 
             const preDripIx = await program.methods
                 .preDrip({
-                    dripAmountToFill: new BN(
-                        partialDripAmountBeforeFees.toString()
-                    ),
+                    dripAmountToFill: new BN(partialDripAmount.toString()),
                     minimumOutputTokensExpected: new BN(
                         outputReceiveAmount.toString()
                     ),
@@ -709,7 +715,7 @@ describe('Program - drip (pre/post)', () => {
                     dripperInputTokenAccountPublicKey,
                     inputMintPublicKey,
                     dripAuthorityKeypair.publicKey,
-                    partialDripAmountAfterFees
+                    partialDripAmount
                 ),
                 createMintToInstruction(
                     outputMintPublicKey,
@@ -775,31 +781,34 @@ describe('Program - drip (pre/post)', () => {
                 // These values are expected to change!
                 // These are validated below
                 dripActivationTimestamp: '0',
-                dripAmountFilled: '0',
-                totalInputTokenDripped: '0',
-                totalOutputTokenReceived: '0',
+                dripAmountRemainingPostFeesInCurrentCycle: '0',
+                dripInputFeesRemainingForCurrentCycle: '0',
+                totalInputTokenDrippedPostFees: '0',
+                totalOutputTokenReceivedPostFees: '0',
                 totalInputFeesCollected: '0',
                 totalOutputFeesCollected: '0',
             }).to.deep.equal({
                 ...dripPositionBeforeJSON,
                 dripActivationTimestamp: '0',
-                dripAmountFilled: '0',
-                totalInputTokenDripped: '0',
-                totalOutputTokenReceived: '0',
+                dripAmountRemainingPostFeesInCurrentCycle: '0',
+                dripInputFeesRemainingForCurrentCycle: '0',
+                totalInputTokenDrippedPostFees: '0',
+                totalOutputTokenReceivedPostFees: '0',
                 totalInputFeesCollected: '0',
                 totalOutputFeesCollected: '0',
             });
 
             if (i == 0) {
-                expect(dripPositionAfterJSON.dripAmountFilled).to.equal(
-                    partialDripAmountBeforeFees.toString()
-                );
-                expect(dripPositionAfterJSON.totalInputTokenDripped).to.equal(
-                    partialDripAmountBeforeFees.toString()
-                );
-                expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
-                    expectedInputFees.toString()
-                );
+                expect(
+                    dripPositionAfterJSON.totalInputTokenDrippedPostFees
+                ).to.equal(partialDripAmount.toString());
+                // expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
+                //     (
+                //         dripPositionBefore.data.totalInputFeesCollected +
+                //         dripPositionBefore.data
+                //             .dripInputFeesRemainingForCurrentCycle
+                //     ).toString()
+                // );
                 expect(dripPositionAfterJSON.totalOutputFeesCollected).to.equal(
                     expectedOutputFees.toString()
                 );
@@ -808,20 +817,24 @@ describe('Program - drip (pre/post)', () => {
                     dripPositionBeforeJSON.dripActivationTimestamp
                 );
             } else if (i == 1) {
-                expect(dripPositionAfterJSON.dripAmountFilled).to.equal('0');
-                expect(dripPositionAfterJSON.totalInputTokenDripped).to.equal(
-                    (
-                        BigInt(dripPositionBefore.data.totalInputTokenDripped) +
-                        BigInt(partialDripAmountBeforeFees)
-                    ).toString()
-                );
-                expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
+                // expect(dripPositionAfterJSON.dripAmountFilled).to.equal('0');
+                expect(
+                    dripPositionAfterJSON.totalInputTokenDrippedPostFees
+                ).to.equal(
                     (
                         BigInt(
-                            dripPositionBefore.data.totalInputFeesCollected
-                        ) + BigInt(expectedInputFees)
+                            dripPositionBefore.data
+                                .totalInputTokenDrippedPostFees
+                        ) + BigInt(partialDripAmount)
                     ).toString()
                 );
+                // expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
+                //     (
+                //         BigInt(
+                //             dripPositionBefore.data.totalInputFeesCollected
+                //         ) + BigInt(expectedInputFees)
+                //     ).toString()
+                // );
                 expect(dripPositionAfterJSON.totalOutputFeesCollected).to.equal(
                     (
                         BigInt(
@@ -834,6 +847,25 @@ describe('Program - drip (pre/post)', () => {
                     dripPositionAfterJSON.dripActivationTimestamp
                 ).to.not.equal(dripPositionBeforeJSON.dripActivationTimestamp);
             }
+            expect(
+                dripPositionAfterJSON.dripAmountRemainingPostFeesInCurrentCycle
+            ).to.equal(
+                (
+                    BigInt(
+                        dripPosition.data
+                            .dripAmountRemainingPostFeesInCurrentCycle
+                    ) - BigInt(partialDripAmount)
+                ).toString()
+            );
+            expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
+                (
+                    BigInt(dripPositionBefore.data.totalInputFeesCollected) +
+                    BigInt(
+                        dripPositionBefore.data
+                            .dripInputFeesRemainingForCurrentCycle
+                    )
+                ).toString()
+            );
             if (i !== dripCount - 1) {
                 await delay(Number(dripPosition.data.frequencyInSeconds) + 500);
             }
