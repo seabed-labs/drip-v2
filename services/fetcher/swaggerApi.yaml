@@ -670,6 +670,8 @@ components:
                     type: string
                 dripActivationTimestamp:
                     type: string
+                cycle:
+                    type: string
             required:
                 - globalConfig
                 - pairConfig
@@ -690,6 +692,7 @@ components:
                 - dripMaxJitter
                 - dripActivationGenesisShift
                 - dripActivationTimestamp
+                - cycle
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
         Omit_DripPositionAccountJSON.owner_:

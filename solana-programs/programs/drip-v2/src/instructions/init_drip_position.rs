@@ -140,7 +140,10 @@ pub fn handle_init_drip_position(
     drip_position.total_output_token_received_post_fees = 0;
     drip_position.auto_credit_enabled = false;
 
-    drip_position.init_drip_timestamps()?;
+    let drip_time = drip_position.get_init_drip_timestamp()?;
+    drip_position.drip_activation_genesis_shift = drip_time.drip_activation_genesis_shift;
+    drip_position.drip_activation_timestamp = drip_time.drip_activation_timestamp;
+    drip_position.cycle = drip_time.cycle;
 
     Ok(())
 }

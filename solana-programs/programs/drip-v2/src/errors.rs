@@ -125,6 +125,7 @@ pub enum DripError {
     #[msg("Expected non-zero used_input_amount post-drip")]
     ExpectedNonZeroInputPostDrip, // 6040 or 0x1798
 
+    // Not used
     #[msg("Expected non-zero input/output drip fees")]
     ExpectedNonZeroDripFees, // 6041 or 0x1799
 

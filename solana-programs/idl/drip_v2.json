@@ -1199,6 +1199,10 @@
           {
             "name": "dripActivationTimestamp",
             "type": "i64"
+          },
+          {
+            "name": "cycle",
+            "type": "u64"
           }
         ]
       }

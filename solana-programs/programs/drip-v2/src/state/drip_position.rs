@@ -4,7 +4,7 @@ use anchor_spl::token::{Mint, TokenAccount};
 use crate::errors::DripError;
 
 #[account]
-#[derive(Default, InitSpace)]
+#[derive(Debug, Default, InitSpace)]
 pub struct DripPosition {
     // size: 32
     pub global_config: Pubkey,
@@ -91,11 +91,20 @@ pub struct DripPosition {
     // size: 8
     pub drip_activation_genesis_shift: i64,
     // DripPosition.drip_activation_timestamp represents the earliest time (solana time) when
-    // this position can drip. After a full drip is complete, this field is updatd to a future time
+    // this position can drip. After a full drip is complete, this field is updated to a future time
     // based on DripPosition.drip_activation_genesis_shift and DripPosition.frequency_in_seconds
     // This field is updated in post_drip.
     // size: 8
     pub drip_activation_timestamp: i64,
+    // DripPosition.cycle represents what cycle the position is in.
+    // Cycle starts at 0 when initialized, and is incremented in post_drip when a drip is completed.
+    pub cycle: u64,
+}
+
+pub struct InitDripTime {
+    pub drip_activation_genesis_shift: i64,
+    pub drip_activation_timestamp: i64,
+    pub cycle: u64,
 }
 
 impl DripPosition {
@@ -146,16 +155,19 @@ impl DripPosition {
     //
     // NOTE: Canonical cycle boundaries are integer multiples of drip_frequency, shifted cycle boundaries are not.
 
-    pub fn init_drip_timestamps(&mut self) -> Result<()> {
+    pub fn get_init_drip_timestamp(&self) -> Result<InitDripTime> {
         let now = Clock::get()?.unix_timestamp;
         let drip_frequency = self.frequency_in_seconds as i64;
 
         let genesis_canonical_activation_timestamp = now - (now % drip_frequency);
-        self.drip_activation_genesis_shift = now - genesis_canonical_activation_timestamp;
+        let drip_activation_genesis_shift = now - genesis_canonical_activation_timestamp;
 
-        self.drip_activation_timestamp = now;
-
-        Ok(())
+        let drip_activation_timestamp = now;
+        Ok(InitDripTime {
+            drip_activation_genesis_shift,
+            drip_activation_timestamp,
+            cycle: 0,
+        })
     }
 
     pub fn get_next_drip_activation_timestamp(&self) -> Result<i64> {
@@ -220,7 +232,7 @@ impl DripPosition {
     }
 }
 
-#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
 pub enum DripPositionOwner {
     Direct { owner: Pubkey },
     Tokenized,

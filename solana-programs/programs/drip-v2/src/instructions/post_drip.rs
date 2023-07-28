@@ -179,14 +179,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let output_token_amount_to_send_to_position =
         dripper_received_output_tokens - output_token_amount_to_send_to_fee_account;
 
-    // TODO: Do we really need this check?
-    require!(
-        drip_position.drip_input_fees_remaining_for_current_cycle
-            + output_token_amount_to_send_to_fee_account
-            != 0,
-        DripError::ExpectedNonZeroDripFees
-    );
-
     /* STATE UPDATES (EFFECTS) */
 
     let drip_position = &mut ctx.accounts.drip_position;
@@ -197,6 +189,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     drip_position.total_output_token_received_post_fees += output_token_amount_to_send_to_position;
     drip_position.total_input_fees_collected +=
         drip_position.drip_input_fees_remaining_for_current_cycle;
+    drip_position.drip_input_fees_remaining_for_current_cycle = 0;
     drip_position.total_output_fees_collected += output_token_amount_to_send_to_fee_account;
 
     if drip_position.drip_amount_remaining_post_fees_in_current_cycle == 0 {
@@ -211,7 +204,9 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             drip_amounts.drip_amount_post_fees;
         drip_position.drip_input_fees_remaining_for_current_cycle =
             drip_amounts.input_token_fee_amount;
+        drip_position.cycle += 1;
     }
+    msg!("{:?}", drip_position);
 
     /* MANUAL CPI (INTERACTIONS) */
 
@@ -283,7 +278,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
 
     /* POST CPI VERIFICATION */
     /* POST CPI STATE UPDATES (EFFECTS) */
-
     Ok(())
 }
 
