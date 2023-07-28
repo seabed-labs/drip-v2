@@ -71,8 +71,9 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                 'finalized'
             );
             if (
+                // TODO: support partial drips
                 BigInt(balance.value.amount) >=
-                    dripPositionAccount.dripAmount &&
+                    dripPositionAccount.dripAmountRemainingPostFeesInCurrentCycle &&
                 BigInt(blockInfo) >
                     BigInt(dripPositionAccount.dripActivationTimestamp)
             ) {
