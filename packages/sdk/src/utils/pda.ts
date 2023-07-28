@@ -42,3 +42,14 @@ export function deriveGlobalConfigSigner(
 
     return pdaPubkey;
 }
+
+export function deriveEphemeralDripState(
+    dripPosition: PublicKey,
+    programId: PublicKey
+): PublicKey {
+    const [pdaPubkey] = PublicKey.findProgramAddressSync(
+        [Buffer.from('drip-v2-ephemeral-drip-state'), dripPosition.toBuffer()],
+        programId
+    );
+    return pdaPubkey;
+}

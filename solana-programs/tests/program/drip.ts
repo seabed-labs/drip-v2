@@ -5,6 +5,7 @@ import {
     SystemProgram,
     SYSVAR_INSTRUCTIONS_PUBKEY,
     Transaction,
+    TransactionInstruction,
 } from '@solana/web3.js';
 import {
     AnchorProvider,
@@ -14,7 +15,7 @@ import {
     workspace,
     BN,
 } from '@coral-xyz/anchor';
-import { DripV2 } from '@dcaf/drip-types';
+import { DripV2, PostDripAccounts, PreDripAccounts } from '@dcaf/drip-types';
 import '../setup';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -28,8 +29,36 @@ import {
     createBurnInstruction,
     getAssociatedTokenAddress,
 } from '@solana/spl-token-0-3-8';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { DripPosition } from '@dcaf/drip-types/src/accounts';
+import {
+    deriveDripPositionSigner,
+    deriveEphemeralDripState,
+    deriveGlobalConfigSigner,
+    derivePairConfig,
+} from '@dcaf/drip/dist/utils/pda';
+
+async function fundAccounts(
+    provider: AnchorProvider,
+    addresses: PublicKey[],
+    amount: number | bigint
+): Promise<void> {
+    const transfers = addresses.map((address) =>
+        SystemProgram.transfer({
+            fromPubkey: provider.publicKey,
+            toPubkey: address,
+            lamports: amount,
+        })
+    );
+    const fundTx = new Transaction({
+        feePayer: provider.publicKey,
+        recentBlockhash: (await provider.connection.getRecentBlockhash())
+            .blockhash,
+    }).add(...transfers);
+
+    await provider.sendAndConfirm(fundTx);
+}
+
 function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -38,7 +67,15 @@ function applyBps(input: bigint, bps: bigint): bigint {
     return (BigInt(input) * BigInt(bps)) / BigInt(10_000);
 }
 
-describe.only('Program - drip (pre/post)', () => {
+type CreateDripSandwich = (args: {
+    dripAmountToFill: number | bigint;
+    minimumOutputTokensExpected: number | bigint;
+    preDripAccountOverrides: Partial<PreDripAccounts>;
+    postDripAccountOverrides: Partial<PostDripAccounts>;
+    dripIxs: TransactionInstruction[];
+}) => Promise<Transaction>;
+
+describe('Program - drip (pre/post)', () => {
     setProvider(AnchorProvider.env());
     const program = workspace.DripV2 as Program<DripV2>;
     const provider = getProvider() as AnchorProvider;
@@ -50,22 +87,15 @@ describe.only('Program - drip (pre/post)', () => {
     let positionOwnerKeypair: Keypair;
     let dripAuthorityKeypair: Keypair;
 
-    let inputMintPublicKey: PublicKey;
-    let outputMintPublicKey: PublicKey;
-    let globalConfigPublicKey: PublicKey;
-    let pairConfigPublicKey: PublicKey;
-    let dripPositionPublicKey: PublicKey;
-    let dripPositionSignerPubkey: PublicKey;
-    let ephemeralDripStatePublicKey: PublicKey;
-    let dripPositionInputTokenAccountPublicKey: PublicKey;
-    let dripPositionOutputTokenAccountPublicKey: PublicKey;
-    let dripperInputTokenAccountPublicKey: PublicKey;
-    let dripperOutputTokenAccountPublicKey: PublicKey;
-    let inputTokenFeeAccountPublicKey: PublicKey;
-    let outputTokenFeeAccountPublicKey: PublicKey;
+    let inputMint: PublicKey;
+    let outputMint: PublicKey;
+    let preDripAccounts: PreDripAccounts;
+    let postDripAccounts: PostDripAccounts;
 
-    const inputTokenFeeBps = 100;
+    // const inputTokenFeeBps = 100;
     const outputTokenFeeBps = 0;
+
+    let createDripSandwich: CreateDripSandwich;
 
     beforeEach(async () => {
         dripAuthorityKeypair = new Keypair();
@@ -73,42 +103,21 @@ describe.only('Program - drip (pre/post)', () => {
         mintAuthority = new Keypair();
         positionOwnerKeypair = new Keypair();
         const globalConfigKeypair = new Keypair();
-        globalConfigPublicKey = globalConfigKeypair.publicKey;
         const dripPositionKeypair = new Keypair();
-        dripPositionPublicKey = dripPositionKeypair.publicKey;
-        const fundTx = new Transaction({
-            feePayer: provider.publicKey,
-            recentBlockhash: (await provider.connection.getRecentBlockhash())
-                .blockhash,
-        }).add(
-            SystemProgram.transfer({
-                fromPubkey: provider.publicKey,
-                toPubkey: superAdminKeypair.publicKey,
-                lamports: 100e9,
-            }),
-            SystemProgram.transfer({
-                fromPubkey: provider.publicKey,
-                toPubkey: positionOwnerKeypair.publicKey,
-                lamports: 100e9,
-            }),
-            SystemProgram.transfer({
-                fromPubkey: provider.publicKey,
-                toPubkey: dripAuthorityKeypair.publicKey,
-                lamports: 100e9,
-            }),
-            SystemProgram.transfer({
-                fromPubkey: provider.publicKey,
-                toPubkey: mintAuthority.publicKey,
-                lamports: 100e9,
-            })
-        );
-        await provider.sendAndConfirm(fundTx);
 
-        const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
+        await fundAccounts(
+            provider,
             [
-                Buffer.from('drip-v2-global-signer'),
-                globalConfigKeypair.publicKey.toBuffer(),
+                superAdminKeypair.publicKey,
+                positionOwnerKeypair.publicKey,
+                dripAuthorityKeypair.publicKey,
+                mintAuthority.publicKey,
             ],
+            100e9
+        );
+
+        const globalSignerPubkey = deriveGlobalConfigSigner(
+            globalConfigKeypair.publicKey,
             program.programId
         );
 
@@ -137,7 +146,7 @@ describe.only('Program - drip (pre/post)', () => {
             })
             .accounts({
                 signer: superAdminKeypair.publicKey,
-                globalConfig: globalConfigPublicKey,
+                globalConfig: globalConfigKeypair.publicKey,
             })
             .signers([superAdminKeypair])
             .rpc();
@@ -151,16 +160,12 @@ describe.only('Program - drip (pre/post)', () => {
             })
             .accounts({
                 signer: superAdminKeypair.publicKey,
-                globalConfig: globalConfigPublicKey,
+                globalConfig: globalConfigKeypair.publicKey,
             })
             .signers([superAdminKeypair])
             .rpc();
 
-        const inputTokenMintKeypair = new Keypair();
-        inputMintPublicKey = inputTokenMintKeypair.publicKey;
-        const outputTokenMintKeypair = new Keypair();
-        outputMintPublicKey = outputTokenMintKeypair.publicKey;
-        [inputMintPublicKey, outputMintPublicKey] = await Promise.all([
+        [inputMint, outputMint] = await Promise.all([
             createMint(
                 provider.connection,
                 mintAuthority,
@@ -176,40 +181,34 @@ describe.only('Program - drip (pre/post)', () => {
                 6
             ),
         ]);
-        [pairConfigPublicKey] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-pair-config'),
-                globalConfigPublicKey.toBuffer(),
-                inputMintPublicKey.toBuffer(),
-                outputMintPublicKey.toBuffer(),
-            ],
+        const pairConfigPublicKey = derivePairConfig(
+            globalConfigKeypair.publicKey,
+            inputMint,
+            outputMint,
             program.programId
         );
         await program.methods
             .initPairConfig()
             .accounts({
                 payer: provider.publicKey,
-                globalConfig: globalConfigPublicKey,
-                inputTokenMint: inputMintPublicKey,
-                outputTokenMint: outputMintPublicKey,
+                globalConfig: globalConfigKeypair.publicKey,
+                inputTokenMint: inputMint,
+                outputTokenMint: outputMint,
                 pairConfig: pairConfigPublicKey,
                 systemProgram: SystemProgram.programId,
             })
             .signers([])
             .rpc();
 
-        [dripPositionSignerPubkey] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-drip-position-signer'),
-                dripPositionKeypair.publicKey.toBuffer(),
-            ],
+        const dripPositionSignerPubkey = deriveDripPositionSigner(
+            dripPositionKeypair.publicKey,
             program.programId
         );
 
-        [
+        const [
             dripPositionInputTokenAccountPublicKey,
             dripPositionOutputTokenAccountPublicKey,
-        ] = [inputMintPublicKey, outputMintPublicKey].map((mint) =>
+        ] = [inputMint, outputMint].map((mint) =>
             getAssociatedTokenAddressSync(
                 mint,
                 dripPositionSignerPubkey,
@@ -219,11 +218,11 @@ describe.only('Program - drip (pre/post)', () => {
             )
         );
 
-        [
+        const [
             dripperInputTokenAccountPublicKey,
             dripperOutputTokenAccountPublicKey,
         ] = await Promise.all(
-            [inputMintPublicKey, outputMintPublicKey].map((mint) =>
+            [inputMint, outputMint].map((mint) =>
                 createAssociatedTokenAccount(
                     provider.connection,
                     dripAuthorityKeypair,
@@ -232,15 +231,15 @@ describe.only('Program - drip (pre/post)', () => {
                 )
             )
         );
-        [inputTokenFeeAccountPublicKey, outputTokenFeeAccountPublicKey] =
+        const [inputTokenFeeAccountPublicKey, outputTokenFeeAccountPublicKey] =
             await Promise.all(
-                [inputMintPublicKey, outputMintPublicKey].map((mint) =>
+                [inputMint, outputMint].map((mint) =>
                     getAssociatedTokenAddress(mint, globalSignerPubkey, true)
                 )
             );
         const createFeeTokenAccountIxs = [
-            [inputTokenFeeAccountPublicKey, inputMintPublicKey],
-            [outputTokenFeeAccountPublicKey, outputMintPublicKey],
+            [inputTokenFeeAccountPublicKey, inputMint],
+            [outputTokenFeeAccountPublicKey, outputMint],
         ].map(([taPublicKey, mint]) =>
             createAssociatedTokenAccountInstruction(
                 provider.publicKey,
@@ -263,10 +262,10 @@ describe.only('Program - drip (pre/post)', () => {
             })
             .accounts({
                 payer: positionOwnerKeypair.publicKey,
-                globalConfig: globalConfigPublicKey,
+                globalConfig: globalConfigKeypair.publicKey,
                 pairConfig: pairConfigPublicKey,
-                inputTokenMint: inputMintPublicKey,
-                outputTokenMint: outputMintPublicKey,
+                inputTokenMint: inputMint,
+                outputTokenMint: outputMint,
                 inputTokenAccount: dripPositionInputTokenAccountPublicKey,
                 outputTokenAccount: dripPositionOutputTokenAccountPublicKey,
                 dripPosition: dripPositionKeypair.publicKey,
@@ -278,13 +277,65 @@ describe.only('Program - drip (pre/post)', () => {
             .signers([dripPositionKeypair, positionOwnerKeypair])
             .rpc();
 
-        [ephemeralDripStatePublicKey] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-ephemeral-drip-state'),
-                dripPositionPublicKey.toBuffer(),
-            ],
+        const ephemeralDripStatePublicKey = deriveEphemeralDripState(
+            dripPositionKeypair.publicKey,
             program.programId
         );
+
+        const commonAccounts = {
+            dripAuthority: dripAuthorityKeypair.publicKey,
+            globalConfig: globalConfigKeypair.publicKey,
+            pairConfig: pairConfigPublicKey,
+            dripPosition: dripPositionKeypair.publicKey,
+            dripPositionSigner: dripPositionSignerPubkey,
+            ephemeralDripState: ephemeralDripStatePublicKey,
+            dripPositionInputTokenAccount:
+                dripPositionInputTokenAccountPublicKey,
+            dripPositionOutputTokenAccount:
+                dripPositionOutputTokenAccountPublicKey,
+            dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
+            dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
+            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+        };
+        preDripAccounts = {
+            ...commonAccounts,
+            systemProgram: SystemProgram.programId,
+        };
+        postDripAccounts = {
+            ...commonAccounts,
+            inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
+            outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
+        };
+
+        createDripSandwich = async (args) => {
+            const preDripIx = await program.methods
+                .preDrip({
+                    dripAmountToFill: new BN(args.dripAmountToFill.toString()),
+                    minimumOutputTokensExpected: new BN(
+                        args.minimumOutputTokensExpected.toString()
+                    ),
+                })
+                .accounts({
+                    ...preDripAccounts,
+                    ...args.preDripAccountOverrides,
+                })
+                .instruction();
+            const postDripIx = await program.methods
+                .postDrip()
+                .accounts({
+                    ...postDripAccounts,
+                    ...args.postDripAccountOverrides,
+                })
+                .instruction();
+
+            return new Transaction({
+                feePayer: dripAuthorityKeypair.publicKey,
+                recentBlockhash: (
+                    await provider.connection.getRecentBlockhash()
+                ).blockhash,
+            }).add(preDripIx, ...args.dripIxs, postDripIx);
+        };
     });
 
     it('should fail if signer does not have permission', async () => {
@@ -293,31 +344,13 @@ describe.only('Program - drip (pre/post)', () => {
                 dripAmountToFill: new BN(0),
                 minimumOutputTokensExpected: new BN(500_000),
             })
-            .accounts({
-                dripAuthority: provider.publicKey,
-                globalConfig: globalConfigPublicKey,
-                pairConfig: pairConfigPublicKey,
-                dripPosition: dripPositionPublicKey,
-                ephemeralDripState: ephemeralDripStatePublicKey,
-                dripPositionInputTokenAccount:
-                    dripPositionInputTokenAccountPublicKey,
-                dripPositionOutputTokenAccount:
-                    dripPositionOutputTokenAccountPublicKey,
-                dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-                dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-                instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-                tokenProgram: TOKEN_PROGRAM_ID,
-
-                systemProgram: SystemProgram.programId,
-            })
+            .accounts({ ...preDripAccounts, dripAuthority: provider.publicKey })
             .instruction();
-
         const tx = new Transaction({
             feePayer: provider.publicKey,
             recentBlockhash: (await provider.connection.getRecentBlockhash())
                 .blockhash,
         }).add(preDripIx);
-
         await expect(provider.sendAndConfirm(tx)).to.eventually.be.rejectedWith(
             /0x1774/
         );
@@ -326,42 +359,24 @@ describe.only('Program - drip (pre/post)', () => {
     it('should fail if post_drip is not in the same transaction', async () => {
         const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
-            dripPositionPublicKey,
+            preDripAccounts.dripPosition,
             program.programId
         );
-        assert(dripPosition);
         await mintTo(
             provider.connection,
             mintAuthority,
-            inputMintPublicKey,
-            dripPositionInputTokenAccountPublicKey,
+            inputMint,
+            preDripAccounts.dripPositionInputTokenAccount,
             mintAuthority,
-            dripPosition.data.dripAmount
+            dripPosition.data.dripAmountPreFees
         );
         const preDripIx = await program.methods
             .preDrip({
                 dripAmountToFill: new BN(0),
                 minimumOutputTokensExpected: new BN(500_000),
             })
-            .accounts({
-                dripAuthority: dripAuthorityKeypair.publicKey,
-                globalConfig: globalConfigPublicKey,
-                pairConfig: pairConfigPublicKey,
-                dripPosition: dripPositionPublicKey,
-                ephemeralDripState: ephemeralDripStatePublicKey,
-                dripPositionInputTokenAccount:
-                    dripPositionInputTokenAccountPublicKey,
-                dripPositionOutputTokenAccount:
-                    dripPositionOutputTokenAccountPublicKey,
-                dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-                dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-                instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-                tokenProgram: TOKEN_PROGRAM_ID,
-
-                systemProgram: SystemProgram.programId,
-            })
+            .accounts(preDripAccounts)
             .instruction();
-
         const tx = new Transaction({
             feePayer: dripAuthorityKeypair.publicKey,
             recentBlockhash: (await provider.connection.getRecentBlockhash())
@@ -378,61 +393,27 @@ describe.only('Program - drip (pre/post)', () => {
     it('should fail if no output tokens are received', async () => {
         const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
-            dripPositionPublicKey,
+            preDripAccounts.dripPosition,
             program.programId
         );
-        assert(dripPosition);
         await mintTo(
             provider.connection,
             mintAuthority,
-            inputMintPublicKey,
-            dripPositionInputTokenAccountPublicKey,
+            inputMint,
+            preDripAccounts.dripPositionInputTokenAccount,
             mintAuthority,
-            dripPosition.data.dripAmount
+            dripPosition.data.dripAmountPreFees
         );
-        const commonAccounts = {
-            dripAuthority: dripAuthorityKeypair.publicKey,
-            globalConfig: globalConfigPublicKey,
-            pairConfig: pairConfigPublicKey,
-            dripPosition: dripPositionPublicKey,
-            dripPositionSigner: dripPositionSignerPubkey,
-            ephemeralDripState: ephemeralDripStatePublicKey,
-            dripPositionInputTokenAccount:
-                dripPositionInputTokenAccountPublicKey,
-            dripPositionOutputTokenAccount:
-                dripPositionOutputTokenAccountPublicKey,
-            dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-            dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-        };
-        const preDripIx = await program.methods
-            .preDrip({
-                dripAmountToFill: new BN(1),
-                minimumOutputTokensExpected: new BN(500_000),
-            })
-            .accounts({
-                ...commonAccounts,
-                systemProgram: SystemProgram.programId,
-            })
-            .instruction();
-        const postDripIx = await program.methods
-            .postDrip()
-            .accounts({
-                ...commonAccounts,
-                inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
-                outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
-            })
-            .instruction();
-
-        const tx = new Transaction({
-            feePayer: dripAuthorityKeypair.publicKey,
-            recentBlockhash: (await provider.connection.getRecentBlockhash())
-                .blockhash,
-        }).add(preDripIx, postDripIx);
-        tx.sign(dripAuthorityKeypair);
+        const dripTx = await createDripSandwich({
+            dripAmountToFill: 1,
+            minimumOutputTokensExpected: 500_000,
+            preDripAccountOverrides: {},
+            postDripAccountOverrides: {},
+            dripIxs: [],
+        });
+        dripTx.sign(dripAuthorityKeypair);
         await expect(
-            sendAndConfirmTransaction(provider.connection, tx, [
+            sendAndConfirmTransaction(provider.connection, dripTx, [
                 dripAuthorityKeypair,
             ])
         ).to.eventually.be.rejectedWith(/0x1795/);
@@ -442,157 +423,91 @@ describe.only('Program - drip (pre/post)', () => {
         it(`should drip ${dripCount} times with the full drip amount each time`, async () => {
             const dripPosition = await DripPosition.fetchNonNullable(
                 provider.connection,
-                dripPositionPublicKey,
+                preDripAccounts.dripPosition,
                 program.programId
             );
             expect(
                 dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
             ).to.not.equal('0');
             const depositAmount =
-                BigInt(dripPosition.data.dripAmount) * BigInt(dripCount);
+                BigInt(dripPosition.data.dripAmountPreFees) * BigInt(dripCount);
             await mintTo(
                 provider.connection,
                 mintAuthority,
-                inputMintPublicKey,
-                dripPositionInputTokenAccountPublicKey,
+                inputMint,
+                preDripAccounts.dripPositionInputTokenAccount,
                 mintAuthority,
                 depositAmount
             );
-            const commonAccounts = {
-                dripAuthority: dripAuthorityKeypair.publicKey,
-                globalConfig: globalConfigPublicKey,
-                pairConfig: pairConfigPublicKey,
-                dripPosition: dripPositionPublicKey,
-                dripPositionSigner: dripPositionSignerPubkey,
-                ephemeralDripState: ephemeralDripStatePublicKey,
-                dripPositionInputTokenAccount:
-                    dripPositionInputTokenAccountPublicKey,
-                dripPositionOutputTokenAccount:
-                    dripPositionOutputTokenAccountPublicKey,
-                dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-                dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-                instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-                tokenProgram: TOKEN_PROGRAM_ID,
-            };
 
             for (let i = 0; i < dripCount; i++) {
                 const [
                     dripPositionBefore,
                     positionInputBalanceBefore,
                     positionOutputBalanceBefore,
-                    dripperInputBalanceBefore,
-                    dripperOutputBalanceBefore,
                 ] = await Promise.all([
-                    DripPosition.fetch(
+                    DripPosition.fetchNonNullable(
                         provider.connection,
-                        dripPositionPublicKey,
+                        preDripAccounts.dripPosition,
                         program.programId
                     ),
                     provider.connection.getTokenAccountBalance(
-                        dripPositionInputTokenAccountPublicKey
+                        preDripAccounts.dripPositionInputTokenAccount
                     ),
                     provider.connection.getTokenAccountBalance(
-                        dripPositionOutputTokenAccountPublicKey
-                    ),
-                    provider.connection.getTokenAccountBalance(
-                        dripperInputTokenAccountPublicKey
-                    ),
-                    provider.connection.getTokenAccountBalance(
-                        dripperOutputTokenAccountPublicKey
+                        preDripAccounts.dripPositionOutputTokenAccount
                     ),
                 ]);
-                assert(dripPositionBefore);
-
-                const dripAmountBefore = BigInt(
-                    dripPositionBefore.data.dripAmount
+                const dripAmountRemainingPostFeesInCurrentCycle = BigInt(
+                    dripPositionBefore.data
+                        .dripAmountRemainingPostFeesInCurrentCycle
                 );
-                // const dripAmountFilledBefore =
-                //     dripPositionBefore.data.dripAmountFilled;
-                // expect(dripAmountFilledBefore.toString()).to.equal('0');
-                // const input_token_fee_amount =
-                //     (dripAmountBefore * BigInt(inputTokenFeeBps)) /
-                //     BigInt(10_000);
-                const outputReceiveAmount = dripAmountBefore / BigInt(2);
-
-                // const requestedDripAmount = dripAmountBefore;
-                // const expectedReceiveAmount =
-                //     dripAmountBefore - input_token_fee_amount;
-                const preDripIx = await program.methods
-                    .preDrip({
-                        dripAmountToFill: new BN(
-                            dripPositionBefore.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
-                        ),
-                        minimumOutputTokensExpected: new BN(
-                            outputReceiveAmount.toString()
-                        ),
-                    })
-                    .accounts({
-                        ...commonAccounts,
-                        systemProgram: SystemProgram.programId,
-                    })
-                    .instruction();
+                const outputReceiveAmount =
+                    dripAmountRemainingPostFeesInCurrentCycle / BigInt(2);
                 const swapIxs = [
                     createBurnInstruction(
-                        dripperInputTokenAccountPublicKey,
-                        inputMintPublicKey,
+                        preDripAccounts.dripperInputTokenAccount,
+                        inputMint,
                         dripAuthorityKeypair.publicKey,
-                        dripPositionBefore.data
-                            .dripAmountRemainingPostFeesInCurrentCycle
+                        dripAmountRemainingPostFeesInCurrentCycle
                     ),
                     createMintToInstruction(
-                        outputMintPublicKey,
-                        dripperOutputTokenAccountPublicKey,
+                        outputMint,
+                        preDripAccounts.dripperOutputTokenAccount,
                         mintAuthority.publicKey,
                         outputReceiveAmount
                     ),
                 ];
-                const postDripIx = await program.methods
-                    .postDrip()
-                    .accounts({
-                        ...commonAccounts,
-                        inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
-                        outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
-                    })
-                    .instruction();
-
-                const tx = new Transaction({
-                    feePayer: dripAuthorityKeypair.publicKey,
-                    recentBlockhash: (
-                        await provider.connection.getRecentBlockhash()
-                    ).blockhash,
-                }).add(preDripIx, ...swapIxs, postDripIx);
-                tx.sign(dripAuthorityKeypair, mintAuthority);
-
+                const dripTx = await createDripSandwich({
+                    dripAmountToFill:
+                        dripPositionBefore.data
+                            .dripAmountRemainingPostFeesInCurrentCycle,
+                    minimumOutputTokensExpected: outputReceiveAmount,
+                    preDripAccountOverrides: {},
+                    postDripAccountOverrides: {},
+                    dripIxs: swapIxs,
+                });
+                dripTx.sign(dripAuthorityKeypair, mintAuthority);
                 await sendAndConfirmTransaction(
                     provider.connection,
-                    tx,
+                    dripTx,
                     [dripAuthorityKeypair, mintAuthority],
                     { skipPreflight: true }
                 );
 
-                const [
-                    positionInputBalanceAfter,
-                    positionOutputBalanceAfter,
-                    dripperInputBalanceAfter,
-                    dripperOutputBalanceAfter,
-                ] = await Promise.all([
-                    provider.connection.getTokenAccountBalance(
-                        dripPositionInputTokenAccountPublicKey
-                    ),
-                    provider.connection.getTokenAccountBalance(
-                        dripPositionOutputTokenAccountPublicKey
-                    ),
-                    provider.connection.getTokenAccountBalance(
-                        dripperInputTokenAccountPublicKey
-                    ),
-                    provider.connection.getTokenAccountBalance(
-                        dripperOutputTokenAccountPublicKey
-                    ),
-                ]);
+                const [positionInputBalanceAfter, positionOutputBalanceAfter] =
+                    await Promise.all([
+                        provider.connection.getTokenAccountBalance(
+                            preDripAccounts.dripPositionInputTokenAccount
+                        ),
+                        provider.connection.getTokenAccountBalance(
+                            preDripAccounts.dripPositionOutputTokenAccount
+                        ),
+                    ]);
 
                 expect(BigInt(positionInputBalanceAfter.value.amount)).to.equal(
                     BigInt(positionInputBalanceBefore.value.amount) -
-                        dripAmountBefore
+                        BigInt(dripPositionBefore.data.dripAmountPreFees)
                 );
                 expect(
                     BigInt(positionOutputBalanceAfter.value.amount)
@@ -600,75 +515,37 @@ describe.only('Program - drip (pre/post)', () => {
                     BigInt(positionOutputBalanceBefore.value.amount) +
                         outputReceiveAmount
                 );
-
-                await delay(
-                    Number(dripPositionBefore.data.frequencyInSeconds) + 500
-                );
+                if (i !== dripCount - 1) {
+                    await delay(
+                        Number(dripPositionBefore.data.frequencyInSeconds) + 500
+                    );
+                }
             }
         });
     });
 
-    it.only('should drip twice in the same cycle with partial drips', async () => {
+    it('should drip three times in the same cycle with partial drips', async () => {
         const dripPosition = await DripPosition.fetchNonNullable(
             provider.connection,
-            dripPositionPublicKey,
+            preDripAccounts.dripPosition,
             program.programId
         );
-        const dripAmountBefore = BigInt(dripPosition.data.dripAmountPreFees);
-        const depositAmount = dripAmountBefore * BigInt(1);
         await mintTo(
             provider.connection,
             mintAuthority,
-            inputMintPublicKey,
-            dripPositionInputTokenAccountPublicKey,
+            inputMint,
+            preDripAccounts.dripPositionInputTokenAccount,
             mintAuthority,
-            depositAmount
+            dripPosition.data.dripAmountPreFees
         );
-        const commonAccounts = {
-            dripAuthority: dripAuthorityKeypair.publicKey,
-            globalConfig: globalConfigPublicKey,
-            pairConfig: pairConfigPublicKey,
-            dripPosition: dripPositionPublicKey,
-            dripPositionSigner: dripPositionSignerPubkey,
-            ephemeralDripState: ephemeralDripStatePublicKey,
-            dripPositionInputTokenAccount:
-                dripPositionInputTokenAccountPublicKey,
-            dripPositionOutputTokenAccount:
-                dripPositionOutputTokenAccountPublicKey,
-            dripperInputTokenAccount: dripperInputTokenAccountPublicKey,
-            dripperOutputTokenAccount: dripperOutputTokenAccountPublicKey,
-            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-        };
 
-        const dripCount = 2;
+        const dripCount = 3;
         for (let i = 0; i < dripCount; i++) {
-            const [
-                dripPositionBefore,
-                positionInputBalanceBefore,
-                positionOutputBalanceBefore,
-                dripperInputBalanceBefore,
-                dripperOutputBalanceBefore,
-            ] = await Promise.all([
-                DripPosition.fetchNonNullable(
-                    provider.connection,
-                    dripPositionPublicKey,
-                    program.programId
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripPositionInputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripPositionOutputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripperInputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripperOutputTokenAccountPublicKey
-                ),
-            ]);
-            assert(dripPositionBefore);
+            const dripPositionBefore = await DripPosition.fetchNonNullable(
+                provider.connection,
+                preDripAccounts.dripPosition,
+                program.programId
+            );
 
             const {
                 partialDripAmount,
@@ -684,7 +561,7 @@ describe.only('Program - drip (pre/post)', () => {
                     BigInt(outputTokenFeeBps)
                 );
                 const partialDripAmount =
-                    i === 0
+                    i < dripCount - 1
                         ? BigInt(dripAmountBefore / BigInt(dripCount))
                         : BigInt(
                               dripPositionBefore.data
@@ -697,82 +574,42 @@ describe.only('Program - drip (pre/post)', () => {
                 };
             })();
 
-            const preDripIx = await program.methods
-                .preDrip({
-                    dripAmountToFill: new BN(partialDripAmount.toString()),
-                    minimumOutputTokensExpected: new BN(
-                        outputReceiveAmount.toString()
-                    ),
-                })
-                .accounts({
-                    ...commonAccounts,
-                    systemProgram: SystemProgram.programId,
-                })
-                .instruction();
-
             const swapIxs = [
                 createBurnInstruction(
-                    dripperInputTokenAccountPublicKey,
-                    inputMintPublicKey,
+                    preDripAccounts.dripperInputTokenAccount,
+                    inputMint,
                     dripAuthorityKeypair.publicKey,
                     partialDripAmount
                 ),
                 createMintToInstruction(
-                    outputMintPublicKey,
-                    dripperOutputTokenAccountPublicKey,
+                    outputMint,
+                    preDripAccounts.dripperOutputTokenAccount,
                     mintAuthority.publicKey,
                     outputReceiveAmount
                 ),
             ];
+            const dripTx = await createDripSandwich({
+                dripAmountToFill: partialDripAmount,
+                minimumOutputTokensExpected: outputReceiveAmount,
+                preDripAccountOverrides: {},
+                postDripAccountOverrides: {},
+                dripIxs: swapIxs,
+            });
+            dripTx.sign(dripAuthorityKeypair, mintAuthority);
+            await sendAndConfirmTransaction(
+                provider.connection,
+                dripTx,
+                [dripAuthorityKeypair, mintAuthority],
+                {
+                    skipPreflight: true,
+                }
+            );
 
-            const postDripIx = await program.methods
-                .postDrip()
-                .accounts({
-                    ...commonAccounts,
-                    inputTokenFeeAccount: inputTokenFeeAccountPublicKey,
-                    outputTokenFeeAccount: outputTokenFeeAccountPublicKey,
-                })
-                .instruction();
-
-            const tx = new Transaction({
-                feePayer: dripAuthorityKeypair.publicKey,
-                recentBlockhash: (
-                    await provider.connection.getRecentBlockhash()
-                ).blockhash,
-            }).add(preDripIx, ...swapIxs, postDripIx);
-            tx.sign(dripAuthorityKeypair, mintAuthority);
-
-            await sendAndConfirmTransaction(provider.connection, tx, [
-                dripAuthorityKeypair,
-                mintAuthority,
-            ]);
-
-            const [
-                dripPositionAfter,
-                positionInputBalanceAfter,
-                positionOutputBalanceAfter,
-                dripperInputBalanceAfter,
-                dripperOutputBalanceAfter,
-            ] = await Promise.all([
-                DripPosition.fetch(
-                    provider.connection,
-                    dripPositionPublicKey,
-                    program.programId
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripPositionInputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripPositionOutputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripperInputTokenAccountPublicKey
-                ),
-                provider.connection.getTokenAccountBalance(
-                    dripperOutputTokenAccountPublicKey
-                ),
-            ]);
-            assert(dripPositionAfter);
+            const dripPositionAfter = await DripPosition.fetchNonNullable(
+                provider.connection,
+                preDripAccounts.dripPosition,
+                program.programId
+            );
             const dripPositionAfterJSON = dripPositionAfter.toJSON();
             const dripPositionBeforeJSON = dripPositionBefore.toJSON();
 
@@ -787,6 +624,7 @@ describe.only('Program - drip (pre/post)', () => {
                 totalOutputTokenReceivedPostFees: '0',
                 totalInputFeesCollected: '0',
                 totalOutputFeesCollected: '0',
+                cycle: '0',
             }).to.deep.equal({
                 ...dripPositionBeforeJSON,
                 dripActivationTimestamp: '0',
@@ -796,76 +634,59 @@ describe.only('Program - drip (pre/post)', () => {
                 totalOutputTokenReceivedPostFees: '0',
                 totalInputFeesCollected: '0',
                 totalOutputFeesCollected: '0',
+                cycle: '0',
             });
-
-            if (i == 0) {
-                expect(
-                    dripPositionAfterJSON.totalInputTokenDrippedPostFees
-                ).to.equal(partialDripAmount.toString());
-                // expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
-                //     (
-                //         dripPositionBefore.data.totalInputFeesCollected +
-                //         dripPositionBefore.data
-                //             .dripInputFeesRemainingForCurrentCycle
-                //     ).toString()
-                // );
-                expect(dripPositionAfterJSON.totalOutputFeesCollected).to.equal(
-                    expectedOutputFees.toString()
-                );
-                // should not advance the cycle
-                expect(dripPositionAfterJSON.dripActivationTimestamp).to.equal(
-                    dripPositionBeforeJSON.dripActivationTimestamp
-                );
-            } else if (i == 1) {
-                // expect(dripPositionAfterJSON.dripAmountFilled).to.equal('0');
-                expect(
-                    dripPositionAfterJSON.totalInputTokenDrippedPostFees
-                ).to.equal(
-                    (
-                        BigInt(
-                            dripPositionBefore.data
-                                .totalInputTokenDrippedPostFees
-                        ) + BigInt(partialDripAmount)
-                    ).toString()
-                );
-                // expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
-                //     (
-                //         BigInt(
-                //             dripPositionBefore.data.totalInputFeesCollected
-                //         ) + BigInt(expectedInputFees)
-                //     ).toString()
-                // );
-                expect(dripPositionAfterJSON.totalOutputFeesCollected).to.equal(
-                    (
-                        BigInt(
-                            dripPositionBefore.data.totalOutputFeesCollected
-                        ) + BigInt(expectedOutputFees)
-                    ).toString()
-                );
-                // should advance the cycle
-                expect(
-                    dripPositionAfterJSON.dripActivationTimestamp
-                ).to.not.equal(dripPositionBeforeJSON.dripActivationTimestamp);
-            }
             expect(
-                dripPositionAfterJSON.dripAmountRemainingPostFeesInCurrentCycle
-            ).to.equal(
-                (
-                    BigInt(
-                        dripPosition.data
-                            .dripAmountRemainingPostFeesInCurrentCycle
-                    ) - BigInt(partialDripAmount)
-                ).toString()
+                dripPositionBeforeJSON.totalInputTokenDrippedPostFees
+            ).to.not.equal(
+                dripPositionAfterJSON.totalInputTokenDrippedPostFees
             );
-            expect(dripPositionAfterJSON.totalInputFeesCollected).to.equal(
-                (
-                    BigInt(dripPositionBefore.data.totalInputFeesCollected) +
+            expect(
+                dripPositionBeforeJSON.totalOutputTokenReceivedPostFees
+            ).to.not.equal(
+                dripPositionAfterJSON.totalOutputTokenReceivedPostFees
+            );
+            expect(
+                BigInt(dripPositionAfter.data.totalInputTokenDrippedPostFees)
+            ).to.equal(
+                BigInt(dripPositionBefore.data.totalInputTokenDrippedPostFees) +
+                    BigInt(partialDripAmount)
+            );
+            expect(
+                BigInt(dripPositionAfter.data.totalOutputFeesCollected)
+            ).to.equal(
+                BigInt(dripPositionAfter.data.totalOutputFeesCollected) +
+                    BigInt(expectedOutputFees)
+            );
+
+            if (i < dripCount - 1) {
+                expect(
+                    BigInt(
+                        dripPositionAfter.data
+                            .dripAmountRemainingPostFeesInCurrentCycle
+                    )
+                ).to.equal(
                     BigInt(
                         dripPositionBefore.data
-                            .dripInputFeesRemainingForCurrentCycle
+                            .dripAmountRemainingPostFeesInCurrentCycle
+                    ) - BigInt(partialDripAmount)
+                );
+                expect(dripPositionAfterJSON.cycle).to.equal('0');
+            } else {
+                expect(
+                    BigInt(
+                        dripPositionAfter.data
+                            .dripAmountRemainingPostFeesInCurrentCycle
                     )
-                ).toString()
-            );
+                ).to.not.equal(
+                    BigInt(
+                        dripPositionBefore.data
+                            .dripAmountRemainingPostFeesInCurrentCycle
+                    ) - BigInt(partialDripAmount)
+                );
+                expect(dripPositionAfterJSON.cycle).to.equal('1');
+            }
+
             if (i !== dripCount - 1) {
                 await delay(Number(dripPosition.data.frequencyInSeconds) + 500);
             }
