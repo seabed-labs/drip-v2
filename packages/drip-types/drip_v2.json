@@ -1140,7 +1140,7 @@
           },
           {
             "name": "dripFeeBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "dripPositionNftMint",
@@ -1294,11 +1294,11 @@
           },
           {
             "name": "inputDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "outputDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1356,7 +1356,7 @@
           },
           {
             "name": "defaultDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "globalConfigSigner",
@@ -1392,11 +1392,11 @@
           },
           {
             "name": "defaultPairDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "inputTokenDripFeePortionBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "inputTokenPriceOracle",
@@ -1470,7 +1470,7 @@
           },
           {
             "name": "defaultDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1516,7 +1516,7 @@
         "fields": [
           {
             "name": "newDefaultDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1528,7 +1528,7 @@
         "fields": [
           {
             "name": "newDefaultPairDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }

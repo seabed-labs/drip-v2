@@ -13,7 +13,7 @@ pub struct GlobalConfig {
     pub super_admin: Pubkey,
     pub admins: [Pubkey; ADMIN_COUNT],
     pub admin_permissions: [u64; ADMIN_COUNT],
-    pub default_drip_fee_bps: u64,
+    pub default_drip_fee_bps: u16, // max of 10_000
     pub global_config_signer: Pubkey,
 }
 

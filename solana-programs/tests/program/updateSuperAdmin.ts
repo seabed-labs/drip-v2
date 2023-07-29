@@ -1,6 +1,5 @@
 import {
     AnchorProvider,
-    BN,
     Program,
     setProvider,
     workspace,
@@ -23,7 +22,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,
@@ -105,7 +104,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,
@@ -138,7 +137,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,
@@ -172,7 +171,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,

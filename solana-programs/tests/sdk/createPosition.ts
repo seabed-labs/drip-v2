@@ -84,7 +84,7 @@ describe('SDK - createPosition', () => {
             args: {
                 params: {
                     superAdmin: superAdminKeypair.publicKey,
-                    defaultDripFeeBps: BigInt(100),
+                    defaultDripFeeBps: 100,
                 },
             },
             accounts: {
@@ -171,7 +171,7 @@ describe('SDK - createPosition', () => {
                     owner: positionOwner.publicKey.toBase58(),
                 },
             },
-            dripFeeBps: '100',
+            dripFeeBps: 100,
             dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
@@ -301,7 +301,7 @@ describe('SDK - createPosition', () => {
                     owner: positionOwner.publicKey.toBase58(),
                 },
             },
-            dripFeeBps: '100',
+            dripFeeBps: 100,
             dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(

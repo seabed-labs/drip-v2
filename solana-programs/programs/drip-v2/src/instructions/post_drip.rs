@@ -151,8 +151,9 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         position_drip_amount_used,
     )?;
 
-    let output_token_amount_to_send_to_fee_account =
-        (dripper_received_output_tokens * ephemeral_drip_state.output_drip_fees_bps) / 10_000;
+    let output_token_amount_to_send_to_fee_account = (dripper_received_output_tokens
+        * u64::from(ephemeral_drip_state.output_drip_fees_bps))
+        / 10_000;
 
     let output_token_amount_to_send_to_position =
         dripper_received_output_tokens - output_token_amount_to_send_to_fee_account;

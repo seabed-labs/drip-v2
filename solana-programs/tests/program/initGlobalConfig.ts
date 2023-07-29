@@ -31,7 +31,7 @@ describe('Program - initGlobalConfig', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,

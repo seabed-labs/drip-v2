@@ -247,7 +247,8 @@ components:
                 superAdmin:
                     type: string
                 defaultDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - superAdmin
                 - defaultDripFeeBps
@@ -424,7 +425,8 @@ components:
         types.UpdateDefaultDripFeesParamsJSON:
             properties:
                 newDefaultDripFeesBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - newDefaultDripFeesBps
             type: object
@@ -471,7 +473,8 @@ components:
         types.UpdateDefaultPairDripFeesParamsJSON:
             properties:
                 newDefaultPairDripFeesBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - newDefaultPairDripFeesBps
             type: object
@@ -639,7 +642,8 @@ components:
                 outputTokenAccount:
                     type: string
                 dripFeeBps:
-                    type: string
+                    type: number
+                    format: double
                 dripPositionNftMint:
                     type: string
                     nullable: true
@@ -765,7 +769,8 @@ components:
                         type: string
                     type: array
                 defaultDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
                 globalConfigSigner:
                     type: string
             required:
@@ -808,9 +813,11 @@ components:
                     type: number
                     format: double
                 defaultPairDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
                 inputTokenDripFeePortionBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - globalConfig
                 - version
