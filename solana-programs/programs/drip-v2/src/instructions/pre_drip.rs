@@ -137,8 +137,6 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
     let input_drip_fee_bps = (drip_fee_bps * input_token_fee_portion_bps) / 10_000;
     let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
-    // let input_token_fee_amount = (partial_drip_amount * input_drip_fee_bps) / 10_000;
-    // let post_fees_partial_drip_amount = partial_drip_amount - input_token_fee_amount;
 
     /* STATE UPDATES (EFFECTS) */
 
