@@ -1,13 +1,13 @@
 import express, {
     json,
     urlencoded,
-    Response as ExResponse,
-    Request as ExRequest,
+    Response as ExpressResponse,
+    Request as ExpressRequest,
     NextFunction,
 } from 'express';
 
 import { RegisterRoutes } from './generated/api';
-import { RestError } from './service/types';
+import { RestError } from './types';
 
 export const app = express();
 
@@ -22,10 +22,10 @@ RegisterRoutes(app);
 
 app.use(function errorHandler(
     err: unknown,
-    req: ExRequest,
-    res: ExResponse,
+    req: ExpressRequest,
+    res: ExpressResponse,
     next: NextFunction
-): ExResponse | void {
+): ExpressResponse | void {
     console.error(err);
     console.error((err as RestError).stack);
     if (typeof (err as RestError)['toJSON'] !== 'function') {
