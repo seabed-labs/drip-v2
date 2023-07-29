@@ -1,0 +1,995 @@
+components:
+    examples: {}
+    headers: {}
+    parameters: {}
+    requestBodies: {}
+    responses: {}
+    schemas:
+        DripV2InstructionNames.deposit:
+            enum:
+                - deposit
+            type: string
+        DepositAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                sourceInputTokenAccount:
+                    type: string
+                dripPositionInputTokenAccount:
+                    type: string
+                dripPosition:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - signer
+                - sourceInputTokenAccount
+                - dripPositionInputTokenAccount
+                - dripPosition
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        types.DepositParamsJSON:
+            properties:
+                depositAmount:
+                    type: string
+            required:
+                - depositAmount
+            type: object
+            additionalProperties: false
+        DepositArgsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.DepositParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedDeposit:
+            properties:
+                data:
+                    $ref: '#/components/schemas/DepositArgsJSON'
+                accounts:
+                    $ref: '#/components/schemas/DepositAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.deposit'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.detokenizeDripPosition:
+            enum:
+                - detokenizeDripPosition
+            type: string
+        DetokenizeDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                owner:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftAccount:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - owner
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftAccount
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedDetokenizeDripPosition:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/DetokenizeDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.detokenizeDripPosition'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.initDripPosition:
+            enum:
+                - initDripPosition
+            type: string
+        InitDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                globalConfig:
+                    type: string
+                pairConfig:
+                    type: string
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                inputTokenAccount:
+                    type: string
+                outputTokenAccount:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+                associatedTokenProgram:
+                    type: string
+            required:
+                - payer
+                - globalConfig
+                - pairConfig
+                - inputTokenMint
+                - outputTokenMint
+                - inputTokenAccount
+                - outputTokenAccount
+                - dripPosition
+                - dripPositionSigner
+                - systemProgram
+                - tokenProgram
+                - associatedTokenProgram
+            type: object
+            additionalProperties: false
+        types.InitDripPositionParamsJSON:
+            properties:
+                owner:
+                    type: string
+                dripAmount:
+                    type: string
+                frequencyInSeconds:
+                    type: string
+            required:
+                - owner
+                - dripAmount
+                - frequencyInSeconds
+            type: object
+            additionalProperties: false
+        InitDripPositionArgsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.InitDripPositionParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedInitDripPosition:
+            properties:
+                data:
+                    $ref: '#/components/schemas/InitDripPositionArgsJSON'
+                accounts:
+                    $ref: '#/components/schemas/InitDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initDripPosition'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.initDripPositionNft:
+            enum:
+                - initDripPositionNft
+            type: string
+        InitDripPositionNftAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftMapping:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftMapping
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedInitDripPositionNft:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/InitDripPositionNftAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initDripPositionNft'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.initGlobalConfig:
+            enum:
+                - initGlobalConfig
+            type: string
+        InitGlobalConfigAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                globalConfig:
+                    type: string
+                globalConfigSigner:
+                    type: string
+                systemProgram:
+                    type: string
+            required:
+                - payer
+                - globalConfig
+                - globalConfigSigner
+                - systemProgram
+            type: object
+            additionalProperties: false
+        types.InitGlobalConfigParamsJSON:
+            properties:
+                superAdmin:
+                    type: string
+                defaultDripFeeBps:
+                    type: string
+            required:
+                - superAdmin
+                - defaultDripFeeBps
+            type: object
+            additionalProperties: false
+        InitGlobalConfigArgsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.InitGlobalConfigParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedInitGlobalConfig:
+            properties:
+                data:
+                    $ref: '#/components/schemas/InitGlobalConfigArgsJSON'
+                accounts:
+                    $ref: '#/components/schemas/InitGlobalConfigAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initGlobalConfig'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.initPairConfig:
+            enum:
+                - initPairConfig
+            type: string
+        InitPairConfigAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                globalConfig:
+                    type: string
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                pairConfig:
+                    type: string
+                systemProgram:
+                    type: string
+            required:
+                - payer
+                - globalConfig
+                - inputTokenMint
+                - outputTokenMint
+                - pairConfig
+                - systemProgram
+            type: object
+            additionalProperties: false
+        ParsedInitPairConfig:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/InitPairConfigAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.initPairConfig'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.toggleAutoCredit:
+            enum:
+                - toggleAutoCredit
+            type: string
+        ToggleAutoCreditAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                dripPosition:
+                    type: string
+            required:
+                - signer
+                - dripPosition
+            type: object
+            additionalProperties: false
+        ParsedToggleAutoCredit:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/ToggleAutoCreditAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.toggleAutoCredit'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.tokenizeDripPosition:
+            enum:
+                - tokenizeDripPosition
+            type: string
+        TokenizeDripPositionAccountsJSON:
+            properties:
+                payer:
+                    type: string
+                owner:
+                    type: string
+                dripPosition:
+                    type: string
+                dripPositionSigner:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                dripPositionNftAccount:
+                    type: string
+                systemProgram:
+                    type: string
+                tokenProgram:
+                    type: string
+            required:
+                - payer
+                - owner
+                - dripPosition
+                - dripPositionSigner
+                - dripPositionNftMint
+                - dripPositionNftAccount
+                - systemProgram
+                - tokenProgram
+            type: object
+            additionalProperties: false
+        ParsedTokenizeDripPosition:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/TokenizeDripPositionAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.tokenizeDripPosition'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.updateAdmin:
+            enum:
+                - updateAdmin
+            type: string
+        UpdateAdminAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+            type: object
+            additionalProperties: false
+        ParsedUpdateAdmin:
+            properties:
+                data: {}
+                accounts:
+                    $ref: '#/components/schemas/UpdateAdminAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateAdmin'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.updateDefaultDripFees:
+            enum:
+                - updateDefaultDripFees
+            type: string
+        UpdateDefaultDripFeesAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+            type: object
+            additionalProperties: false
+        types.UpdateDefaultDripFeesParamsJSON:
+            properties:
+                newDefaultDripFeesBps:
+                    type: string
+            required:
+                - newDefaultDripFeesBps
+            type: object
+            additionalProperties: false
+        UpdateDefaultDripFeesArgsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.UpdateDefaultDripFeesParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedUpdateDefaultDripFees:
+            properties:
+                data:
+                    $ref: '#/components/schemas/UpdateDefaultDripFeesArgsJSON'
+                accounts:
+                    $ref: '#/components/schemas/UpdateDefaultDripFeesAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultDripFees'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.updateDefaultPairDripFees:
+            enum:
+                - updateDefaultPairDripFees
+            type: string
+        UpdateDefaultPairDripFeesAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                pairConfig:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - pairConfig
+                - globalConfig
+            type: object
+            additionalProperties: false
+        types.UpdateDefaultPairDripFeesParamsJSON:
+            properties:
+                newDefaultPairDripFeesBps:
+                    type: string
+            required:
+                - newDefaultPairDripFeesBps
+            type: object
+            additionalProperties: false
+        UpdateDefaultPairDripFeesArgsJSON:
+            properties:
+                params:
+                    $ref: '#/components/schemas/types.UpdateDefaultPairDripFeesParamsJSON'
+            required:
+                - params
+            type: object
+            additionalProperties: false
+        ParsedUpdateDefaultPairDripFees:
+            properties:
+                data:
+                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesArgsJSON'
+                accounts:
+                    $ref: '#/components/schemas/UpdateDefaultPairDripFeesAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateDefaultPairDripFees'
+            required:
+                - data
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.updatePythPriceFeed:
+            enum:
+                - updatePythPriceFeed
+            type: string
+        UpdatePythPriceFeedAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                globalConfig:
+                    type: string
+                pairConfig:
+                    type: string
+                inputTokenPythPriceFeed:
+                    type: string
+                outputTokenPythPriceFeed:
+                    type: string
+            required:
+                - signer
+                - globalConfig
+                - pairConfig
+                - inputTokenPythPriceFeed
+                - outputTokenPythPriceFeed
+            type: object
+            additionalProperties: false
+        ParsedUpdatePythPriceFeed:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/UpdatePythPriceFeedAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updatePythPriceFeed'
+            required:
+                - accounts
+                - name
+            type: object
+        DripV2InstructionNames.updateSuperAdmin:
+            enum:
+                - updateSuperAdmin
+            type: string
+        UpdateSuperAdminAccountsJSON:
+            properties:
+                signer:
+                    type: string
+                newSuperAdmin:
+                    type: string
+                globalConfig:
+                    type: string
+            required:
+                - signer
+                - newSuperAdmin
+                - globalConfig
+            type: object
+            additionalProperties: false
+        ParsedUpdateSuperAdmin:
+            properties:
+                accounts:
+                    $ref: '#/components/schemas/UpdateSuperAdminAccountsJSON'
+                name:
+                    $ref: '#/components/schemas/DripV2InstructionNames.updateSuperAdmin'
+            required:
+                - accounts
+                - name
+            type: object
+        ParsedDripIx:
+            properties:
+                parsedUpdateSuperAdmin:
+                    $ref: '#/components/schemas/ParsedUpdateSuperAdmin'
+                parsedUpdatePythPriceFeed:
+                    $ref: '#/components/schemas/ParsedUpdatePythPriceFeed'
+                parsedUpdateDefaultPairDripFees:
+                    $ref: '#/components/schemas/ParsedUpdateDefaultPairDripFees'
+                parsedUpdateDefaultDripFees:
+                    $ref: '#/components/schemas/ParsedUpdateDefaultDripFees'
+                parsedUpdateAdmin:
+                    $ref: '#/components/schemas/ParsedUpdateAdmin'
+                parsedTokenizeDripPosition:
+                    $ref: '#/components/schemas/ParsedTokenizeDripPosition'
+                parsedToggleAutoCredit:
+                    $ref: '#/components/schemas/ParsedToggleAutoCredit'
+                parsedInitPairConfig:
+                    $ref: '#/components/schemas/ParsedInitPairConfig'
+                parsedInitGlobalConfig:
+                    $ref: '#/components/schemas/ParsedInitGlobalConfig'
+                parsedInitDripPositionNft:
+                    $ref: '#/components/schemas/ParsedInitDripPositionNft'
+                parsedInitDripPosition:
+                    $ref: '#/components/schemas/ParsedInitDripPosition'
+                parsedDetokenizeDripPosition:
+                    $ref: '#/components/schemas/ParsedDetokenizeDripPosition'
+                parsedDeposit:
+                    $ref: '#/components/schemas/ParsedDeposit'
+            type: object
+        ParsedDripIxWithIndex:
+            allOf:
+                -
+                    properties:
+                        index:
+                            type: number
+                            format: double
+                    required:
+                        - index
+                    type: object
+                -
+                    $ref: '#/components/schemas/ParsedDripIx'
+        ParsedTxResponse:
+            properties:
+                instructions:
+                    items:
+                        $ref: '#/components/schemas/ParsedDripIxWithIndex'
+                    type: array
+                signature:
+                    type: string
+            required:
+                - instructions
+                - signature
+            type: object
+        RestError:
+            properties:
+                message:
+                    type: string
+                status:
+                    type: number
+                    format: double
+            required:
+                - message
+                - status
+            type: object
+        Commitment:
+            type: string
+            enum:
+                - confirmed
+                - finalized
+        Pick_DripPositionAccountJSON.Exclude_keyofDripPositionAccountJSON.owner__:
+            properties:
+                globalConfig:
+                    type: string
+                pairConfig:
+                    type: string
+                inputTokenAccount:
+                    type: string
+                outputTokenAccount:
+                    type: string
+                dripFeeBps:
+                    type: string
+                dripPositionNftMint:
+                    type: string
+                    nullable: true
+                dripPositionSigner:
+                    type: string
+                autoCreditEnabled:
+                    type: boolean
+                dripAmountPreFees:
+                    type: string
+                dripAmountRemainingPostFeesInCurrentCycle:
+                    type: string
+                dripInputFeesRemainingForCurrentCycle:
+                    type: string
+                totalInputFeesCollected:
+                    type: string
+                totalOutputFeesCollected:
+                    type: string
+                totalInputTokenDrippedPostFees:
+                    type: string
+                totalOutputTokenReceivedPostFees:
+                    type: string
+                frequencyInSeconds:
+                    type: string
+                dripMaxJitter:
+                    type: number
+                    format: double
+                dripActivationGenesisShift:
+                    type: string
+                dripActivationTimestamp:
+                    type: string
+                cycle:
+                    type: string
+            required:
+                - globalConfig
+                - pairConfig
+                - inputTokenAccount
+                - outputTokenAccount
+                - dripFeeBps
+                - dripPositionNftMint
+                - dripPositionSigner
+                - autoCreditEnabled
+                - dripAmountPreFees
+                - dripAmountRemainingPostFeesInCurrentCycle
+                - dripInputFeesRemainingForCurrentCycle
+                - totalInputFeesCollected
+                - totalOutputFeesCollected
+                - totalInputTokenDrippedPostFees
+                - totalOutputTokenReceivedPostFees
+                - frequencyInSeconds
+                - dripMaxJitter
+                - dripActivationGenesisShift
+                - dripActivationTimestamp
+                - cycle
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        Omit_DripPositionAccountJSON.owner_:
+            $ref: '#/components/schemas/Pick_DripPositionAccountJSON.Exclude_keyofDripPositionAccountJSON.owner__'
+            description: 'Construct a type with the properties of T except for those in type K.'
+        DripPositionJSONWrapper:
+            allOf:
+                -
+                    $ref: '#/components/schemas/Omit_DripPositionAccountJSON.owner_'
+                -
+                    properties:
+                        owner:
+                            type: string
+                        ownerType:
+                            type: string
+                            enum:
+                                - Direct
+                                - Tokenized
+                    required:
+                        - ownerType
+                    type: object
+        DripPositionNftMappingAccountJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                dripPositionNftMint:
+                    type: string
+                dripPosition:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - dripPositionNftMint
+                - dripPosition
+                - bump
+            type: object
+            additionalProperties: false
+        DripPositionSignerAccountJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                dripPosition:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - dripPosition
+                - bump
+            type: object
+            additionalProperties: false
+        GlobalConfigAccountJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                superAdmin:
+                    type: string
+                admins:
+                    items:
+                        type: string
+                    type: array
+                adminPermissions:
+                    items:
+                        type: string
+                    type: array
+                defaultDripFeeBps:
+                    type: string
+                globalConfigSigner:
+                    type: string
+            required:
+                - version
+                - superAdmin
+                - admins
+                - adminPermissions
+                - defaultDripFeeBps
+                - globalConfigSigner
+            type: object
+            additionalProperties: false
+        GlobalConfigSignerAccountJSON:
+            properties:
+                version:
+                    type: number
+                    format: double
+                globalConfig:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+            required:
+                - version
+                - globalConfig
+                - bump
+            type: object
+            additionalProperties: false
+        Pick_PairConfigAccountJSON.Exclude_keyofPairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__:
+            properties:
+                globalConfig:
+                    type: string
+                version:
+                    type: number
+                    format: double
+                inputTokenMint:
+                    type: string
+                outputTokenMint:
+                    type: string
+                bump:
+                    type: number
+                    format: double
+                defaultPairDripFeeBps:
+                    type: string
+                inputTokenDripFeePortionBps:
+                    type: string
+            required:
+                - globalConfig
+                - version
+                - inputTokenMint
+                - outputTokenMint
+                - bump
+                - defaultPairDripFeeBps
+                - inputTokenDripFeePortionBps
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        Omit_PairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_:
+            $ref: '#/components/schemas/Pick_PairConfigAccountJSON.Exclude_keyofPairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle__'
+            description: 'Construct a type with the properties of T except for those in type K.'
+        PriceOracleJSON:
+            properties:
+                priceOracleJsonIsPyth:
+                    type: boolean
+                priceOracleJsonIsUnavailable:
+                    type: boolean
+            required:
+                - priceOracleJsonIsPyth
+                - priceOracleJsonIsUnavailable
+            type: object
+        PairConfigJSONWrapper:
+            allOf:
+                -
+                    $ref: '#/components/schemas/Omit_PairConfigAccountJSON.inputTokenPriceOracle-or-outputTokenPriceOracle_'
+                -
+                    properties:
+                        outputTokenPriceOracle:
+                            $ref: '#/components/schemas/PriceOracleJSON'
+                        inputTokenPriceOracle:
+                            $ref: '#/components/schemas/PriceOracleJSON'
+                    required:
+                        - outputTokenPriceOracle
+                        - inputTokenPriceOracle
+                    type: object
+        ParsedAccountResponse:
+            properties:
+                parsedPairConfig:
+                    $ref: '#/components/schemas/PairConfigJSONWrapper'
+                parsedGlobalConfigSigner:
+                    $ref: '#/components/schemas/GlobalConfigSignerAccountJSON'
+                parsedGlobalConfig:
+                    $ref: '#/components/schemas/GlobalConfigAccountJSON'
+                parsedDripPositionSigner:
+                    $ref: '#/components/schemas/DripPositionSignerAccountJSON'
+                parsedDripPositionNftMapping:
+                    $ref: '#/components/schemas/DripPositionNftMappingAccountJSON'
+                parsedDripPosition:
+                    $ref: '#/components/schemas/DripPositionJSONWrapper'
+                name:
+                    type: string
+                publicKey:
+                    type: string
+            required:
+                - name
+                - publicKey
+            type: object
+        PingResponse:
+            properties:
+                message:
+                    type: string
+            required:
+                - message
+            type: object
+    securitySchemes: {}
+info:
+    title: '@dcaf/drip-api'
+    version: 0.1.0
+    description: 'Worker to parse drip program accounts and instructions.'
+    license:
+        name: MIT
+    contact:
+        name: 'Dcaf Labs'
+openapi: 3.0.0
+paths:
+    '/fetch/tx/{signature}':
+        get:
+            operationId: ParseTx
+            responses:
+                '200':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ParsedTxResponse'
+                '400':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '404':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '422':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '500':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: signature
+                    required: true
+                    schema:
+                        type: string
+                -
+                    in: query
+                    name: commitment
+                    required: false
+                    schema:
+                        $ref: '#/components/schemas/Commitment'
+    '/fetch/account/{accountPublicKey}':
+        get:
+            operationId: ParseAccount
+            responses:
+                '200':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ParsedAccountResponse'
+                '400':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '404':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+                '500':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: accountPublicKey
+                    required: true
+                    schema:
+                        type: string
+                -
+                    in: query
+                    name: commitment
+                    required: false
+                    schema:
+                        $ref: '#/components/schemas/Commitment'
+    /:
+        get:
+            operationId: Ping
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PingResponse'
+            security: []
+            parameters: []
+servers:
+    -
+        url: /

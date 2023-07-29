@@ -1,0 +1,32 @@
+{
+    "extends": "../../tsconfig.json",
+    "exclude": [
+        "./coverage",
+        "./node_modules",
+        "./dist",
+        "test",
+        "jest.config.js"
+    ],
+    "compilerOptions": {
+        "rootDir": "./src" /* Specify the root folder within your source files. */,
+        "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+
+        /* Module Resolution Options */
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+
+        /* Experimental Options */
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "references": [
+        {
+            "path": "../../packages/drip-types"
+        }
+    ],
+    "ts-node": {
+        "require": ["tsconfig-paths/register"],
+        "transpileOnly": true,
+        "files": true
+    }
+}

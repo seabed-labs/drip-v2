@@ -1,5 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner lint-fix-inner test-inner
-# all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner api-inner test-inner lint-fix-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner api-inner dripper-inner lint-fix-inner test-inner
 
 root:
 	yarn install
@@ -27,9 +26,9 @@ test: program-inner drip-types-inner sdk-inner test-inner
 
 fetcher: program-inner drip-types-inner sdk-inner fetcher-inner
 
-dripper: program-inner drip-types-inner sdk-inner dripper-inner
+api: program-inner drip-types-inner sdk-inner api-inner
 
-# api: program-inner drip-types-inner sdk-inner api-inner
+dripper: program-inner drip-types-inner sdk-inner dripper-inner
 
 sdk: program-inner drip-types-inner sdk-inner
 
@@ -39,6 +38,7 @@ program-inner:
 	cd solana-programs && anchor build
 	cp solana-programs/target/idl/drip_v2.json solana-programs/idl/drip_v2.json
 	cp solana-programs/idl/drip_v2.json services/fetcher/drip_v2.json
+	cp solana-programs/idl/drip_v2.json services/api/drip_v2.json
 	cp solana-programs/target/types/drip_v2.ts packages/drip-types/src/drip_v2.ts
 	cp solana-programs/idl/drip_v2.json packages/drip-types/drip_v2.json
 
@@ -51,11 +51,11 @@ sdk-inner:
 fetcher-inner:
 	cd services/fetcher && yarn install && yarn build
 
+api-inner:
+	cd services/api && yarn install && yarn build
+
 dripper-inner:
 	cd services/dripper && yarn install && yarn build
-
-# api-inner:
-# 	cd services/api && go install ./... && go build ./...
 
 test-inner:
 	cd solana-programs && cargo test
