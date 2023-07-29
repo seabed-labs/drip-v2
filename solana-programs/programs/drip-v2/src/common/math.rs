@@ -13,8 +13,8 @@ pub fn split_drip_amount_from_fees(
     let input_drip_fee_bps = (drip_fee_bps * input_token_drip_fee_portion_bps) / 10_000;
     let input_token_fee_amount = (drip_amount * input_drip_fee_bps) / 10_000;
     let drip_amount_post_fees = drip_amount - input_token_fee_amount;
-    return DripAmount {
+    DripAmount {
         drip_amount_post_fees,
         input_token_fee_amount,
-    };
+    }
 }

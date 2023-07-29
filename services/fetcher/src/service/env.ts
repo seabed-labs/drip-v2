@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const programId: PublicKey = new PublicKey(process.env.DRIP_PROGRAM_ID!);
 
 export const rpcUrl: string =

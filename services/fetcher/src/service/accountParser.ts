@@ -70,7 +70,7 @@ export function tryDecodeToParsedDripAccount(
                 ownerType: decodedData.owner.kind,
             },
         };
-    } else if (discriminator.equals(DripPosition.discriminator)) {
+    } else if (discriminator.equals(DripPositionNftMapping.discriminator)) {
         return {
             name: 'DripPositionNftMapping',
             parsedDripPositionNftMapping:

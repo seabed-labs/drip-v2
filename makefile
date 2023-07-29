@@ -1,8 +1,9 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner test-inner lint-fix-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner lint-fix-inner test-inner
 # all: root program-inner drip-types-inner sdk-inner fetcher-inner dripper-inner api-inner test-inner lint-fix-inner
 
 root:
 	yarn install
+	cd ui/xnft && yarn install
 
 clean: root
 	yarn workspaces foreach run clean
