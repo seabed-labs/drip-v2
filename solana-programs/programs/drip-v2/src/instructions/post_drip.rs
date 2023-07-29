@@ -132,28 +132,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let position_drip_amount_used =
         ephemeral_drip_state.input_transferred_to_dripper - unused_input_token_amount;
 
-    // ex.
-    // dripAmount = 100
-    // input_drip_fees_bps = 1000
-    // position_drip_amount_used = 80
-    // actual fees = position_drip_amount_used * (input_drip_fees_bps/10_000) / ((10_000 - input_drip_fees_bps)/10_000)
-    // = position_drip_amount_used * input_drip_fees_bps / (10_000-input_drip_fees_bps)
-    // = 80 * 1000 / 9_000 = 80_000 / 9_000 = 8.8 => 8
-    // let input_token_amount_to_send_to_fee_account = (position_drip_amount_used
-    //     * ephemeral_drip_state.input_drip_fees_bps)
-    //     / (10_000 - ephemeral_drip_state.input_drip_fees_bps);
-
-    // require!(
-    //     input_token_amount_to_send_to_fee_account <= ephemeral_drip_state.input_reserved_for_fees,
-    //     DripError::InputFeesLargerThanReserved
-    // );
-
-    // let position_drip_amount_filled_with_fees =
-    //     position_drip_amount_used + input_token_amount_to_send_to_fee_account;
-
-    // TODO: do we want to verify that user input tokens are used in swap?
-    // Edge case: drip amount or so small or drip fee so high that the only amount used is the input fee
-
     let dripper_received_output_tokens = dripper_output_token_account.amount
         - ephemeral_drip_state.dripper_output_token_account_balance_pre_drip_balance;
 
