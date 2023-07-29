@@ -184,8 +184,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
             drip_amounts.input_token_fee_amount;
         drip_position.cycle += 1;
     }
-    msg!("{:?}", drip_position);
-
     /* MANUAL CPI (INTERACTIONS) */
 
     // send output token to position
