@@ -1,5 +1,6 @@
-import request from 'supertest';
 import nock from 'nock';
+import request from 'supertest';
+
 import { app } from '../../src/app';
 import { rpcUrl } from '../../src/service/env';
 // import fs from 'fs/promises'

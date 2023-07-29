@@ -1,13 +1,6 @@
 import { Address, Provider } from '@coral-xyz/anchor';
 import { Wallet } from '@coral-xyz/anchor/dist/cjs/provider';
 import {
-    CreatePositionParams,
-    IDripClient,
-    IDripPosition,
-    IDripInstructionsFactory,
-    TxResult,
-} from '../types';
-import {
     Commitment,
     Connection,
     Keypair,
@@ -19,6 +12,15 @@ import {
     TransactionSignature,
     VersionedTransaction,
 } from '@solana/web3.js';
+
+import {
+    CreatePositionParams,
+    IDripClient,
+    IDripPosition,
+    IDripInstructionsFactory,
+    TxResult,
+} from '../types';
+
 import { DripInstructionsFactory } from './DripInstructionsFactory';
 import { DripPosition } from './DripPosition';
 

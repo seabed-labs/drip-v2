@@ -1,16 +1,20 @@
+import assert from 'assert';
+
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
+import { Logger } from 'winston';
+
+import { DripPosition } from '../positions';
+import { notEmpty } from '../utils';
+import { DripperWallet } from '../wallet/impl';
+
 import { PositionHandlerBase } from './abstract';
+
 import {
-    compareSwapQuoteDesc,
     ITokenSwapHandler,
     SwapQuoteWithInstructions,
+    compareSwapQuoteDesc,
 } from './index';
-import { DripV2 } from '@dcaf/drip-types';
-import assert from 'assert';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { notEmpty } from '../utils';
-import { DripPosition } from '../positions';
-import { Logger } from 'winston';
-import { DripperWallet } from '../wallet/dripperWallet';
 
 export class MetaAggregator extends PositionHandlerBase {
     constructor(

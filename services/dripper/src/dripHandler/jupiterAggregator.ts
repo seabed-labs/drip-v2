@@ -1,6 +1,9 @@
-import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
+import assert from 'assert';
+
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
 import { Jupiter, SwapMode } from '@jup-ag/core';
+import { createTransferInstruction } from '@solana/spl-token-0-3-8';
 import {
     Cluster,
     PublicKey,
@@ -8,14 +11,15 @@ import {
     VersionedTransaction,
 } from '@solana/web3.js';
 import JSBI from 'jsbi';
-import assert from 'assert';
-import { PositionHandlerBase } from './abstract';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { createTransferInstruction } from '@solana/spl-token-0-3-8';
-import { maybeInitAta } from '../utils';
-import { DripPosition } from '../positions';
-import { DripperWallet } from '../wallet/dripperWallet';
 import { Logger } from 'winston';
+
+import { DripPosition } from '../positions';
+import { maybeInitAta } from '../utils';
+import { DripperWallet } from '../wallet/impl';
+
+import { PositionHandlerBase } from './abstract';
+
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
 
 export class JupiterSwap
     extends PositionHandlerBase

@@ -1,20 +1,29 @@
-import * as anchor from '@coral-xyz/anchor';
 import {
-    Keypair,
-    SystemProgram,
-    SYSVAR_INSTRUCTIONS_PUBKEY,
-} from '@solana/web3.js';
-import { DripV2 } from '@dcaf/drip-types';
+    BN,
+    Program,
+    getProvider,
+    translateAddress,
+    workspace,
+} from '@coral-xyz/anchor';
+import { DripV2, PostDripAccounts, PreDripAccounts } from '@dcaf/drip-types';
 import {
     createAssociatedTokenAccountIdempotent,
     createMintToInstruction,
     getOrCreateAssociatedTokenAccount,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
+import {
+    Keypair,
+    PublicKey,
+    SystemProgram,
+    SYSVAR_INSTRUCTIONS_PUBKEY,
+    Transaction,
+} from '@solana/web3.js';
 
 export async function drip(positionAddr: string): Promise<string> {
-    const program = anchor.workspace.DripV2 as anchor.Program<DripV2>;
-    const provider = anchor.getProvider();
+    const program = workspace.DripV2 as Program<DripV2>;
+    const provider = getProvider();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const providerPubkey = provider.publicKey!;
 
     const payerKeypair = new Keypair();
@@ -24,11 +33,9 @@ export async function drip(positionAddr: string): Promise<string> {
         lamports: 100e9, // 100 SOL
     });
 
-    await provider.sendAndConfirm?.(
-        new anchor.web3.Transaction().add(fundSuperAdminIx)
-    );
+    await provider.sendAndConfirm?.(new Transaction().add(fundSuperAdminIx));
 
-    const positionPubkey = anchor.translateAddress(positionAddr);
+    const positionPubkey = translateAddress(positionAddr);
 
     const positionAccount = await program.account.dripPosition.fetch(
         positionPubkey
@@ -65,25 +72,36 @@ export async function drip(positionAddr: string): Promise<string> {
             providerPubkey
         );
 
+    const dripperOutputTokenAccountPubkey =
+        await createAssociatedTokenAccountIdempotent(
+            provider.connection,
+            payerKeypair,
+            positionAccount.outputTokenMint,
+            providerPubkey
+        );
+
     console.log('Creating pre-drip IX');
+    const preDripAccounts: PreDripAccounts = {
+        dripAuthority: providerPubkey,
+        globalConfig: positionAccount.globalConfig,
+        pairConfig: positionAccount.pairConfig,
+        dripPosition: positionPubkey,
+        dripPositionSigner: positionAccount.dripPositionSigner,
+        dripPositionInputTokenAccount: positionAccount.inputTokenAccount,
+        dripPositionOutputTokenAccount: positionAccount.outputTokenAccount,
+        dripperInputTokenAccount: dripperInputTokenAccountPubkey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        ephemeralDripState: new PublicKey('TODO'),
+        dripperOutputTokenAccount: dripperOutputTokenAccountPubkey,
+        systemProgram: SystemProgram.programId,
+    };
     const preDripIx = await program.methods
         .preDrip({
-            dripAmountToFill: new anchor.BN(100),
-            minimumOutputTokensExpected: new anchor.BN(50),
+            dripAmountToFill: new BN(100),
+            minimumOutputTokensExpected: new BN(50),
         })
-        .accounts({
-            signer: providerPubkey,
-            globalConfig: positionAccount.globalConfig,
-            inputTokenFeeAccount: inputTokenFeeAccount.address,
-            pairConfig: positionAccount.pairConfig,
-            dripPosition: positionPubkey,
-            dripPositionSigner: positionAccount.dripPositionSigner,
-            dripPositionInputTokenAccount: positionAccount.inputTokenAccount,
-            dripPositionOutputTokenAccount: positionAccount.outputTokenAccount,
-            dripperInputTokenAccount: dripperInputTokenAccountPubkey,
-            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-        })
+        .accounts(preDripAccounts)
         .instruction();
 
     console.log('Creating mint to IX');
@@ -95,31 +113,31 @@ export async function drip(positionAddr: string): Promise<string> {
     );
 
     console.log('Creating post-drip IX');
+    const postDripAccounts: PostDripAccounts = {
+        dripAuthority: providerPubkey,
+        globalConfig: positionAccount.globalConfig,
+        outputTokenFeeAccount: outputTokenFeeAccount.address,
+        pairConfig: positionAccount.pairConfig,
+        dripPosition: positionPubkey,
+        dripPositionSigner: positionAccount.dripPositionSigner,
+        dripPositionInputTokenAccount: positionAccount.inputTokenAccount,
+        dripPositionOutputTokenAccount: positionAccount.outputTokenAccount,
+        dripperInputTokenAccount: dripperInputTokenAccountPubkey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        ephemeralDripState: new PublicKey('TODO'),
+        dripperOutputTokenAccount: dripperOutputTokenAccountPubkey,
+        inputTokenFeeAccount: inputTokenFeeAccount.address,
+    };
     const postDripIx = await program.methods
         .postDrip()
-        .accounts({
-            signer: providerPubkey,
-            globalConfig: positionAccount.globalConfig,
-            outputTokenFeeAccount: outputTokenFeeAccount.address,
-            pairConfig: positionAccount.pairConfig,
-            dripPosition: positionPubkey,
-            dripPositionSigner: positionAccount.dripPositionSigner,
-            dripPositionInputTokenAccount: positionAccount.inputTokenAccount,
-            dripPositionOutputTokenAccount: positionAccount.outputTokenAccount,
-            dripperInputTokenAccount: dripperInputTokenAccountPubkey,
-            instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenProgram: TOKEN_PROGRAM_ID,
-        })
+        .accounts(postDripAccounts)
         .instruction();
 
     console.log('Dripping...');
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const dripTxSig = await provider.sendAndConfirm!(
-        new anchor.web3.Transaction().add(
-            preDripIx,
-            mintOutputTokenIx,
-            postDripIx
-        )
+        new Transaction().add(preDripIx, mintOutputTokenIx, postDripIx)
     );
 
     return dripTxSig;

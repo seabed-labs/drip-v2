@@ -1,3 +1,4 @@
+import { Address, translateAddress } from '@coral-xyz/anchor';
 import {
     AccountInfo,
     Commitment,
@@ -6,10 +7,10 @@ import {
     VersionedTransactionResponse,
     Connection as Web3Conn,
 } from '@solana/web3.js';
-import { Address, translateAddress } from '@coral-xyz/anchor';
-import { RestError } from './types';
+
 import { getErrMessage } from './common';
 import { rpcUrl } from './env';
+import { RestError } from './types';
 
 const MAX_SUPPORTED_TRANSACTION_VERSION = 0;
 

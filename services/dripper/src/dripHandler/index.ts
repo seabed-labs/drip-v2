@@ -1,11 +1,13 @@
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
 import { Signer, TransactionInstruction } from '@solana/web3.js';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { MetaAggregator } from './metaAggregator';
-import { JupiterSwap } from './jupiterAggregator';
-import { DripPosition } from '../positions';
 import { Logger } from 'winston';
-import { DripperWallet } from '../wallet/dripperWallet';
+
+import { DripPosition } from '../positions';
+import { DripperWallet } from '../wallet/impl';
+
+import { JupiterSwap } from './jupiterAggregator';
+import { MetaAggregator } from './metaAggregator';
 
 export type SwapQuote = {
     inputAmount: bigint;

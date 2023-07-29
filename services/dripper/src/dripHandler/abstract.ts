@@ -1,6 +1,13 @@
+import assert from 'assert';
+
+import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
+import { PairConfig, PairConfigAccount } from '@dcaf/drip-types/src/accounts';
 import { DripV2 } from '@dcaf/drip-types/src/drip_v2';
-import { PairConfigAccount, PairConfig } from '@dcaf/drip-types/src/accounts';
 import { PriceOracle } from '@dcaf/drip-types/src/types';
+import {
+    TOKEN_PROGRAM_ID,
+    getAssociatedTokenAddress,
+} from '@solana/spl-token-0-3-8';
 import {
     AddressLookupTableAccount,
     AddressLookupTableProgram,
@@ -10,27 +17,23 @@ import {
     Transaction,
     TransactionInstruction,
 } from '@solana/web3.js';
+import { Logger } from 'winston';
+
+import { DripPosition } from '../positions';
+import { createVersionedTransactions } from '../solana';
 import {
+    DEFAULT_CONFIRM_OPTIONS,
     createLuts,
     dedupeInstructionsPublicKeys,
-    DEFAULT_CONFIRM_OPTIONS,
     deriveGlobalConfigSigner,
     derivePositionSigner,
     getNextSlotWithRetry,
     maybeInitAta,
     tryWithReturn,
 } from '../utils';
-import assert from 'assert';
-import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
-import { createVersionedTransactions } from '../solana';
+import { DripperWallet } from '../wallet/impl';
+
 import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
-import {
-    getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-} from '@solana/spl-token-0-3-8';
-import { DripPosition } from '../positions';
-import { Logger } from 'winston';
-import { DripperWallet } from '../wallet/dripperWallet';
 
 const GET_NEXT_SLOT_MAX_TRY = 3;
 

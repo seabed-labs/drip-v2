@@ -1,14 +1,18 @@
-import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
-import { DripV2 } from '@dcaf/drip-types';
-import { Signer, Transaction } from '@solana/web3.js';
 import assert from 'assert';
-import { PositionHandlerBase } from './abstract';
+
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { DripV2 } from '@dcaf/drip-types';
 import { Prism } from '@prism-hq/prism-ag';
+import { Signer, Transaction } from '@solana/web3.js';
 import Decimal from 'decimal.js';
-import { DripPosition } from '../positions';
 import { Logger } from 'winston';
-import { DripperWallet } from '../wallet/dripperWallet';
+
+import { DripPosition } from '../positions';
+import { DripperWallet } from '../wallet/impl';
+
+import { PositionHandlerBase } from './abstract';
+
+import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
 
 // Reverse engineered these types by logging their sdk
 

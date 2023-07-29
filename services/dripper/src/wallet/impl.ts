@@ -1,9 +1,10 @@
 import { Wallet as AnchorWallet } from '@coral-xyz/anchor';
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { IDripperWallet } from './index';
 import { mnemonicToSeedSync } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
+
+import { IDripperWallet } from './index';
 
 const SOLANA_BIP_44_ROOT_PATH = `m/44'/501'`;
 

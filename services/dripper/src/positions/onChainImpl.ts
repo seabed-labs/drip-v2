@@ -1,12 +1,14 @@
-import { DripPosition, IPosition, IPositionsFetcher } from './index';
 import {
-    DripPosition as DripPositionClass,
     DripPositionAccount,
     DripPositionAccountJSON,
+    DripPosition as DripPositionClass,
 } from '@dcaf/drip-types/src/accounts';
-import { GetPositionHandler, IDripHandler } from '../dripHandler';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
+
+import { GetPositionHandler, IDripHandler } from '../dripHandler';
+
+import { DripPosition, IPosition, IPositionsFetcher } from './index';
 
 export class OnChainPositionsFetcher implements IPositionsFetcher {
     constructor(

@@ -1,16 +1,16 @@
 import {
     AddressLookupTableAccount,
-    Connection as Web3Conn,
     PublicKey,
     TransactionInstruction,
     TransactionMessage,
     VersionedTransaction,
+    Connection as Web3Conn,
 } from '@solana/web3.js';
-import { rpcUrl } from '../env';
+
 import { DEFAULT_COMMITMENT, DEFAULT_CONFIRM_OPTIONS } from '../utils';
 
 export class Connection extends Web3Conn {
-    constructor() {
+    constructor(rpcUrl: string) {
         super(rpcUrl, DEFAULT_COMMITMENT);
     }
 }

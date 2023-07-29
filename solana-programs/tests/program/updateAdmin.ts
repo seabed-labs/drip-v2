@@ -1,15 +1,21 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import {
+    AnchorProvider,
+    BN,
+    Program,
+    getProvider,
+    setProvider,
+    workspace,
+} from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
 import '../setup';
 
 // TODO: These tests are not exhaustive at all yet
 
 describe('Program - updateAdmin', () => {
-    anchor.setProvider(anchor.AnchorProvider.env());
-    const program = anchor.workspace.DripV2 as Program<DripV2>;
+    setProvider(AnchorProvider.env());
+    const program = workspace.DripV2 as Program<DripV2>;
 
     let globalConfigPubkey: PublicKey;
     let superAdminKeypair: Keypair;
@@ -21,7 +27,7 @@ describe('Program - updateAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdminKeypair.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: program.provider.publicKey,
@@ -38,7 +44,7 @@ describe('Program - updateAdmin', () => {
         await expect(
             program.methods
                 .updateAdmin({
-                    adminIndex: new anchor.BN(0),
+                    adminIndex: new BN(0),
                     adminChange: {
                         setAdminAndResetPermissions: { 0: PublicKey.default },
                     },
@@ -81,7 +87,7 @@ describe('Program - updateAdmin', () => {
 
         await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     setAdminAndResetPermissions: {
                         0: newAdminPubkey,
@@ -123,7 +129,7 @@ describe('Program - updateAdmin', () => {
     });
 
     it('can give drip permissions to an existing admin', async () => {
-        const provider = anchor.getProvider() as AnchorProvider;
+        const provider = getProvider() as AnchorProvider;
         const newAdminPubkey = PublicKey.unique();
 
         const globalConfigAccountBefore =
@@ -152,7 +158,7 @@ describe('Program - updateAdmin', () => {
 
         let tx = await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     setAdminAndResetPermissions: { 0: newAdminPubkey },
                 },
@@ -165,7 +171,7 @@ describe('Program - updateAdmin', () => {
 
         const giveAdminInitPairConfigPermissionIX = await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     addPermission: { 0: { drip: {} } },
                 },

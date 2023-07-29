@@ -1,4 +1,15 @@
 import {
+    Deposit,
+    InitDripPosition,
+    InitPairConfig,
+    PairConfig,
+} from '@dcaf/drip-types';
+import {
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
+import {
     Connection,
     Keypair,
     PublicKey,
@@ -6,6 +17,7 @@ import {
     Transaction,
     TransactionInstruction,
 } from '@solana/web3.js';
+
 import {
     CreatePositionParams,
     DepositParams,
@@ -14,17 +26,6 @@ import {
     WithdrawParams,
 } from '../types';
 import { DripPDA } from '../utils';
-import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    getAssociatedTokenAddressSync,
-} from '@solana/spl-token';
-import {
-    Deposit,
-    InitDripPosition,
-    InitPairConfig,
-    PairConfig,
-} from '@dcaf/drip-types';
 
 export class DripInstructionsFactory implements IDripInstructionsFactory {
     public constructor(

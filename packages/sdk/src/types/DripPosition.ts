@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
-import { DepositParams, WithdrawParams } from './params';
+
 import { TxResult } from './TxResult';
+import { DepositParams, WithdrawParams } from './params';
 
 export interface PositionInProfit {
     pnl: 'profit';

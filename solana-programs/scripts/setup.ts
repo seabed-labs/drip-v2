@@ -1,22 +1,20 @@
+// eslint-disable-next-line import/order
 import dotenv from 'dotenv';
 dotenv.config({
     path: './scripts/staging.env',
 });
 
-import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
-import { DripV2, IDL, Accounts } from '@dcaf/drip-types';
-import {
-    Connection,
-    Keypair,
-    LAMPORTS_PER_SOL,
-    PublicKey,
-    SystemProgram,
-    Transaction,
-    TransactionInstruction,
-} from '@solana/web3.js';
 import fs from 'fs/promises';
-import * as anchor from '@coral-xyz/anchor';
+
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import {
+    DripPosition,
+    DripV2,
+    GlobalConfig,
+    IDL,
+    PairConfig,
+} from '@dcaf/drip-types';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     createAssociatedTokenAccountInstruction,
@@ -28,6 +26,15 @@ import {
     NATIVE_MINT,
     TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
+import {
+    Connection,
+    Keypair,
+    LAMPORTS_PER_SOL,
+    PublicKey,
+    SystemProgram,
+    Transaction,
+    TransactionInstruction,
+} from '@solana/web3.js';
 import { mnemonicToSeed } from 'bip39';
 import { derivePath } from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
@@ -67,7 +74,7 @@ async function maybeInitPairConfig(
         ],
         program.programId
     );
-    const pairConfigAccount = await Accounts.PairConfig.fetch(
+    const pairConfigAccount = await PairConfig.fetch(
         provider.connection,
         pairConfigPubkey,
         program.programId
@@ -192,7 +199,7 @@ export async function deposit(
     dripPositionPub: PublicKey,
     amount: bigint
 ): Promise<void> {
-    const dripPosition = await Accounts.DripPosition.fetch(
+    const dripPosition = await DripPosition.fetch(
         provider.connection,
         dripPositionPub,
         program.programId
@@ -200,15 +207,20 @@ export async function deposit(
     if (!dripPosition) {
         throw new Error('ERROR');
     }
+    const pairConfig = await PairConfig.fetchNonNullable(
+        provider.connection,
+        dripPosition.data.pairConfig,
+        program.programId
+    );
     const { address } = await maybeInitAta(
         provider,
-        dripPosition.inputTokenMint,
+        pairConfig.data.inputTokenMint,
         provider.publicKey
     );
 
     const ix = await createTransferInstruction(
         address,
-        dripPosition.inputTokenAccount,
+        dripPosition.data.inputTokenAccount,
         provider.publicKey,
         amount
     );
@@ -268,7 +280,7 @@ export async function createPosition(
     const initDripPositionTxSig = await program.methods
         .initDripPosition({
             dripAmount: dripAmount,
-            frequencyInSeconds: new anchor.BN(30),
+            frequencyInSeconds: new BN(30),
             owner: positionOwner,
         })
         .accounts({
@@ -378,7 +390,7 @@ export async function setNewDripperPermissions(
     superAdmin: Keypair,
     globalConfig: PublicKey
 ): Promise<void> {
-    const globalConfigAccount = await Accounts.GlobalConfig.fetch(
+    const globalConfigAccount = await GlobalConfig.fetch(
         provider.connection,
         globalConfig,
         program.programId
@@ -386,7 +398,7 @@ export async function setNewDripperPermissions(
     if (!globalConfigAccount) {
         throw new Error('invalid config');
     }
-    const index = globalConfigAccount.admins.findIndex(
+    const index = globalConfigAccount.data.admins.findIndex(
         (admin) => admin.toString() === PublicKey.default.toString()
     );
     if (index === undefined) {
@@ -426,6 +438,7 @@ export async function setNewDripperPermissions(
 
 async function run() {
     const [, , cmd, ...cmdArgs] = process.argv;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const mnemonicSeed = await mnemonicToSeed(process.env.DRIPPER_SEED_PHRASE!);
 
     const derivedSeed = derivePath(
@@ -436,7 +449,9 @@ async function run() {
     const dripperKeypair = Keypair.fromSecretKey(secret);
     console.log('dripper', dripperKeypair.publicKey.toString());
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const connection = new Connection(process.env.RPC_URL!);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const programId = new PublicKey(process.env.DRIP_PROGRAM_ID!);
     const wallet = new Wallet(dripperKeypair);
     const provider = new AnchorProvider(connection, wallet, {
@@ -510,6 +525,7 @@ async function run() {
             return;
         }
         const superAdminKeypair = Keypair.fromSecretKey(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             Uint8Array.from(JSON.parse(process.env.SUPER_ADMIN!))
         );
         const globalConfig = new PublicKey(cmdArgs[0]);
