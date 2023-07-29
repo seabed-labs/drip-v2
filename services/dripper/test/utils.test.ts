@@ -1,5 +1,6 @@
-import { dedupeInstructionsPublicKeys, notEmpty, paginate } from '../src/utils';
 import { Keypair, TransactionInstruction } from '@solana/web3.js';
+
+import { dedupeInstructionsPublicKeys, notEmpty, paginate } from '../src/utils';
 
 describe('Utils', () => {
     describe('paginate', () => {

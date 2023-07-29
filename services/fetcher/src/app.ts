@@ -5,6 +5,7 @@ import express, {
     Request as ExRequest,
     NextFunction,
 } from 'express';
+
 import { RegisterRoutes } from './generated/api';
 import { RestError } from './service/types';
 

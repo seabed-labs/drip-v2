@@ -1,13 +1,18 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Program } from '@coral-xyz/anchor';
+import {
+    AnchorProvider,
+    BN,
+    Program,
+    setProvider,
+    workspace,
+} from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
 import '../setup';
 
 describe('Program - updateDefaultDripFees', () => {
-    anchor.setProvider(anchor.AnchorProvider.env());
-    const program = anchor.workspace.DripV2 as Program<DripV2>;
+    setProvider(AnchorProvider.env());
+    const program = workspace.DripV2 as Program<DripV2>;
 
     let superAdminKeypair: Keypair;
     let globalConfigPubkey: PublicKey;
@@ -20,7 +25,7 @@ describe('Program - updateDefaultDripFees', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdminKeypair.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: program.provider.publicKey,
@@ -58,7 +63,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateDefaultDripFees({
-                newDefaultDripFeesBps: new anchor.BN(50),
+                newDefaultDripFeesBps: new BN(50),
             })
             .accounts({
                 signer: superAdminKeypair.publicKey,
@@ -97,7 +102,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     setAdminAndResetPermissions: {
                         0: adminKeypair.publicKey,
@@ -111,7 +116,7 @@ describe('Program - updateDefaultDripFees', () => {
             .postInstructions([
                 await program.methods
                     .updateAdmin({
-                        adminIndex: new anchor.BN(0),
+                        adminIndex: new BN(0),
                         adminChange: {
                             addPermission: {
                                 0: {
@@ -157,7 +162,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateDefaultDripFees({
-                newDefaultDripFeesBps: new anchor.BN(50),
+                newDefaultDripFeesBps: new BN(50),
             })
             .accounts({
                 signer: adminKeypair.publicKey,
@@ -198,7 +203,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     setAdminAndResetPermissions: {
                         0: adminKeypair.publicKey,
@@ -212,7 +217,7 @@ describe('Program - updateDefaultDripFees', () => {
             .postInstructions([
                 await program.methods
                     .updateAdmin({
-                        adminIndex: new anchor.BN(0),
+                        adminIndex: new BN(0),
                         adminChange: {
                             addPermission: {
                                 0: {
@@ -259,7 +264,7 @@ describe('Program - updateDefaultDripFees', () => {
         await expect(
             program.methods
                 .updateDefaultDripFees({
-                    newDefaultDripFeesBps: new anchor.BN(50),
+                    newDefaultDripFeesBps: new BN(50),
                 })
                 .accounts({
                     signer: adminKeypair.publicKey,
@@ -276,7 +281,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateAdmin({
-                adminIndex: new anchor.BN(0),
+                adminIndex: new BN(0),
                 adminChange: {
                     setAdminAndResetPermissions: {
                         0: adminKeypair.publicKey,
@@ -290,7 +295,7 @@ describe('Program - updateDefaultDripFees', () => {
             .postInstructions([
                 await program.methods
                     .updateAdmin({
-                        adminIndex: new anchor.BN(0),
+                        adminIndex: new BN(0),
                         adminChange: {
                             addPermission: {
                                 0: {
@@ -337,7 +342,7 @@ describe('Program - updateDefaultDripFees', () => {
         await expect(
             program.methods
                 .updateDefaultDripFees({
-                    newDefaultDripFeesBps: new anchor.BN(50),
+                    newDefaultDripFeesBps: new BN(50),
                 })
                 .accounts({
                     signer: nonAdminKeypair.publicKey,

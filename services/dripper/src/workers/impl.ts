@@ -1,9 +1,11 @@
-import { IWorker } from './index';
-import { Connection } from '@solana/web3.js';
-import { IPositionsFetcher } from '../positions';
 import { AnchorProvider } from '@coral-xyz/anchor';
-import { delay, tryWithReturn } from '../utils';
+import { Connection } from '@solana/web3.js';
 import { Logger } from 'winston';
+
+import { IPositionsFetcher } from '../positions';
+import { delay, tryWithReturn } from '../utils';
+
+import { IWorker } from './index';
 
 export class DripWorker implements IWorker {
     private enabled: boolean;

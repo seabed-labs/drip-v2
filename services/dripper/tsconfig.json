@@ -1,6 +1,12 @@
 {
     "extends": "../../tsconfig.json",
-    "exclude": ["./coverage","./node_modules", "./dist", "test", "jest.config.js"],
+    "exclude": [
+        "./coverage",
+        "./node_modules",
+        "./dist",
+        "test",
+        "jest.config.js"
+    ],
     "compilerOptions": {
         "rootDir": "./src" /* Specify the root folder within your source files. */,
         "outDir": "./dist" /* Specify an output folder for all emitted files. */,
@@ -12,14 +18,14 @@
         /* needed for tsyringe */
         /* Experimental Options */
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
+        "emitDecoratorMetadata": true
     },
     "references": [
         {
             "path": "../../packages/drip-types"
         },
         {
-            "path": "../../packages/sdk",
+            "path": "../../packages/sdk"
         }
     ],
     "ts-node": {

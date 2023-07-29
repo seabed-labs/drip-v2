@@ -1,3 +1,8 @@
+import { AnchorProvider } from '@coral-xyz/anchor';
+import {
+    createAssociatedTokenAccountInstruction,
+    getAssociatedTokenAddress,
+} from '@solana/spl-token-0-3-8';
 import {
     AddressLookupTableProgram,
     Commitment,
@@ -6,13 +11,9 @@ import {
     PublicKey,
     TransactionInstruction,
 } from '@solana/web3.js';
-import {
-    createAssociatedTokenAccountInstruction,
-    getAssociatedTokenAddress,
-} from '@solana/spl-token-0-3-8';
-import { createVersionedTransactions } from './solana';
-import { AnchorProvider } from '@coral-xyz/anchor';
 import { Logger } from 'winston';
+
+import { createVersionedTransactions } from './solana';
 
 const MAX_ACCOUNTS_PER_TX = 20;
 const ACCOUNTS_PER_LUT = 256;

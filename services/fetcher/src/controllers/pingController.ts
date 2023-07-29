@@ -1,4 +1,5 @@
 import { Controller, Get, Route } from 'tsoa';
+
 import { PingResponse } from '../service/types';
 
 @Route('/')

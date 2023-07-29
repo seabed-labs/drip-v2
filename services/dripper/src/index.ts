@@ -1,19 +1,19 @@
+// eslint-disable-next-line import/order
 import dotenv from 'dotenv';
 dotenv.config();
-
-import { DripWorker } from './workers/dripWorker';
-import { IWorker } from './workers';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { Connection } from './solana';
-import { DripperWallet } from './wallet/dripperWallet';
-import { DEFAULT_CONFIRM_OPTIONS } from './utils';
-import { OnChainPositionsFetcher } from './positions/onchain';
-import { PublicKey } from '@solana/web3.js';
-import { dripperSeedPhrase, programId } from './env';
-import { getPositionHandler } from './dripHandler';
 import { IDL } from '@dcaf/drip-types';
 import winston, { format } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+
+import { Config } from './config';
+import { getPositionHandler } from './dripHandler';
+import { OnChainPositionsFetcher } from './positions/onChainImpl';
+import { Connection } from './solana';
+import { DEFAULT_CONFIRM_OPTIONS } from './utils';
+import { DripperWallet } from './wallet/impl';
+import { IWorker } from './workers';
+import { DripWorker } from './workers/impl';
 
 const { combine, timestamp, label } = format;
 
@@ -33,29 +33,21 @@ async function exitHandler(signal: string, worker: IWorker) {
 }
 
 async function main() {
-    if (!programId) {
-        throw new Error('empty programId');
-    }
-    if (!dripperSeedPhrase) {
-        throw new Error('empty seed phrase');
-    }
-
-    const dripperWallet = new DripperWallet(dripperSeedPhrase);
-    const programIdPublicKey = new PublicKey(programId);
-    const connection = new Connection();
+    const cfg = new Config();
+    const dripperWallet = new DripperWallet(cfg.dripperSeedPhrase());
+    const connection = new Connection(cfg.rpcUrl());
     const provider = new AnchorProvider(
         connection,
         dripperWallet,
         DEFAULT_CONFIRM_OPTIONS
     );
-    const program = new Program(IDL, programIdPublicKey, provider);
+    const program = new Program(IDL, cfg.programId(), provider);
     logger = logger.data({
         dripperWalletPublicKey: dripperWallet.publicKey.toString(),
-        programId: programIdPublicKey.toString(),
+        programId: cfg.programId().toString(),
     });
-
     const positionFetcher = new OnChainPositionsFetcher(
-        programIdPublicKey,
+        cfg.programId(),
         connection,
         getPositionHandler(logger, dripperWallet, provider, program)
     );

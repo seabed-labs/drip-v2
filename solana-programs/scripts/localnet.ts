@@ -1,10 +1,9 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Program } from '@coral-xyz/anchor';
-import { DripV2 } from '@dcaf/drip-types';
-import { spawn } from 'node:child_process';
 import fs from 'fs/promises';
-import fetch from 'node-fetch';
+import { spawn } from 'node:child_process';
+
+import { BN, getProvider, workspace, Program } from '@coral-xyz/anchor';
+import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import { DripV2 } from '@dcaf/drip-types';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
@@ -12,7 +11,14 @@ import {
     createMint,
     mintTo,
 } from '@solana/spl-token';
-import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import {
+    Keypair,
+    PublicKey,
+    SystemProgram,
+    Transaction,
+} from '@solana/web3.js';
+import fetch from 'node-fetch';
+
 import { delay, keyPairToObject, stringifyJSON } from './setup';
 
 const localnet = spawn('anchor', ['localnet']);
@@ -59,8 +65,9 @@ async function getRawTransaction(txSig: string) {
 
 // TODO: Refactor to use setup.ts
 async function setup() {
-    const program = anchor.workspace.DripV2 as Program<DripV2>;
-    const provider = anchor.getProvider();
+    const program = workspace.DripV2 as Program<DripV2>;
+    const provider = getProvider();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const providerPubkey = provider.publicKey!;
 
     const superAdmin = Keypair.generate();
@@ -73,9 +80,9 @@ async function setup() {
 
     console.log(`Funding mint authority ${mintAuthority.publicKey.toBase58()}`);
     await provider.sendAndConfirm?.(
-        new anchor.web3.Transaction(
-            await provider.connection.getLatestBlockhash()
-        ).add(fundMintAuthorityIx)
+        new Transaction(await provider.connection.getLatestBlockhash()).add(
+            fundMintAuthorityIx
+        )
     );
 
     const globalConfigKeypair = new Keypair();
@@ -92,7 +99,7 @@ async function setup() {
     const initGlobalConfigTxSig = await program.methods
         .initGlobalConfig({
             superAdmin: superAdmin.publicKey,
-            defaultDripFeeBps: new anchor.BN(100),
+            defaultDripFeeBps: new BN(100),
         })
         .accounts({
             payer: provider.publicKey,
@@ -108,7 +115,7 @@ async function setup() {
     );
     const addProviderAsAdminTxSig = await program.methods
         .updateAdmin({
-            adminIndex: new anchor.BN(0),
+            adminIndex: new BN(0),
             adminChange: {
                 setAdminAndResetPermissions: [providerPubkey],
             },
@@ -123,7 +130,7 @@ async function setup() {
     console.log('Setting provider pubkey admin perm to dripper');
     const setProviderPermToDripperTxSig = await program.methods
         .updateAdmin({
-            adminIndex: new anchor.BN(0),
+            adminIndex: new BN(0),
             adminChange: {
                 addPermission: [{ drip: {} }],
             },
@@ -216,8 +223,8 @@ async function setup() {
         const initDripPositionTxSig = await program.methods
             .initDripPosition({
                 owner: dripPositionOwnerKeypair.publicKey,
-                dripAmount: new anchor.BN(100),
-                frequencyInSeconds: new anchor.BN(3600),
+                dripAmount: new BN(100),
+                frequencyInSeconds: new BN(3600),
             })
             .accounts({
                 payer: providerPubkey,
@@ -289,7 +296,7 @@ async function setup() {
             );
             depositTx = await program.methods
                 .deposit({
-                    depositAmount: new anchor.BN(1000e6),
+                    depositAmount: new BN(1000e6),
                 })
                 .accounts({
                     signer: dripPositionOwnerKeypair.publicKey,

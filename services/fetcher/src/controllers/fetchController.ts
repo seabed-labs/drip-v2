@@ -1,3 +1,5 @@
+import { translateAddress } from '@coral-xyz/anchor';
+import { PublicKey } from '@solana/web3.js';
 import {
     Response,
     Controller,
@@ -7,6 +9,11 @@ import {
     Route,
     SuccessResponse,
 } from 'tsoa';
+
+import { tryDecodeToParsedDripAccount } from '../service/accountParser';
+import { programId } from '../service/env';
+import { tryDecodeIx } from '../service/ixParser';
+import { Connection } from '../service/solana';
 import {
     ParsedAccountResponse,
     Commitment,
@@ -14,12 +21,6 @@ import {
     RestError,
     ParsedDripIxWithIndex,
 } from '../service/types';
-import { Connection } from '../service/solana';
-import { tryDecodeToParsedDripAccount } from '../service/accountParser';
-import { programId } from '../service/env';
-import { PublicKey } from '@solana/web3.js';
-import { tryDecodeIx } from '../service/ixParser';
-import { translateAddress } from '@coral-xyz/anchor';
 
 @Route('fetch')
 export class FetchController extends Controller {

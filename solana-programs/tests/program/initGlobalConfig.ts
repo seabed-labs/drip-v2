@@ -1,18 +1,24 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Program } from '@coral-xyz/anchor';
+import {
+    AnchorProvider,
+    BN,
+    Program,
+    getProvider,
+    setProvider,
+    workspace,
+} from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
 import '../setup';
 
 describe('Program - initGlobalConfig', () => {
-    anchor.setProvider(anchor.AnchorProvider.env());
-    const program = anchor.workspace.DripV2 as Program<DripV2>;
+    setProvider(AnchorProvider.env());
+    const program = workspace.DripV2 as Program<DripV2>;
 
     it('initializes the GlobalConfig account', async () => {
         const globalConfigKeypair = new Keypair();
         const superAdmin = new Keypair();
-        const provider = anchor.getProvider();
+        const provider = getProvider();
 
         const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
             [
@@ -25,7 +31,7 @@ describe('Program - initGlobalConfig', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: provider.publicKey,

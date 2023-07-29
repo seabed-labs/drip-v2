@@ -1,13 +1,18 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { Program } from '@coral-xyz/anchor';
+import {
+    AnchorProvider,
+    BN,
+    Program,
+    setProvider,
+    workspace,
+} from '@coral-xyz/anchor';
 import { DripV2 } from '@dcaf/drip-types';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
 import '../setup';
 
 describe('Program - updateSuperAdmin', () => {
-    anchor.setProvider(anchor.AnchorProvider.env());
-    const program = anchor.workspace.DripV2 as Program<DripV2>;
+    setProvider(AnchorProvider.env());
+    const program = workspace.DripV2 as Program<DripV2>;
 
     it('updates the super admin', async () => {
         const globalConfigKeypair = new Keypair();
@@ -18,7 +23,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: provider.publicKey,
@@ -100,7 +105,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: provider.publicKey,
@@ -133,7 +138,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: provider.publicKey,
@@ -167,7 +172,7 @@ describe('Program - updateSuperAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdmin1.publicKey,
-                defaultDripFeeBps: new anchor.BN(100),
+                defaultDripFeeBps: new BN(100),
             })
             .accounts({
                 payer: provider.publicKey,

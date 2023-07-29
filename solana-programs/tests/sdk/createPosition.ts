@@ -1,7 +1,18 @@
 import '../setup';
-import * as anchor from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
-import { AnchorProvider } from '@coral-xyz/anchor';
+import {
+    AnchorProvider,
+    Program,
+    getProvider,
+    setProvider,
+    workspace,
+} from '@coral-xyz/anchor';
+import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
+import {
+    DripPositionAccountJSON,
+    DripV2,
+    InitGlobalConfig,
+} from '@dcaf/drip-types';
+import { DripPosition } from '@dcaf/drip-types/src/accounts';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
@@ -11,24 +22,19 @@ import {
     getOrCreateAssociatedTokenAccount,
     mintTo,
 } from '@solana/spl-token';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { assert, expect } from 'chai';
+
 import { newTransaction } from './utils';
-import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
-import {
-    DripPositionAccountJSON,
-    DripV2,
-    InitGlobalConfig,
-} from '@dcaf/drip-types';
-import { DripPosition } from '@dcaf/drip-types/src/accounts';
 
 describe('SDK - createPosition', () => {
     // TODO: for debugging with yarn run localnet
     // process.env.ANCHOR_PROVIDER_URL="http://localhost:8899"
     // process.env.ANCHOR_WALLET="./local.json"
 
-    anchor.setProvider(anchor.AnchorProvider.env());
-    const program = anchor.workspace.DripV2 as anchor.Program<DripV2>;
-    const provider = anchor.getProvider() as AnchorProvider;
+    setProvider(AnchorProvider.env());
+    const program = workspace.DripV2 as Program<DripV2>;
+    const provider = getProvider() as AnchorProvider;
 
     let mintAuthorityKeypair: Keypair;
     let inputMintPubkey: PublicKey, outputMintPubkey: PublicKey;

@@ -1,12 +1,4 @@
-import {
-    Keypair,
-    PublicKey,
-    sendAndConfirmTransaction,
-    SystemProgram,
-    SYSVAR_INSTRUCTIONS_PUBKEY,
-    Transaction,
-    TransactionInstruction,
-} from '@solana/web3.js';
+import '../setup';
 import {
     AnchorProvider,
     getProvider,
@@ -15,8 +7,14 @@ import {
     workspace,
     BN,
 } from '@coral-xyz/anchor';
+import {
+    deriveDripPositionSigner,
+    deriveEphemeralDripState,
+    deriveGlobalConfigSigner,
+    derivePairConfig,
+} from '@dcaf/drip/dist/utils/pda';
 import { DripV2, PostDripAccounts, PreDripAccounts } from '@dcaf/drip-types';
-import '../setup';
+import { DripPosition } from '@dcaf/drip-types/src/accounts';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     createAssociatedTokenAccountInstruction,
@@ -29,14 +27,16 @@ import {
     createBurnInstruction,
     getAssociatedTokenAddress,
 } from '@solana/spl-token-0-3-8';
-import { expect } from 'chai';
-import { DripPosition } from '@dcaf/drip-types/src/accounts';
 import {
-    deriveDripPositionSigner,
-    deriveEphemeralDripState,
-    deriveGlobalConfigSigner,
-    derivePairConfig,
-} from '@dcaf/drip/dist/utils/pda';
+    Keypair,
+    PublicKey,
+    sendAndConfirmTransaction,
+    SystemProgram,
+    SYSVAR_INSTRUCTIONS_PUBKEY,
+    Transaction,
+    TransactionInstruction,
+} from '@solana/web3.js';
+import { expect } from 'chai';
 
 async function fundAccounts(
     provider: AnchorProvider,
