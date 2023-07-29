@@ -123,11 +123,15 @@ pub enum DripError {
     EphemeralDripStateDripPositionMismatch, // 6039 or 0x1797
 
     #[msg("Expected non-zero used_input_amount post-drip")]
-    ExpectedNonZeroInputPostDrip, // 6037 or 0x1798
+    ExpectedNonZeroInputPostDrip, // 6040 or 0x1798
 
+    // Not used
     #[msg("Expected non-zero input/output drip fees")]
-    ExpectedNonZeroDripFees, // 6038 or 0x1799
+    ExpectedNonZeroDripFees, // 6041 or 0x1799
 
     #[msg("Input drip fees larger then reserved")]
-    InputFeesLargerThanReserved, // 6038 or 0x1799
+    InputFeesLargerThanReserved, // 6042 or 0x179A
+
+    #[msg("The requested drip amount is larger then the maximum allowable amount for this position cycle")]
+    RequestedDripAmountExceedsMaxForPosition, // 6043 or 0x179B
 }

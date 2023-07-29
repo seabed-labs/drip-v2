@@ -75,7 +75,9 @@ export class PrismSwap
         );
         // Prism sdk uses UI values
         const [route] = prism.getRoutes(
-            new Decimal(this.dripPosition.data.dripAmount.toString())
+            new Decimal(
+                this.dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
+            )
                 .div(Math.pow(10, inputTokenAccount.value.decimals))
                 .toNumber()
         ) as PrismRoute[];

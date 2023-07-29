@@ -14,7 +14,11 @@ import {
 import { assert, expect } from 'chai';
 import { newTransaction } from './utils';
 import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
-import { DripV2, InitGlobalConfig } from '@dcaf/drip-types';
+import {
+    DripPositionAccountJSON,
+    DripV2,
+    InitGlobalConfig,
+} from '@dcaf/drip-types';
 import { DripPosition } from '@dcaf/drip-types/src/accounts';
 
 describe('SDK - createPosition', () => {
@@ -151,7 +155,7 @@ describe('SDK - createPosition', () => {
             );
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            19
+            21
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -176,20 +180,22 @@ describe('SDK - createPosition', () => {
             inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
-            dripAmount: '1000',
-            dripAmountFilled: '0',
+            dripAmountPreFees: '1000',
             frequencyInSeconds: '3600',
-            totalInputTokenDripped: '0',
-            totalOutputTokenReceived: '0',
+            totalInputTokenDrippedPostFees: '0',
+            totalOutputTokenReceivedPostFees: '0',
             totalInputFeesCollected: '0',
             totalOutputFeesCollected: '0',
             dripPositionNftMint: null,
             dripMaxJitter: 0,
+            dripInputFeesRemainingForCurrentCycle: '10',
+            dripAmountRemainingPostFeesInCurrentCycle: '990',
+            cycle: '0',
             // TODO: Not sure how to check correctly (we need to fake the time somehow)
             //       For now we should just unit test this instead
             // dripActivationGenesisShift: '0',
             // dripActivationTimestamp: '0',
-        });
+        } as Omit<DripPositionAccountJSON, 'dripActivationGenesisShift' | 'dripActivationTimestamp'>);
 
         expect(
             Number(dripPositionAccount.data.dripActivationGenesisShift)
@@ -279,7 +285,7 @@ describe('SDK - createPosition', () => {
 
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            19
+            21
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -304,20 +310,22 @@ describe('SDK - createPosition', () => {
             inputTokenAccount: expectedDripPositionInputTokenAccount.toBase58(),
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
-            dripAmount: '1000',
-            dripAmountFilled: '0',
+            dripAmountPreFees: '1000',
             frequencyInSeconds: '3600',
-            totalInputTokenDripped: '0',
-            totalOutputTokenReceived: '0',
+            totalInputTokenDrippedPostFees: '0',
+            totalOutputTokenReceivedPostFees: '0',
             totalInputFeesCollected: '0',
             totalOutputFeesCollected: '0',
             dripPositionNftMint: null,
             dripMaxJitter: 0,
+            dripInputFeesRemainingForCurrentCycle: '10',
+            dripAmountRemainingPostFeesInCurrentCycle: '990',
+            cycle: '0',
             // TODO: Not sure how to check correctly (we need to fake the time somehow)
             //       For now we should just unit test this instead
             // dripActivationGenesisShift: '0',
             // dripActivationTimestamp: '0',
-        });
+        } as Omit<DripPositionAccountJSON, 'dripActivationGenesisShift' | 'dripActivationTimestamp'>);
 
         expect(
             Number(dripPositionAccount.data.dripActivationGenesisShift)

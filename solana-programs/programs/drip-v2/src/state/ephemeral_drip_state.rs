@@ -30,10 +30,6 @@ pub struct EphemeralDripState {
     // This is used to protect against large slippage.
     // size: 8
     pub minimum_output_expected: u64,
-    // EphemeralDripState.input_reserved_for_fees is the maximum amount of input tokens
-    // reserved for fees. These fees are transferred in post_drip.
-    // size: 8
-    pub input_reserved_for_fees: u64,
     // EphemeralDripState.input_reserved_for_fees is the bps to apply to the input tokens
     // size: 8
     pub input_drip_fees_bps: u64,

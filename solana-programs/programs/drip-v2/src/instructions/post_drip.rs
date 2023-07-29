@@ -2,6 +2,7 @@ use anchor_lang::{prelude::*, Discriminator};
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use solana_program::sysvar::{instructions::get_instruction_relative, SysvarId};
 
+use crate::common::math::split_drip_amount_from_fees;
 use crate::common::validation::pre_drip_post_drip_have_expected_accounts;
 use crate::state::{DripPositionSigner, EphemeralDripState};
 use crate::{
@@ -131,28 +132,6 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let position_drip_amount_used =
         ephemeral_drip_state.input_transferred_to_dripper - unused_input_token_amount;
 
-    // ex.
-    // dripAmount = 100
-    // input_drip_fees_bps = 1000
-    // position_drip_amount_used = 80
-    // actual fees = position_drip_amount_used * (input_drip_fees_bps/10_000) / ((10_000 - input_drip_fees_bps)/10_000)
-    // = position_drip_amount_used * input_drip_fees_bps / (10_000-input_drip_fees_bps)
-    // = 80 * 1000 / 9_000 = 80_000 / 9_000 = 8.8 => 8
-    let input_token_amount_to_send_to_fee_account = (position_drip_amount_used
-        * ephemeral_drip_state.input_drip_fees_bps)
-        / (10_000 - ephemeral_drip_state.input_drip_fees_bps);
-
-    require!(
-        input_token_amount_to_send_to_fee_account <= ephemeral_drip_state.input_reserved_for_fees,
-        DripError::InputFeesLargerThanReserved
-    );
-
-    let position_drip_amount_filled_with_fees =
-        position_drip_amount_used + input_token_amount_to_send_to_fee_account;
-
-    // TODO: do we want to verify that user input tokens are used in swap?
-    // Edge case: drip amount or so small or drip fee so high that the only amount used is the input fee
-
     let dripper_received_output_tokens = dripper_output_token_account.amount
         - ephemeral_drip_state.dripper_output_token_account_balance_pre_drip_balance;
 
@@ -178,30 +157,33 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
     let output_token_amount_to_send_to_position =
         dripper_received_output_tokens - output_token_amount_to_send_to_fee_account;
 
-    require!(
-        input_token_amount_to_send_to_fee_account + output_token_amount_to_send_to_fee_account != 0,
-        DripError::ExpectedNonZeroDripFees
-    );
-
     /* STATE UPDATES (EFFECTS) */
 
     let drip_position = &mut ctx.accounts.drip_position;
+    let pair_config = &ctx.accounts.pair_config;
 
-    drip_position.drip_amount_filled += position_drip_amount_filled_with_fees;
-    drip_position.total_input_token_dripped += position_drip_amount_filled_with_fees;
-    drip_position.total_output_token_received += dripper_received_output_tokens;
-    // TODO: would it be better to "commit" the position data in pre_drip since that's when it was transferred?
-    // I think its better to keep all drip state updates isolated to the min # of ixs
-    // we can move input fee transfer to post_drip as well to keep state consistent.
-    drip_position.total_input_fees_collected += input_token_amount_to_send_to_fee_account;
+    drip_position.drip_amount_remaining_post_fees_in_current_cycle -= position_drip_amount_used;
+    drip_position.total_input_token_dripped_post_fees += position_drip_amount_used;
+    drip_position.total_output_token_received_post_fees += output_token_amount_to_send_to_position;
+    drip_position.total_input_fees_collected +=
+        drip_position.drip_input_fees_remaining_for_current_cycle;
+    drip_position.drip_input_fees_remaining_for_current_cycle = 0;
     drip_position.total_output_fees_collected += output_token_amount_to_send_to_fee_account;
 
-    if drip_position.drip_amount_filled == drip_position.drip_amount {
+    if drip_position.drip_amount_remaining_post_fees_in_current_cycle == 0 {
         drip_position.drip_activation_timestamp =
             drip_position.get_next_drip_activation_timestamp()?;
-        drip_position.drip_amount_filled = 0;
+        let drip_amounts = split_drip_amount_from_fees(
+            &drip_position.drip_amount_pre_fees,
+            &drip_position.drip_fee_bps,
+            &pair_config.input_token_drip_fee_portion_bps,
+        );
+        drip_position.drip_amount_remaining_post_fees_in_current_cycle =
+            drip_amounts.drip_amount_post_fees;
+        drip_position.drip_input_fees_remaining_for_current_cycle =
+            drip_amounts.input_token_fee_amount;
+        drip_position.cycle += 1;
     }
-
     /* MANUAL CPI (INTERACTIONS) */
 
     // send output token to position
@@ -250,7 +232,7 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
         )?;
     }
 
-    if input_token_amount_to_send_to_fee_account != 0 {
+    if drip_position.drip_input_fees_remaining_for_current_cycle != 0 {
         token::transfer(
             CpiContext::new_with_signer(
                 token_program.to_account_info(),
@@ -265,14 +247,13 @@ pub fn handle_post_drip(ctx: Context<PostDrip>) -> Result<()> {
                     &[drip_position_signer.bump],
                 ]],
             ),
-            input_token_amount_to_send_to_fee_account,
+            drip_position.drip_input_fees_remaining_for_current_cycle,
         )?;
     }
     // TODO(#101): Support auto-credit flow (not critical, skipping for now)
 
     /* POST CPI VERIFICATION */
     /* POST CPI STATE UPDATES (EFFECTS) */
-
     Ok(())
 }
 

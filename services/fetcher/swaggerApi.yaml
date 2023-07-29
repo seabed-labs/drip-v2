@@ -647,17 +647,19 @@ components:
                     type: string
                 autoCreditEnabled:
                     type: boolean
-                dripAmount:
+                dripAmountPreFees:
                     type: string
-                dripAmountFilled:
+                dripAmountRemainingPostFeesInCurrentCycle:
+                    type: string
+                dripInputFeesRemainingForCurrentCycle:
                     type: string
                 totalInputFeesCollected:
                     type: string
                 totalOutputFeesCollected:
                     type: string
-                totalInputTokenDripped:
+                totalInputTokenDrippedPostFees:
                     type: string
-                totalOutputTokenReceived:
+                totalOutputTokenReceivedPostFees:
                     type: string
                 frequencyInSeconds:
                     type: string
@@ -668,6 +670,8 @@ components:
                     type: string
                 dripActivationTimestamp:
                     type: string
+                cycle:
+                    type: string
             required:
                 - globalConfig
                 - pairConfig
@@ -677,16 +681,18 @@ components:
                 - dripPositionNftMint
                 - dripPositionSigner
                 - autoCreditEnabled
-                - dripAmount
-                - dripAmountFilled
+                - dripAmountPreFees
+                - dripAmountRemainingPostFeesInCurrentCycle
+                - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected
                 - totalOutputFeesCollected
-                - totalInputTokenDripped
-                - totalOutputTokenReceived
+                - totalInputTokenDrippedPostFees
+                - totalOutputTokenReceivedPostFees
                 - frequencyInSeconds
                 - dripMaxJitter
                 - dripActivationGenesisShift
                 - dripActivationTimestamp
+                - cycle
             type: object
             description: 'From T, pick a set of properties whose keys are in the union K'
         Omit_DripPositionAccountJSON.owner_:

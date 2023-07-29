@@ -44,17 +44,24 @@ pub struct DripPosition {
     // auto credit disabled, tokenized ownership
     // size: 1
     pub auto_credit_enabled: bool,
-    // DripPosition.drip_amount is the user defined drip_amount.
+    // DripPosition.drip_amount_pre_fees is the user defined drip_amount.
     // Input fees are deducted from this amount before every drip as defined by
     // DripPosition.drip_fee_bps and PairConfig.input_token_drip_fee_portion_bps
     // size: 8
-    pub drip_amount: u64,
-    // DripPosition.drip_amount_filled is a subset of DripPosition.drip_amount
-    // It represents how much of the input tokens have been used to drip in the current cycle.
-    // This includes both the input tokens used as fees + the input tokens used to swap.
-    // This field is updated in post_drip.
+    pub drip_amount_pre_fees: u64,
+    // DripPosition.drip_amount_remaining_post_fees_in_current_cycle represents the maximum amount of input tokens
+    // the dripper can request to withdraw in pre_drip.
+    // This value is initialized to be drip_amount - reserved_input_fees in init_drip_position.
+    // This value is reset in the last partial drip of a cycle.
     // size: 8
-    pub drip_amount_filled: u64,
+    pub drip_amount_remaining_post_fees_in_current_cycle: u64,
+    // DripPosition.drip_input_fees_remaining_for_current_cycle represents how much of the input tokens the protocol
+    // can transfer from this position this cycle.
+    // This field is initialized in init_drip_position.
+    // This field is reduced in post_drip.
+    // This field is reset in the last post_drip of each cycle.
+    // size: 8
+    pub drip_input_fees_remaining_for_current_cycle: u64,
     // DripPosition.total_input_fees_collected represents the lifetime total amount of input tokens transferred for protocol fees for this position.
     // This field is updated in pre_drip.
     // size: 8
@@ -63,14 +70,14 @@ pub struct DripPosition {
     // This field is updated in post_drip.
     // size: 8
     pub total_output_fees_collected: u64,
-    // DripPosition.total_input_token_dripped represents the total amount of input tokens swapped (including input fees).
+    // DripPosition.total_input_token_dripped represents the total amount of input tokens swapped.
     // This field is updated in post_drip.
     // size: 8
-    pub total_input_token_dripped: u64,
-    // DripPosition.total_output_token_received represents the total amount of input tokens swapped (including output fees).
+    pub total_input_token_dripped_post_fees: u64,
+    // DripPosition.total_output_token_received represents the total amount of input tokens swapped.
     // This field is updated in post_drip.
     // size: 8
-    pub total_output_token_received: u64,
+    pub total_output_token_received_post_fees: u64,
     // DripPosition.frequency_in_seconds - DripPosition.drip_max_jitter is the minimum amount of time between two full drips.
     // A full drip occurs when DripPosition.drip_amount_filled == DripPosition.drip_amount
     // size: 8
@@ -84,11 +91,20 @@ pub struct DripPosition {
     // size: 8
     pub drip_activation_genesis_shift: i64,
     // DripPosition.drip_activation_timestamp represents the earliest time (solana time) when
-    // this position can drip. After a full drip is complete, this field is updatd to a future time
+    // this position can drip. After a full drip is complete, this field is updated to a future time
     // based on DripPosition.drip_activation_genesis_shift and DripPosition.frequency_in_seconds
     // This field is updated in post_drip.
     // size: 8
     pub drip_activation_timestamp: i64,
+    // DripPosition.cycle represents what cycle the position is in.
+    // Cycle starts at 0 when initialized, and is incremented in post_drip when a drip is completed.
+    pub cycle: u64,
+}
+
+pub struct InitDripTime {
+    pub drip_activation_genesis_shift: i64,
+    pub drip_activation_timestamp: i64,
+    pub cycle: u64,
 }
 
 impl DripPosition {
@@ -139,16 +155,19 @@ impl DripPosition {
     //
     // NOTE: Canonical cycle boundaries are integer multiples of drip_frequency, shifted cycle boundaries are not.
 
-    pub fn init_drip_timestamps(&mut self) -> Result<()> {
+    pub fn get_init_drip_timestamp(&self) -> Result<InitDripTime> {
         let now = Clock::get()?.unix_timestamp;
         let drip_frequency = self.frequency_in_seconds as i64;
 
         let genesis_canonical_activation_timestamp = now - (now % drip_frequency);
-        self.drip_activation_genesis_shift = now - genesis_canonical_activation_timestamp;
+        let drip_activation_genesis_shift = now - genesis_canonical_activation_timestamp;
 
-        self.drip_activation_timestamp = now;
-
-        Ok(())
+        let drip_activation_timestamp = now;
+        Ok(InitDripTime {
+            drip_activation_genesis_shift,
+            drip_activation_timestamp,
+            cycle: 0,
+        })
     }
 
     pub fn get_next_drip_activation_timestamp(&self) -> Result<i64> {

@@ -347,6 +347,9 @@ export abstract class PositionHandlerBase implements ITokenSwapHandler {
         ]);
         const preDripIx = await this.program.methods
             .preDrip({
+                dripAmountToFill: new BN(
+                    this.dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
+                ),
                 minimumOutputTokensExpected: new BN(
                     minimumOutputTokensExpected.toString()
                 ),

@@ -42,7 +42,9 @@ export class JupiterSwap
         ]);
         const computeRoutesRes = await jup.computeRoutes({
             inputMint: new PublicKey(pairConfigAccount.inputTokenMint),
-            amount: JSBI.BigInt(this.dripPosition.data.dripAmount.toString()),
+            amount: JSBI.BigInt(
+                this.dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
+            ),
             outputMint: new PublicKey(pairConfigAccount.outputTokenMint),
             // TODO: use position defined position slippage
             slippageBps: 100,
