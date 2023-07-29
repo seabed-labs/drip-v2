@@ -4,7 +4,7 @@ use anchor_spl::token::{Mint, TokenAccount};
 use crate::errors::DripError;
 
 #[account]
-#[derive(Debug, Default, InitSpace)]
+#[derive(Default, InitSpace)]
 pub struct DripPosition {
     // size: 32
     pub global_config: Pubkey,
@@ -232,7 +232,7 @@ impl DripPosition {
     }
 }
 
-#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
 pub enum DripPositionOwner {
     Direct { owner: Pubkey },
     Tokenized,
