@@ -1,20 +1,16 @@
 import assert from 'assert';
 
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { DripV2 } from '@dcaf/drip-types';
+import { PairConfigAccount } from '@dcaf/drip-types';
 import { Prism } from '@prism-hq/prism-ag';
-import { Signer, Transaction } from '@solana/web3.js';
+import { Connection, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 import { Logger } from 'winston';
 
-import { DripPosition } from '../positions';
-import { DripperWallet } from '../wallet/impl';
+import { DripPositionPendingDrip } from '../types';
 
-import { PositionHandlerBase } from './abstract';
+import { ISwapHandler, SwapQuoteWithInstructions } from './index';
 
-import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
-
-// Reverse engineered these types by logging their sdk
+// These types are reverse engineered by logging their sdk
 
 type PrismSwapTransactions = {
     preTransaction: Transaction;
@@ -44,44 +40,39 @@ type PrismRoute = {
     };
 };
 
-export class PrismSwap
-    extends PositionHandlerBase
-    implements ITokenSwapHandler
-{
+export class PrismSwap implements ISwapHandler {
     constructor(
-        baseLogger: Logger,
-        dripperWallet: DripperWallet,
-        provider: AnchorProvider,
-        program: Program<DripV2>,
-        dripPosition: DripPosition
-    ) {
-        super(baseLogger, dripperWallet, provider, program, dripPosition);
-    }
+        private readonly logger: Logger,
+        private readonly connection: Connection,
+        private readonly dripper: PublicKey
+    ) {}
 
-    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        const [prism, inputTokenAccount, pairConfigAccount] = await Promise.all(
-            [
-                Prism.init({
-                    user: this.provider.publicKey,
-                    connection: this.provider.connection,
-                    // TODO(mocha): use slippage from position
-                    slippage: 100,
-                }),
-                this.provider.connection.getTokenAccountBalance(
-                    this.dripPosition.data.inputTokenAccount
-                ),
-                this.getPairConfig(),
-            ]
-        );
+    async createSwapInstructions(
+        dripPosition: DripPositionPendingDrip,
+        pairConfig: PairConfigAccount
+    ): Promise<SwapQuoteWithInstructions> {
+        const [prism, inputTokenAccount] = await Promise.all([
+            Prism.init({
+                user: this.dripper,
+                connection: this.connection,
+                // Can't cache this like we do with jupiter because there is no way to
+                // specify the slippage when fetching routes
+                // although there is setSlippage, if this class is re-used across multiple positions
+                // slippage from one position can leak into another
+                // TODO(mocha): use slippage from position
+                slippage: 100,
+            }),
+            this.connection.getTokenAccountBalance(
+                dripPosition.data.inputTokenAccount
+            ),
+        ]);
         await prism.loadRoutes(
-            pairConfigAccount.inputTokenMint.toString(),
-            pairConfigAccount.outputTokenMint.toString()
+            pairConfig.inputTokenMint.toString(),
+            pairConfig.outputTokenMint.toString()
         );
         // Prism sdk uses UI values
         const [route] = prism.getRoutes(
-            new Decimal(
-                this.dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
-            )
+            new Decimal(dripPosition.dripAmountToFill.toString())
                 .div(Math.pow(10, inputTokenAccount.value.decimals))
                 .toNumber()
         ) as PrismRoute[];
@@ -91,6 +82,7 @@ export class PrismSwap
             route,
             false
         )) as PrismSwapTransactions;
+
         return {
             inputAmount: BigInt(
                 route.amountIn * Math.pow(10, route.routeData.fromCoin.decimals)

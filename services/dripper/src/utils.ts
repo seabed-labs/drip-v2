@@ -100,30 +100,6 @@ export async function maybeInitAta(
     };
 }
 
-// TODO(#112): These should live in the SDK
-export function deriveGlobalConfigSigner(
-    globalConfig: PublicKey,
-    dripProgramId: PublicKey
-): PublicKey {
-    const [globalConfigSigner] = PublicKey.findProgramAddressSync(
-        [Buffer.from('drip-v2-global-signer'), globalConfig.toBuffer()],
-        dripProgramId
-    );
-    return globalConfigSigner;
-}
-
-// TODO(#112): These should live in the SDK
-export function derivePositionSigner(
-    dripPosition: PublicKey,
-    dripProgramId: PublicKey
-): PublicKey {
-    const [dripPositionSigner] = PublicKey.findProgramAddressSync(
-        [Buffer.from('drip-v2-drip-position-signer'), dripPosition.toBuffer()],
-        dripProgramId
-    );
-    return dripPositionSigner;
-}
-
 // TODO(#114): this type of error handling likely exists already in a well formed and tested lib
 export async function tryWithReturn<T>(
     logger: Logger,

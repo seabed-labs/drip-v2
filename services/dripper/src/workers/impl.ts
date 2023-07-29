@@ -43,24 +43,26 @@ export class DripWorker implements IWorker {
 
     private async run(): Promise<void> {
         while (this.enabled) {
-            const positions = await this.positions.getPositionsPendingDrip();
+            const positions = await this.positions.getPositionsToDrip();
             this.logger
                 .data({ numPositions: positions.length })
                 .info(`dripping positions`);
             const dripTxSigs: (string | undefined)[] = [];
             for (const position of positions) {
                 dripTxSigs.push(
-                    await tryWithReturn(this.logger, position.drip, (e) => {
-                        this.logger
-                            .data({
-                                error: JSON.stringify(e),
-                                dripPositionPublicKey: position
-                                    .getData()
-                                    .address.toString(),
-                            })
-                            .error('failed to drip');
-                        return undefined;
-                    })
+                    await tryWithReturn(
+                        this.logger,
+                        () => position.drip(this.provider),
+                        (e) => {
+                            this.logger
+                                .data({
+                                    error: JSON.stringify(e),
+                                    dripPosition: position.toJSON(),
+                                })
+                                .error('failed to drip');
+                            return undefined;
+                        }
+                    )
                 );
             }
             // TODO(#116): send to api server to queue for fetcher
