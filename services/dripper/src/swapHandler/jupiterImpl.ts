@@ -1,11 +1,11 @@
 import assert from 'assert';
 
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
-import { DripV2 } from '@dcaf/drip-types';
+import { PairConfigAccount } from '@dcaf/drip-types';
 import { Jupiter, SwapMode } from '@jup-ag/core';
 import { createTransferInstruction } from '@solana/spl-token-0-3-8';
 import {
     Cluster,
+    Connection,
     PublicKey,
     TransactionMessage,
     VersionedTransaction,
@@ -13,43 +13,32 @@ import {
 import JSBI from 'jsbi';
 import { Logger } from 'winston';
 
-import { DripPosition } from '../positions';
+import { DripPositionPendingDrip } from '../types';
 import { maybeInitAta } from '../utils';
-import { DripperWallet } from '../wallet/impl';
 
-import { PositionHandlerBase } from './abstract';
+import { ISwapHandler, SwapQuoteWithInstructions } from './index';
 
-import { ITokenSwapHandler, SwapQuoteWithInstructions } from './index';
-
-export class JupiterSwap
-    extends PositionHandlerBase
-    implements ITokenSwapHandler
-{
+export class JupiterSwap implements ISwapHandler {
     private jupiter: Jupiter | undefined;
 
     constructor(
-        baseLogger: Logger,
-        dripperWallet: DripperWallet,
-        provider: AnchorProvider,
-        program: Program<DripV2>,
-        dripPosition: DripPosition,
-        private readonly cluster: Cluster
+        private readonly logger: Logger,
+        private readonly cluster: Cluster,
+        private readonly connection: Connection,
+        private readonly dripper: PublicKey
     ) {
-        super(baseLogger, dripperWallet, provider, program, dripPosition);
         this.jupiter = undefined;
     }
 
-    async createSwapInstructions(): Promise<SwapQuoteWithInstructions> {
-        const [jup, pairConfigAccount] = await Promise.all([
-            this.initIfNeeded(),
-            this.getPairConfig(),
-        ]);
+    async createSwapInstructions(
+        dripPosition: DripPositionPendingDrip,
+        pairConfig: PairConfigAccount
+    ): Promise<SwapQuoteWithInstructions> {
+        const [jup] = await Promise.all([this.initIfNeeded()]);
         const computeRoutesRes = await jup.computeRoutes({
-            inputMint: new PublicKey(pairConfigAccount.inputTokenMint),
-            amount: JSBI.BigInt(
-                this.dripPosition.data.dripAmountRemainingPostFeesInCurrentCycle.toString()
-            ),
-            outputMint: new PublicKey(pairConfigAccount.outputTokenMint),
+            inputMint: new PublicKey(pairConfig.inputTokenMint),
+            amount: JSBI.BigInt(dripPosition.dripAmountToFill.toString()),
+            outputMint: new PublicKey(pairConfig.outputTokenMint),
             // TODO: use position defined position slippage
             slippageBps: 100,
             forceFetch: true,
@@ -77,16 +66,16 @@ export class JupiterSwap
         );
         const instructions = message.instructions;
         const { address: dripperOutputTokenAta } = await maybeInitAta(
-            this.provider.connection,
-            this.program.programId,
-            pairConfigAccount.outputTokenMint,
-            this.provider.publicKey
+            this.connection,
+            this.dripper,
+            pairConfig.outputTokenMint,
+            this.dripper
         );
         instructions.push(
             createTransferInstruction(
                 dripperOutputTokenAta,
-                this.dripPosition.data.outputTokenAccount,
-                this.provider.publicKey,
+                dripPosition.data.outputTokenAccount,
+                this.dripper,
                 BigInt(route.otherAmountThreshold.toString())
             )
         );
@@ -106,9 +95,9 @@ export class JupiterSwap
     private async initIfNeeded(): Promise<Jupiter> {
         if (!this.jupiter) {
             this.jupiter = await Jupiter.load({
-                connection: this.provider.connection,
+                connection: this.connection,
                 cluster: this.cluster,
-                user: this.provider.publicKey,
+                user: this.dripper,
             });
         }
         return this.jupiter;

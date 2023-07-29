@@ -35,16 +35,16 @@ export class Config implements IConfig {
         this._rpcUrl = rpcUrl;
     }
 
-    programId(): PublicKey {
+    get programId(): PublicKey {
         return this._programId;
     }
-    dripperSeedPhrase(): string {
+    get dripperSeedPhrase(): string {
         return this._dripperSeedPhrase;
     }
-    solanaCluster(): Cluster {
+    get solanaCluster(): Cluster {
         return this._solanaCluster;
     }
-    rpcUrl(): string {
+    get rpcUrl(): string {
         return this._rpcUrl;
     }
 }
