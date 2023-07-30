@@ -26,6 +26,7 @@ export class WebhookController extends Controller {
     ) {
         super();
     }
+
     @Response<RestError>(503)
     @SuccessResponse(201)
     @Post('/tx')
@@ -62,6 +63,8 @@ export class WebhookController extends Controller {
         };
     }
 
+    @Response<RestError>(503)
+    @SuccessResponse(201)
     @Post('/account')
     public async submitAccount(
         @Body() accounts: WebhookSubmitAccountsBody
