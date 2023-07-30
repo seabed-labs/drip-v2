@@ -68,6 +68,20 @@ CREATE TABLE "drip_position" (
     "cycle" numeric NOT NULL
 );
 
+CREATE TABLE "token_account" (
+    "public_key" varchar(44) PRIMARY KEY,
+    "mint" varchar(44) NOT NULL,
+    "owner" varchar(44) NOT NULL,
+    "amount" numeric NOT NULL,
+    "delegate" varchar(44),
+    "delegate_amount" numeric NOT NULL,
+    "is_initialized" boolean NOT NULL,
+    "is_frozen" boolean NOT NULL,
+    "is_native" boolean NOT NULL,
+    "rent_exempt_reserve" numeric,
+    "close_authority" varchar(44),
+);
+
 -- migrate:down
 DROP TABLE "global_config";
 DROP TABLE "global_config_signer";
