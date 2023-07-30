@@ -154,10 +154,18 @@ components:
                     type: string
                 frequencyInSeconds:
                     type: string
+                maxSlippageBps:
+                    type: number
+                    format: double
+                maxPriceDeviationBps:
+                    type: number
+                    format: double
             required:
                 - owner
                 - dripAmount
                 - frequencyInSeconds
+                - maxSlippageBps
+                - maxPriceDeviationBps
             type: object
             additionalProperties: false
         InitDripPositionArgsJSON:
@@ -641,6 +649,14 @@ components:
                     type: string
                 outputTokenAccount:
                     type: string
+                dripAmountPreFees:
+                    type: string
+                maxSlippageBps:
+                    type: number
+                    format: double
+                maxPriceDeviationBps:
+                    type: number
+                    format: double
                 dripFeeBps:
                     type: number
                     format: double
@@ -649,8 +665,6 @@ components:
                     nullable: true
                 autoCreditEnabled:
                     type: boolean
-                dripAmountPreFees:
-                    type: string
                 dripAmountRemainingPostFeesInCurrentCycle:
                     type: string
                 dripInputFeesRemainingForCurrentCycle:
@@ -679,10 +693,12 @@ components:
                 - pairConfig
                 - inputTokenAccount
                 - outputTokenAccount
+                - dripAmountPreFees
+                - maxSlippageBps
+                - maxPriceDeviationBps
                 - dripFeeBps
                 - dripPositionNftMint
                 - autoCreditEnabled
-                - dripAmountPreFees
                 - dripAmountRemainingPostFeesInCurrentCycle
                 - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected

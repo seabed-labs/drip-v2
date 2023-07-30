@@ -119,7 +119,9 @@ describe('SDK - createPosition', () => {
             inputMint: inputMintPubkey,
             outputMint: outputMintPubkey,
             dripAmount: BigInt(1000),
-            dripFrequencyInSeconds: 3600,
+            frequencyInSeconds: BigInt(3600),
+            maxSlippageBps: 100,
+            maxPriceDeviationBps: 150,
         });
 
         assert(isTxSuccessful(txResult), 'Expected TX to be successful');
@@ -161,7 +163,7 @@ describe('SDK - createPosition', () => {
             );
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            20
+            22
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -186,6 +188,8 @@ describe('SDK - createPosition', () => {
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
             dripAmountPreFees: '1000',
+            maxSlippageBps: 100,
+            maxPriceDeviationBps: 150,
             frequencyInSeconds: '3600',
             totalInputTokenDrippedPostFees: '0',
             totalOutputTokenReceivedPostFees: '0',
@@ -241,12 +245,14 @@ describe('SDK - createPosition', () => {
             inputMint: inputMintPubkey,
             outputMint: outputMintPubkey,
             dripAmount: BigInt(1000),
-            dripFrequencyInSeconds: 3600,
+            frequencyInSeconds: BigInt(3600),
             initialDeposit: {
                 depositor: positionOwner.publicKey,
                 depositorTokenAccount: positionOwnerInputTokenAccount.address,
                 amount: BigInt(10_000),
             },
+            maxSlippageBps: 100,
+            maxPriceDeviationBps: 150,
             signers: [positionOwner],
         });
 
@@ -290,7 +296,7 @@ describe('SDK - createPosition', () => {
 
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            20
+            22
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -315,6 +321,8 @@ describe('SDK - createPosition', () => {
             outputTokenAccount:
                 expectedDripPositionOutputTokenAccount.toBase58(),
             dripAmountPreFees: '1000',
+            maxSlippageBps: 100,
+            maxPriceDeviationBps: 150,
             frequencyInSeconds: '3600',
             totalInputTokenDrippedPostFees: '0',
             totalOutputTokenReceivedPostFees: '0',

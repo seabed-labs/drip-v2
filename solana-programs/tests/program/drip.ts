@@ -259,6 +259,8 @@ describe('Program - drip (pre/post)', () => {
                 owner: positionOwnerKeypair.publicKey,
                 dripAmount: new BN(1_000_000),
                 frequencyInSeconds: new BN(1),
+                maxSlippageBps: 100,
+                maxPriceDeviationBps: 150,
             })
             .accounts({
                 payer: positionOwnerKeypair.publicKey,

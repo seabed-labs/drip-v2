@@ -76,6 +76,8 @@ pub struct InitDripPositionParams {
     pub owner: Pubkey,
     pub drip_amount: u64,
     pub frequency_in_seconds: u64,
+    pub max_slippage_bps: u16,
+    pub max_price_deviation_bps: u16,
 }
 
 pub fn handle_init_drip_position(
@@ -129,6 +131,9 @@ pub fn handle_init_drip_position(
     drip_position.pair_config = ctx.accounts.pair_config.key();
 
     drip_position.drip_fee_bps = ctx.accounts.pair_config.default_pair_drip_fee_bps;
+    drip_position.max_slippage_bps = params.max_slippage_bps;
+    drip_position.max_price_deviation_bps = params.max_price_deviation_bps;
+
     // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
     drip_position.drip_amount_pre_fees = params.drip_amount;
     drip_position.drip_amount_remaining_post_fees_in_current_cycle =

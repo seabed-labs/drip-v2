@@ -1124,6 +1124,18 @@
             }
           },
           {
+            "name": "dripAmountPreFees",
+            "type": "u64"
+          },
+          {
+            "name": "maxSlippageBps",
+            "type": "u16"
+          },
+          {
+            "name": "maxPriceDeviationBps",
+            "type": "u16"
+          },
+          {
             "name": "dripFeeBps",
             "type": "u16"
           },
@@ -1136,10 +1148,6 @@
           {
             "name": "autoCreditEnabled",
             "type": "bool"
-          },
-          {
-            "name": "dripAmountPreFees",
-            "type": "u64"
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",
@@ -1436,6 +1444,14 @@
           {
             "name": "frequencyInSeconds",
             "type": "u64"
+          },
+          {
+            "name": "maxSlippageBps",
+            "type": "u16"
+          },
+          {
+            "name": "maxPriceDeviationBps",
+            "type": "u16"
           }
         ]
       }

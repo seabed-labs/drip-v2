@@ -1,12 +1,10 @@
+import { InitDripPositionParamsFields } from '@dcaf/drip-types';
 import { PublicKey, Signer } from '@solana/web3.js';
 
-export interface CreatePositionParams {
-    owner: PublicKey;
+export interface CreatePositionParams extends InitDripPositionParamsFields {
     payer?: PublicKey;
     inputMint: PublicKey;
     outputMint: PublicKey;
-    dripAmount: bigint;
-    dripFrequencyInSeconds: number;
     initialDeposit?: {
         amount: bigint;
         depositor: PublicKey;
