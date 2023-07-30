@@ -2021,6 +2021,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dbmate/darwin-arm64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/darwin-arm64@npm:2.5.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@dbmate/darwin-x64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/darwin-x64@npm:2.5.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@dbmate/linux-arm64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/linux-arm64@npm:2.5.0"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@dbmate/linux-arm@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/linux-arm@npm:2.5.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@dbmate/linux-ia32@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/linux-ia32@npm:2.5.0"
+  conditions: os=linux & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@dbmate/linux-x64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/linux-x64@npm:2.5.0"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@dbmate/win32-x64@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@dbmate/win32-x64@npm:2.5.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@dcaf/anchor-client-gen@npm:0.28.1-beta.6":
   version: 0.28.1-beta.6
   resolution: "@dcaf/anchor-client-gen@npm:0.28.1-beta.6"
@@ -2058,6 +2107,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.59.11
     bn.js: ^5.2.1
     cross-env: ^7.0.3
+    dbmate: ^2.5.0
     dotenv: ^16.3.1
     eslint: ^8.9.0
     eslint-plugin-prettier: ^4.2.1
@@ -10394,6 +10444,38 @@ __metadata:
   version: 1.11.8
   resolution: "dayjs@npm:1.11.8"
   checksum: 4fe04b6df98ba6e5f89b49d80bba603cbf01e21a1b4a24ecb163c94c0ba5324a32ac234a139cee654f89d5277a2bcebca5347e6676c28a0a6d1a90f1d34a42b8
+  languageName: node
+  linkType: hard
+
+"dbmate@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "dbmate@npm:2.5.0"
+  dependencies:
+    "@dbmate/darwin-arm64": 2.5.0
+    "@dbmate/darwin-x64": 2.5.0
+    "@dbmate/linux-arm": 2.5.0
+    "@dbmate/linux-arm64": 2.5.0
+    "@dbmate/linux-ia32": 2.5.0
+    "@dbmate/linux-x64": 2.5.0
+    "@dbmate/win32-x64": 2.5.0
+  dependenciesMeta:
+    "@dbmate/darwin-arm64":
+      optional: true
+    "@dbmate/darwin-x64":
+      optional: true
+    "@dbmate/linux-arm":
+      optional: true
+    "@dbmate/linux-arm64":
+      optional: true
+    "@dbmate/linux-ia32":
+      optional: true
+    "@dbmate/linux-x64":
+      optional: true
+    "@dbmate/win32-x64":
+      optional: true
+  bin:
+    dbmate: dist/cli.js
+  checksum: c70dd858635ed4b4446442ae352f7a568bee5cb17def7a2e8b50ebbb2959afab0fc848dbd36fd97aeed0e3bae4b3179f08b2509b5721e8775c37aa9373fa8fe8
   languageName: node
   linkType: hard
 
