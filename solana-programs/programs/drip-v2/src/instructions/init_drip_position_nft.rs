@@ -10,10 +10,6 @@ pub struct InitDripPositionNft<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(
-        mut,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Account<'info, DripPosition>,
 
     #[account(
@@ -51,6 +47,13 @@ pub struct InitDripPositionNft<'info> {
 }
 
 pub fn handle_init_drip_position_nft(ctx: Context<InitDripPositionNft>) -> Result<()> {
+    require!(
+        ctx.accounts
+            .drip_position
+            .key()
+            .eq(&ctx.accounts.drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         ctx.accounts.drip_position.drip_position_nft_mint.is_none(),
         DripError::DripPositionNftMintAlreadyCreated

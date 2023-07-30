@@ -12,10 +12,6 @@ pub struct DetokenizeDripPosition<'info> {
 
     pub owner: Signer<'info>,
 
-    #[account(
-        mut,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Account<'info, DripPosition>,
 
     #[account(
@@ -40,17 +36,22 @@ pub struct DetokenizeDripPosition<'info> {
 
 pub fn handle_detokenize_drip_position(ctx: Context<DetokenizeDripPosition>) -> Result<()> {
     require!(
+        ctx.accounts
+            .drip_position
+            .key()
+            .eq(&ctx.accounts.drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
+    require!(
         ctx.accounts.drip_position.is_tokenized(),
         DripError::DripPositionNotTokenized
     );
-
     require!(
         ctx.accounts
             .drip_position
             .has_associated_nft_mint(&ctx.accounts.drip_position_nft_mint.key()),
         DripError::UnexpectedDripPositionNftMint
     );
-
     require!(
         ctx.accounts
             .drip_position_nft_account
@@ -58,7 +59,6 @@ pub fn handle_detokenize_drip_position(ctx: Context<DetokenizeDripPosition>) -> 
             .eq(&ctx.accounts.drip_position_nft_mint.key()),
         DripError::UnexpectedDripPositionNftAccount
     );
-
     require!(
         ctx.accounts
             .drip_position_nft_account

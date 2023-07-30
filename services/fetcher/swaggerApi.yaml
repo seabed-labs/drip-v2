@@ -647,8 +647,6 @@ components:
                 dripPositionNftMint:
                     type: string
                     nullable: true
-                dripPositionSigner:
-                    type: string
                 autoCreditEnabled:
                     type: boolean
                 dripAmountPreFees:
@@ -683,7 +681,6 @@ components:
                 - outputTokenAccount
                 - dripFeeBps
                 - dripPositionNftMint
-                - dripPositionSigner
                 - autoCreditEnabled
                 - dripAmountPreFees
                 - dripAmountRemainingPostFeesInCurrentCycle

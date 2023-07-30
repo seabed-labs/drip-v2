@@ -161,7 +161,7 @@ describe('SDK - createPosition', () => {
             );
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            21
+            20
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -172,7 +172,6 @@ describe('SDK - createPosition', () => {
                 },
             },
             dripFeeBps: 100,
-            dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
                 [
@@ -291,7 +290,7 @@ describe('SDK - createPosition', () => {
 
         expect(Object.keys(dripPositionAccount?.toJSON() ?? {}).length).to.eq(
             // NOTE: If you update this, also update the actual field check below
-            21
+            20
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
@@ -302,7 +301,6 @@ describe('SDK - createPosition', () => {
                 },
             },
             dripFeeBps: 100,
-            dripPositionSigner: expectedDripPositionSignerPubkey.toBase58(),
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
                 [

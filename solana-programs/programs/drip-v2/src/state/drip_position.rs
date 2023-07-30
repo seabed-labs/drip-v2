@@ -31,10 +31,6 @@ pub struct DripPosition {
     // because we want to preserve it between tokenizations
     // size: 1 + 32
     pub drip_position_nft_mint: Option<Pubkey>,
-    // TODO: we can remove this reference to drip_position_signer
-    // since it's a PDA derived from this address!
-    // size: 32
-    pub drip_position_signer: Pubkey,
     // DripPosition.auto_credit_enabled is a flag for enabling the auto credit feature.
     // If this is enabled, the output tokens from each drip are transferred to the owner in the drip tx.
     // This can ONLY be enabled if the owner is of type Direct.

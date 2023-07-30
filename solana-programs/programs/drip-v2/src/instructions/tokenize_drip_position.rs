@@ -12,10 +12,6 @@ pub struct TokenizeDripPosition<'info> {
 
     pub owner: Signer<'info>,
 
-    #[account(
-        mut,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Account<'info, DripPosition>,
 
     #[account(
@@ -39,6 +35,13 @@ pub struct TokenizeDripPosition<'info> {
 }
 
 pub fn handle_tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
+    require!(
+        ctx.accounts
+            .drip_position
+            .key()
+            .eq(&ctx.accounts.drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         ctx.accounts
             .drip_position

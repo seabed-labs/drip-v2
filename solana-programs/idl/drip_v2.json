@@ -478,11 +478,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -560,11 +557,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -627,11 +621,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -778,10 +769,7 @@
         {
           "name": "dripPosition",
           "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -868,11 +856,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -1147,10 +1132,6 @@
             "type": {
               "option": "publicKey"
             }
-          },
-          {
-            "name": "dripPositionSigner",
-            "type": "publicKey"
           },
           {
             "name": "autoCreditEnabled",

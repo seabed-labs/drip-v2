@@ -35,10 +35,6 @@ pub struct PreDrip<'info> {
     )]
     pub pair_config: Box<Account<'info, PairConfig>>,
 
-    #[account(
-        mut,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Box<Account<'info, DripPosition>>,
 
     #[account(
@@ -218,7 +214,10 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
         drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
     );
-
+    require!(
+        drip_position.key().eq(&drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         drip_position_signer.drip_position.eq(&drip_position.key()),
         DripError::DripPositionSignerMismatch
