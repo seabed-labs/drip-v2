@@ -35,8 +35,20 @@ export type WebhookResponse = {
     processed: string[];
 };
 
-export type WebhookSubmitTx = {
-    signatures: string[];
+export type SubmitTx = {
+    transaction: {
+        signatures: string[];
+    };
 };
 
-export type WebhookSubmitTxsBody = WebhookSubmitTx[];
+export type WebhookSubmitTxsBody = SubmitTx[];
+
+export type SubmitAccount = {
+    account: {
+        parsed: {
+            pubkey: string;
+        };
+    };
+};
+
+export type WebhookSubmitAccountsBody = SubmitAccount[];

@@ -1,3 +1,4 @@
+import { PublicKey } from '@solana/web3.js';
 import { inject } from 'inversify';
 import { Body, Controller, Post, Route, SuccessResponse, Response } from 'tsoa';
 
@@ -6,8 +7,14 @@ import { ILogger } from '../base/logger';
 import { ITransactionProcessor } from '../base/transactionProcessor';
 import { TYPES } from '../ioCTypes';
 
-import { RestError, WebhookResponse, WebhookSubmitTxsBody } from './types';
+import {
+    RestError,
+    WebhookResponse,
+    WebhookSubmitAccountsBody,
+    WebhookSubmitTxsBody,
+} from './types';
 
+// TODO: Add api key verification
 @Route('webhook')
 export class WebhookController extends Controller {
     constructor(
@@ -28,18 +35,18 @@ export class WebhookController extends Controller {
         const res: string[] = [];
         for (let i = 0; i < txs.length; i++) {
             try {
-                if (!txs[i].signatures.length) {
+                if (!txs[i].transaction.signatures.length) {
                     this.logger.data(txs[i]).warn('Received empty signatures!');
                     continue;
                 }
                 await this.txProcessor.upsertDripTransaction(
-                    txs[i].signatures[0]
+                    txs[i].transaction.signatures[0]
                 );
             } catch (e) {
                 this.logger
                     .data({
                         error: e,
-                        signature: txs[i].signatures[0],
+                        signature: txs[i].transaction.signatures[0],
                     })
                     .error('Failed to process transaction');
             }
@@ -56,10 +63,32 @@ export class WebhookController extends Controller {
     }
 
     @Post('/account')
-    public async submitAccount(): Promise<WebhookResponse> {
-        this.setStatus(503);
+    public async submitAccount(
+        @Body() accounts: WebhookSubmitAccountsBody
+    ): Promise<WebhookResponse> {
+        const res: string[] = [];
+        for (let i = 0; i < accounts.length; i++) {
+            try {
+                await this.accountProcessor.upsertDripAccount(
+                    new PublicKey(accounts[i].account.parsed.pubkey)
+                );
+            } catch (e) {
+                this.logger
+                    .data({
+                        error: e,
+                        signature: accounts[i].account.parsed.pubkey,
+                    })
+                    .error('Failed to process transaction');
+            }
+        }
+        // error out so that helius can retry
+        if (res.length !== accounts.length) {
+            this.setStatus(503);
+        } else {
+            this.setStatus(201);
+        }
         return {
-            processed: [],
+            processed: res,
         };
     }
 }
