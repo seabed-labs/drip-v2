@@ -10,7 +10,8 @@
   "scripts": {
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated",
     "prepack": "yarn run build",
-    "build": "yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc",
+    "build": "yarn run build:db-types && yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc",
+    "build:db-types": "yarn migrate:up && yarn run ts-node scripts/zapatos",
     "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src/generated/anchor",
     "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
     "build:tsc": "yarn run tsc",
@@ -57,6 +58,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "nodemon": "^2.0.22",
-    "tsoa": "^5.1.1"
+    "pg": "^8.11.1",
+    "tsoa": "^5.1.1",
+    "zapatos": "^6.1.4"
   }
 }

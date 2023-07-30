@@ -5,6 +5,7 @@
         "./node_modules",
         "./dist",
         "test",
+        "./scripts",
         "jest.config.js"
     ],
     "compilerOptions": {
