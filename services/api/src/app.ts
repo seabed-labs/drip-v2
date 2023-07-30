@@ -6,8 +6,8 @@ import express, {
     NextFunction,
 } from 'express';
 
+import { RestError } from './controllers/types';
 import { RegisterRoutes } from './generated/api';
-import { RestError } from './types';
 
 export const app = express();
 

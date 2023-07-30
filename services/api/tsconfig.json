@@ -15,10 +15,13 @@
         /* Module Resolution Options */
         "moduleResolution": "node",
         "resolveJsonModule": true,
+        "strictNullChecks": true,
 
-        /* Experimental Options */
+        /* Needed for Inversify */
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "lib": ["es6", "dom"],
+        "types": ["reflect-metadata"]
     },
     "references": [
         {

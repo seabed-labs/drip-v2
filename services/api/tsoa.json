@@ -13,7 +13,8 @@
   },
   "routes": {
       "routesDir": "src/generated/api",
-      "routesFileName": "index.ts"
+      "routesFileName": "index.ts",
+      "iocModule": "src/ioC"
   },
   "yaml": true
 }

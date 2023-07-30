@@ -30,3 +30,13 @@ export class RestError extends Error {
 export type PingResponse = {
     message: string;
 };
+
+export type WebhookResponse = {
+    processed: string[];
+};
+
+export type WebhookSubmitTx = {
+    signatures: string[];
+};
+
+export type WebhookSubmitTxsBody = WebhookSubmitTx[];

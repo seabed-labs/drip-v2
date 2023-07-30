@@ -1,6 +1,6 @@
 import { Controller, Get, Route } from 'tsoa';
 
-import { PingResponse } from '../types';
+import { PingResponse } from './types';
 
 @Route('/')
 export class PingController extends Controller {

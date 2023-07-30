@@ -16,7 +16,7 @@
     "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
     "build:tsc": "yarn run tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon ./src/index.ts",
+    "start:dev": "yarn run ts-node ./src/index.ts",
     "migrate:up": "dbmate -e API_DATABASE_URL --wait up",
     "migrate:down": "dbmate -e API_DATABASE_URL rollback",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
@@ -57,9 +57,14 @@
     "bn.js": "^5.2.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "inversify": "^6.0.1",
+    "inversify-binding-decorators": "^4.0.0",
     "nodemon": "^2.0.22",
     "pg": "^8.11.1",
+    "reflect-metadata": "^0.1.13",
     "tsoa": "^5.1.1",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1",
     "zapatos": "^6.1.4"
   }
 }

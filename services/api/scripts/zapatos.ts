@@ -8,7 +8,7 @@ const zapCfg: zg.Config = {
     db: {
         connectionString: process.env.API_DATABASE_URL,
     },
-    outDir: './src/generated/db',
+    outDir: './src/generated',
     customTypesTransform: 'PgMyType',
 };
 
