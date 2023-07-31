@@ -15,6 +15,8 @@ import {
 } from './types';
 
 // TODO: Add api key verification
+// TODO: Add queue so that our Api instance does not become
+// overloaded / ddos'd
 @Route('webhook')
 export class WebhookController extends Controller {
     constructor(

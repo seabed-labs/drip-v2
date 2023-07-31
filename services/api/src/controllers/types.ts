@@ -1,3 +1,5 @@
+import { DripPositionAccountJSON } from '@dcaf/drip-types';
+
 export class RestError extends Error {
     constructor(readonly status: number, readonly message: string) {
         super(`${status}: ${message ?? ''}`);
@@ -27,6 +29,17 @@ export class RestError extends Error {
     }
 }
 
+export type Response<T> =
+    | {
+          data: T;
+      }
+    | {
+          error: string;
+      };
+////////////////////////////////////////////////////////////////////////
+// Request Responses
+////////////////////////////////////////////////////////////////////////
+
 export type PingResponse = {
     message: string;
 };
@@ -34,6 +47,12 @@ export type PingResponse = {
 export type WebhookResponse = {
     processed: string[];
 };
+
+export type GetWalletPositions = Response<DripPositionAccountJSON[]>;
+
+////////////////////////////////////////////////////////////////////////
+// Request Bodies
+////////////////////////////////////////////////////////////////////////
 
 export type SubmitTx = {
     transaction: {

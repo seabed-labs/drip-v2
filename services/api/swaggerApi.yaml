@@ -5,6 +5,138 @@ components:
     requestBodies: {}
     responses: {}
     schemas:
+        DripPositionOwner.DirectJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Direct
+                    nullable: false
+                value:
+                    properties:
+                        owner:
+                            type: string
+                    required:
+                        - owner
+                    type: object
+            required:
+                - kind
+                - value
+            type: object
+            additionalProperties: false
+        DripPositionOwner.TokenizedJSON:
+            properties:
+                kind:
+                    type: string
+                    enum:
+                        - Tokenized
+                    nullable: false
+            required:
+                - kind
+            type: object
+            additionalProperties: false
+        types.DripPositionOwnerJSON:
+            anyOf:
+                -
+                    $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
+                -
+                    $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
+        DripPositionAccountJSON:
+            properties:
+                globalConfig:
+                    type: string
+                pairConfig:
+                    type: string
+                inputTokenAccount:
+                    type: string
+                outputTokenAccount:
+                    type: string
+                owner:
+                    $ref: '#/components/schemas/types.DripPositionOwnerJSON'
+                dripAmountPreFees:
+                    type: string
+                maxSlippageBps:
+                    type: number
+                    format: double
+                maxPriceDeviationBps:
+                    type: number
+                    format: double
+                dripFeeBps:
+                    type: number
+                    format: double
+                dripPositionNftMint:
+                    type: string
+                    nullable: true
+                autoCreditEnabled:
+                    type: boolean
+                dripAmountRemainingPostFeesInCurrentCycle:
+                    type: string
+                dripInputFeesRemainingForCurrentCycle:
+                    type: string
+                totalInputFeesCollected:
+                    type: string
+                totalOutputFeesCollected:
+                    type: string
+                totalInputTokenDrippedPostFees:
+                    type: string
+                totalOutputTokenReceivedPostFees:
+                    type: string
+                frequencyInSeconds:
+                    type: string
+                dripMaxJitter:
+                    type: number
+                    format: double
+                dripActivationGenesisShift:
+                    type: string
+                dripActivationTimestamp:
+                    type: string
+                cycle:
+                    type: string
+            required:
+                - globalConfig
+                - pairConfig
+                - inputTokenAccount
+                - outputTokenAccount
+                - owner
+                - dripAmountPreFees
+                - maxSlippageBps
+                - maxPriceDeviationBps
+                - dripFeeBps
+                - dripPositionNftMint
+                - autoCreditEnabled
+                - dripAmountRemainingPostFeesInCurrentCycle
+                - dripInputFeesRemainingForCurrentCycle
+                - totalInputFeesCollected
+                - totalOutputFeesCollected
+                - totalInputTokenDrippedPostFees
+                - totalOutputTokenReceivedPostFees
+                - frequencyInSeconds
+                - dripMaxJitter
+                - dripActivationGenesisShift
+                - dripActivationTimestamp
+                - cycle
+            type: object
+            additionalProperties: false
+        Response_DripPositionAccountJSON-Array_:
+            anyOf:
+                -
+                    properties:
+                        data:
+                            items:
+                                $ref: '#/components/schemas/DripPositionAccountJSON'
+                            type: array
+                    required:
+                        - data
+                    type: object
+                -
+                    properties:
+                        error:
+                            type: string
+                    required:
+                        - error
+                    type: object
+        GetWalletPositions:
+            $ref: '#/components/schemas/Response_DripPositionAccountJSON-Array_'
         PingResponse:
             properties:
                 message:
@@ -12,6 +144,65 @@ components:
             required:
                 - message
             type: object
+        WebhookResponse:
+            properties:
+                processed:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - processed
+            type: object
+        RestError:
+            properties:
+                message:
+                    type: string
+                status:
+                    type: number
+                    format: double
+            required:
+                - message
+                - status
+            type: object
+        SubmitTx:
+            properties:
+                transaction:
+                    properties:
+                        signatures:
+                            items:
+                                type: string
+                            type: array
+                    required:
+                        - signatures
+                    type: object
+            required:
+                - transaction
+            type: object
+        WebhookSubmitTxsBody:
+            items:
+                $ref: '#/components/schemas/SubmitTx'
+            type: array
+        SubmitAccount:
+            properties:
+                account:
+                    properties:
+                        parsed:
+                            properties:
+                                pubkey:
+                                    type: string
+                            required:
+                                - pubkey
+                            type: object
+                    required:
+                        - parsed
+                    type: object
+            required:
+                - account
+            type: object
+        WebhookSubmitAccountsBody:
+            items:
+                $ref: '#/components/schemas/SubmitAccount'
+            type: array
     securitySchemes: {}
 info:
     title: '@dcaf/drip-api'
@@ -23,6 +214,24 @@ info:
         name: 'Dcaf Labs'
 openapi: 3.0.0
 paths:
+    '/positions/{wallet}':
+        get:
+            operationId: GetDripPositionsForWallet
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetWalletPositions'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: wallet
+                    required: true
+                    schema:
+                        type: string
     /:
         get:
             operationId: Ping
@@ -35,6 +244,54 @@ paths:
                                 $ref: '#/components/schemas/PingResponse'
             security: []
             parameters: []
+    /webhook/tx:
+        post:
+            operationId: SubmitTx
+            responses:
+                '201':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WebhookResponse'
+                '503':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WebhookSubmitTxsBody'
+    /webhook/account:
+        post:
+            operationId: SubmitAccount
+            responses:
+                '201':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WebhookResponse'
+                '503':
+                    description: ""
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestError'
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WebhookSubmitAccountsBody'
 servers:
     -
         url: /

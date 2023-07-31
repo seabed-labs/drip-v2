@@ -39,7 +39,7 @@ CREATE TABLE "drip_position_nft_mapping" (
     "bump" int NOT NULL
 );
 
-CREATE TYPE owner_kind as ENUM ('DIRECT', 'TOKENIZED');
+CREATE TYPE owner_kind as ENUM ('Direct', 'Tokenized');
 
 CREATE TABLE "drip_position" (
     "public_key" varchar(44) PRIMARY KEY,
@@ -47,7 +47,7 @@ CREATE TABLE "drip_position" (
     "pair_config" varchar(44) NOT NULL,
     "input_token_account" varchar(44) NOT NULL,
     "output_token_account" varchar(33) NOT NULL,
-    "owner_value" varchar(44) NOT NULL,
+    "owner_value" varchar(44),
     "owner_kind" owner_kind NOT NULL,
     "drip_amount_pre_fees" numeric NOT NULL,
     "max_slippage_bps" int NOT NULL,
@@ -79,8 +79,13 @@ CREATE TABLE "token_account" (
     "is_frozen" boolean NOT NULL,
     "is_native" boolean NOT NULL,
     "rent_exempt_reserve" numeric,
-    "close_authority" varchar(44),
+    "close_authority" varchar(44)
 );
+
+CREATE TABLE "drip_position_wallet_owner" (
+    "drip_position_public_key" varchar(44) PRIMARY KEY,
+    "wallet_public_key" varchar(44)
+)
 
 -- migrate:down
 DROP TABLE "global_config";
@@ -89,4 +94,6 @@ DROP TABLE "pair_config";
 DROP TABLE "drip_position_signer";
 DROP TABLE "drip_position_nft_mapping";
 DROP TABLE "drip_position";
+DROP TABLE "token_account";
+DROP TABLE "drip_position_wallet_owner";
 DROP TYPE "owner_kind";

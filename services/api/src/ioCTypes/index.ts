@@ -3,8 +3,9 @@
 export const TYPES = {
     IConfig: Symbol('Config'),
     ILogger: Symbol('Logger'),
-    IAccountProcessor: Symbol('AccountProcessor'),
+    IDatabasePool: Symbol('DatabasePool'),
     IAccountRepository: Symbol('AccountRepository'),
+    IAccountProcessor: Symbol('AccountProcessor'),
     IInstructionProcessor: Symbol('InstructionProcessor'),
     ITransactionProcessor: Symbol('TransactionProcessor'),
 };

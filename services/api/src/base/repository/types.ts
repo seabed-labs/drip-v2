@@ -1,5 +1,10 @@
-import type { global_config } from 'zapatos/schema';
+import { Address } from '@coral-xyz/anchor';
+
+import type { global_config, drip_position } from 'zapatos/schema';
 
 export interface IAccountRepository {
-    getGlobalConfigs(): global_config.Selectable[];
+    getGlobalConfigs(): Promise<global_config.Selectable[]>;
+    getDripPositionsForWallet(
+        walletPublicKey: Address
+    ): Promise<drip_position.Selectable[]>;
 }
