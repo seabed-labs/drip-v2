@@ -17,7 +17,7 @@ import {
 } from '../base/InstructionProcessor';
 import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
 import { IConfig, Config } from '../base/config';
-import { DatabasePool, IDatabasePool } from '../base/databasePool';
+import { Database, IDatabase } from '../base/database';
 import { ILogger, Logger } from '../base/logger';
 import { IAccountRepository, AccountRepository } from '../base/repository';
 import {
@@ -42,7 +42,7 @@ iocContainer.load(buildProviderModule());
 
 iocContainer.bind<ILogger>(TYPES.IConfig).to(Logger);
 iocContainer.bind<IConfig>(TYPES.IConfig).to(Config);
-iocContainer.bind<IDatabasePool>(TYPES.IDatabasePool).to(DatabasePool);
+iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database);
 iocContainer
     .bind<IAccountProcessor>(TYPES.IAccountProcessor)
     .to(AccountProcessor);

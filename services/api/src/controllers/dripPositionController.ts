@@ -41,7 +41,7 @@ export class DripPositionController extends Controller {
                 owner = {
                     kind: p.owner_kind,
                     value: {
-                        owner: p.owner_value!,
+                        owner: p.owner_value,
                     },
                 };
             } else if (p.owner_kind === 'Tokenized') {
@@ -56,25 +56,32 @@ export class DripPositionController extends Controller {
                 inputTokenAccount: p.input_token_account,
                 outputTokenAccount: p.output_token_account,
                 owner,
-                // https://github.com/jawj/zapatos/issues/95 zapatos won't work :((
-                // TODO: dripAmount is being parsed as a number instead of a bigint!!!
                 dripAmountPreFees: p.drip_amount_pre_fees.toString(),
                 maxSlippageBps: 0,
                 maxPriceDeviationBps: 0,
                 dripFeeBps: 0,
                 dripPositionNftMint: null,
                 autoCreditEnabled: false,
-                dripAmountRemainingPostFeesInCurrentCycle: '',
-                dripInputFeesRemainingForCurrentCycle: '',
-                totalInputFeesCollected: '',
-                totalOutputFeesCollected: '',
-                totalInputTokenDrippedPostFees: '',
-                totalOutputTokenReceivedPostFees: '',
-                frequencyInSeconds: '',
-                dripMaxJitter: 0,
-                dripActivationGenesisShift: '',
-                dripActivationTimestamp: '',
-                cycle: '',
+                dripAmountRemainingPostFeesInCurrentCycle:
+                    p.drip_amount_remaining_post_fees_in_current_cycle.toString(),
+                dripInputFeesRemainingForCurrentCycle:
+                    p.drip_input_fees_remaining_for_current_cycle.toString(),
+                totalInputFeesCollected:
+                    p.total_input_fees_collected.toString(),
+                totalOutputFeesCollected:
+                    p.total_output_fees_collected.toString(),
+                totalInputTokenDrippedPostFees:
+                    p.total_input_token_dripped_post_fees.toString(),
+                totalOutputTokenReceivedPostFees:
+                    p.total_output_token_received_post_fees.toString(),
+                frequencyInSeconds: p.frequency_in_seconds.toString(),
+                dripMaxJitter: p.drip_max_jitter,
+                dripActivationGenesisShift:
+                    p.drip_activation_genesis_shift.toString(),
+                dripActivationTimestamp: Math.floor(
+                    p.drip_activation_timestamp.getTime() / 1000
+                ).toString(),
+                cycle: p.cycle.toString(),
             };
             return apiPosition;
         });

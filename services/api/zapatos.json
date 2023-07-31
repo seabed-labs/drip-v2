@@ -1,7 +1,0 @@
-{
-    "db": {
-        "connectionString": "postgres://drip:drip@localhost:5432/drip?sslmode=disable"
-    },
-    "outDir": "src/generated/db",
-    "progressListener": true
-}

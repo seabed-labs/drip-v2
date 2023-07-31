@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prismaClient"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("API_DATABASE_URL")
+}
+
+model drip_position {
+  public_key                                       String     @id @db.VarChar(44)
+  global_config                                    String     @db.VarChar(44)
+  pair_config                                      String     @db.VarChar(44)
+  input_token_account                              String     @db.VarChar(44)
+  output_token_account                             String     @db.VarChar(33)
+  owner_value                                      String?    @db.VarChar(44)
+  owner_kind                                       owner_kind
+  drip_amount_pre_fees                             Decimal    @db.Decimal
+  max_slippage_bps                                 Int
+  max_price_deviation_bps                          Int
+  drip_fee_bps                                     Int
+  drip_position_nft_mint                           String?    @db.VarChar(44)
+  auto_credit_enabled                              Boolean
+  drip_amount_remaining_post_fees_in_current_cycle Decimal    @db.Decimal
+  drip_input_fees_remaining_for_current_cycle      Decimal    @db.Decimal
+  total_input_fees_collected                       Decimal    @db.Decimal
+  total_output_fees_collected                      Decimal    @db.Decimal
+  total_input_token_dripped_post_fees              Decimal    @db.Decimal
+  total_output_token_received_post_fees            Decimal    @db.Decimal
+  frequency_in_seconds                             Decimal    @db.Decimal
+  drip_max_jitter                                  Int
+  drip_activation_genesis_shift                    Int
+  drip_activation_timestamp                        DateTime   @db.Timestamptz(6)
+  cycle                                            Decimal    @db.Decimal
+}
+
+model drip_position_nft_mapping {
+  public_key             String @id @db.VarChar(44)
+  drip_position_nft_mint String @db.VarChar(44)
+  drip_position          String @db.VarChar(44)
+  bump                   Int
+}
+
+model drip_position_signer {
+  public_key    String @id @db.VarChar(44)
+  drip_position String @db.VarChar(44)
+  version       Int
+  bump          Int
+}
+
+model drip_position_wallet_owner {
+  drip_position_public_key String  @id @db.VarChar(44)
+  wallet_public_key        String? @db.VarChar(44)
+}
+
+model global_config {
+  public_key           String    @id @db.VarChar(44)
+  version              Int
+  super_admin          String    @db.VarChar(44)
+  admins               String[]  @db.VarChar(44)
+  admin_permissions    Decimal[] @db.Decimal
+  default_drip_fee_bps Int
+  global_config_signer String    @db.VarChar(44)
+}
+
+model global_config_signer {
+  public_key    String @id @db.VarChar(44)
+  version       Int
+  global_config String @db.VarChar(44)
+  bump          Int
+}
+
+model pair_config {
+  public_key           String @id @db.VarChar(44)
+  global_config        String @db.VarChar(44)
+  input_token_mint     String @db.VarChar(44)
+  output_token_mint    String @db.VarChar(44)
+  bump                 Int
+  default_drip_fee_bps Int
+}
+
+model schema_migrations {
+  version String @id @db.VarChar(128)
+}
+
+model token_account {
+  public_key          String   @id @db.VarChar(44)
+  mint                String   @db.VarChar(44)
+  owner               String   @db.VarChar(44)
+  amount              Decimal  @db.Decimal
+  delegate            String?  @db.VarChar(44)
+  delegate_amount     Decimal  @db.Decimal
+  is_initialized      Boolean
+  is_frozen           Boolean
+  is_native           Boolean
+  rent_exempt_reserve Decimal? @db.Decimal
+  close_authority     String?  @db.VarChar(44)
+}
+
+enum owner_kind {
+  Direct
+  Tokenized
+}

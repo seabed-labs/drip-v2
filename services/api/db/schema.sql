@@ -45,7 +45,7 @@ CREATE TABLE public.drip_position (
     drip_input_fees_remaining_for_current_cycle numeric NOT NULL,
     total_input_fees_collected numeric NOT NULL,
     total_output_fees_collected numeric NOT NULL,
-    "total_input_token_DrippedPostFees" numeric NOT NULL,
+    total_input_token_dripped_post_fees numeric NOT NULL,
     total_output_token_received_post_fees numeric NOT NULL,
     frequency_in_seconds numeric NOT NULL,
     drip_max_jitter integer NOT NULL,

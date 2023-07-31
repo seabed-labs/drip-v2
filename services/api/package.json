@@ -11,7 +11,8 @@
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated",
     "prepack": "yarn run build",
     "build": "yarn run build:db-types && yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc",
-    "build:db-types": "yarn migrate:up && yarn run ts-node scripts/zapatos",
+    "build:db-types": "yarn run prisma generate",
+    "build:db-types-introspection":"yarn migrate:up && yarn run prisma db pull && yarn run build:db-types",
     "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src/generated/anchor",
     "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
     "build:tsc": "yarn run tsc",
@@ -43,6 +44,7 @@
     "jest": "^29.5.0",
     "nock": "^13.3.1",
     "prettier": "^2.5.1",
+    "prisma": "^5.0.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
@@ -52,6 +54,7 @@
     "@coral-xyz/anchor": "0.27.0",
     "@dcaf/drip": "0.1.0",
     "@dcaf/drip-types": "0.1.0",
+    "@prisma/client": "^5.0.0",
     "@solana/web3.js": "1.77.3",
     "@types/express": "^4.17.17",
     "@types/node": "^20.3.1",
@@ -65,7 +68,6 @@
     "reflect-metadata": "^0.1.13",
     "tsoa": "^5.1.1",
     "winston": "^3.10.0",
-    "winston-daily-rotate-file": "^4.7.1",
-    "zapatos": "^6.1.4"
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }
