@@ -105,6 +105,10 @@ pub mod drip_v2 {
         handle_deposit(ctx, params)
     }
 
+    pub fn close_position(ctx: Context<ClosePosition>) -> Result<()> {
+        handle_close_position(ctx)
+    }
+
     pub fn withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
         handle_withdraw(ctx, params)
     }

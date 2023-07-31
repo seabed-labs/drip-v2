@@ -725,6 +725,78 @@
       ]
     },
     {
+      "name": "closePosition",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dripPosition",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionSigner",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "drip-v2-drip-position-signer"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "DripPosition",
+                "path": "drip_position"
+              }
+            ]
+          },
+          "relations": [
+            "drip_position"
+          ]
+        },
+        {
+          "name": "dripPositionInputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionOutputTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dripPositionNftMint",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "dripPositionNftAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "dripPositionNftMapping",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
