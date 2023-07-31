@@ -4,7 +4,7 @@ import { PrismaClient } from '../../generated/prismaClient';
 import { PrismaClientOptions } from '../../generated/prismaClient/runtime/library';
 import { TYPES } from '../../ioCTypes';
 import { IConfig } from '../config';
-import { ILogger } from '../logger';
+import { logger } from '../logger';
 
 import { IDatabase } from './types';
 
@@ -13,10 +13,7 @@ export class Database
     extends PrismaClient<PrismaClientOptions, 'error'>
     implements IDatabase
 {
-    constructor(
-        @inject(TYPES.IConfig) config: IConfig,
-        @inject(TYPES.ILogger) logger: ILogger
-    ) {
+    constructor(@inject(TYPES.IConfig) config: IConfig) {
         super({
             datasources: {
                 db: {
@@ -32,7 +29,7 @@ export class Database
         });
 
         this.$on('error', (e) => {
-            logger.data(e).error('database error');
+            logger.error('database error', e);
         });
     }
 }

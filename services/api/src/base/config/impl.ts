@@ -19,16 +19,20 @@ export class Config implements IConfig {
         if (!databaseUrl) {
             throw new Error(`DATABASE_URL is not set`);
         }
-        const rpcUrl = process.env.DRIPPER_RPC_URL;
+        const rpcUrl = process.env.RPC_URL;
         if (!rpcUrl) {
-            throw new Error(`DRIPPER_RPC_URL is not set`);
+            throw new Error(`RPC_URL is not set`);
         }
         const environment = process.env.ENVIRONMENT;
         if (!environment) {
             throw new Error(`SOLANA_CLUSTER is not set`);
         }
-        if (Environments.includes(environment as Environment)) {
-            throw new Error(`Invalid environment ${environment}`);
+        if (!Environments.includes(environment as Environment)) {
+            throw new Error(
+                `Invalid environment. Got ${environment}, expected one of ${JSON.stringify(
+                    Environments
+                )}`
+            );
         }
         this._programId = new PublicKey(programId);
         this._databaseUrl = databaseUrl;

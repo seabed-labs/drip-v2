@@ -2,13 +2,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import 'reflect-metadata';
-
-import { Container, decorate, injectable, interfaces } from 'inversify';
-import {
-    buildProviderModule,
-    fluentProvide,
-} from 'inversify-binding-decorators';
+import { Container, decorate, injectable } from 'inversify';
+import { buildProviderModule } from 'inversify-binding-decorators';
 import { Controller } from 'tsoa';
 
 import {
@@ -18,37 +13,30 @@ import {
 import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
 import { IConfig, Config } from '../base/config';
 import { Database, IDatabase } from '../base/database';
-import { ILogger, Logger } from '../base/logger';
 import { IAccountRepository, AccountRepository } from '../base/repository';
 import {
     ITransactionProcessor,
     TransactionProcessor,
 } from '../base/transactionProcessor';
+import { PrismaClient } from '../generated/prismaClient';
 import { TYPES } from '../ioCTypes';
 
 // https://tsoa-community.github.io/docs/di.html
-
-export const provideSingleton = function <T>(
-    identifier: interfaces.ServiceIdentifier<T>
-) {
-    return fluentProvide(identifier).inSingletonScope().done();
-};
-
 const iocContainer = new Container();
 // Makes tsoa's Controller injectable
 decorate(injectable(), Controller);
+decorate(injectable(), PrismaClient);
 // make inversify aware of inversify-binding-decorators
 iocContainer.load(buildProviderModule());
 
-iocContainer.bind<ILogger>(TYPES.IConfig).to(Logger);
 iocContainer.bind<IConfig>(TYPES.IConfig).to(Config);
-iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database);
+iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database).inSingletonScope();
+iocContainer
+    .bind<IAccountRepository>(TYPES.IAccountRepository)
+    .to(AccountRepository);
 iocContainer
     .bind<IAccountProcessor>(TYPES.IAccountProcessor)
     .to(AccountProcessor);
-iocContainer
-    .bind<IAccountRepository>(TYPES.IAccountProcessor)
-    .to(AccountRepository);
 iocContainer
     .bind<IInstructionProcessor>(TYPES.IInstructionProcessor)
     .to(InstructionProcessor);

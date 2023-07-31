@@ -9,11 +9,12 @@ import { inject } from 'inversify';
 import { Controller, Get, Path, Route } from 'tsoa';
 
 import { IAccountRepository } from '../base/repository';
-import { TYPES } from '../ioCTypes';
+import { TYPES, provideSingleton } from '../ioCTypes';
 
 import { GetWalletPositions } from './types';
 
 @Route('/positions')
+@provideSingleton(DripPositionController)
 export class DripPositionController extends Controller {
     constructor(
         @inject(TYPES.IAccountRepository)

@@ -2130,7 +2130,6 @@ __metadata:
     typescript: ^5.1.3
     winston: ^3.10.0
     winston-daily-rotate-file: ^4.7.1
-    zapatos: ^6.1.4
   languageName: unknown
   linkType: soft
 
@@ -24484,19 +24483,6 @@ xnft@latest:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
-  languageName: node
-  linkType: hard
-
-"zapatos@npm:^6.1.4":
-  version: 6.1.4
-  resolution: "zapatos@npm:6.1.4"
-  peerDependencies:
-    "@types/pg": ">=7.14.3"
-    pg: ">=7.18.2"
-    typescript: ">=4.1"
-  bin:
-    zapatos: dist/generate/cli.js
-  checksum: b28f53bc040127b357b9fe54947694d6ffe0201e79198e0f5666bb9f97c5d29d55287dff6efd58a1676d7c990a115019d4bc1b8cf8a44b5994525bfca24be105
   languageName: node
   linkType: hard
 

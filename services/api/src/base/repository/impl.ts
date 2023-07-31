@@ -1,5 +1,5 @@
 import { Address } from '@coral-xyz/anchor';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 
 import { drip_position } from '../../generated/prismaClient';
 import { TYPES } from '../../ioCTypes';
@@ -7,6 +7,7 @@ import { IDatabase } from '../database';
 
 import { IAccountRepository } from './types';
 
+@injectable()
 export class AccountRepository implements IAccountRepository {
     constructor(
         @inject(TYPES.IDatabase)

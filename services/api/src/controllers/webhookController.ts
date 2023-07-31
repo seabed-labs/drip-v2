@@ -3,9 +3,10 @@ import { inject } from 'inversify';
 import { Body, Controller, Post, Route, SuccessResponse, Response } from 'tsoa';
 
 import { IAccountProcessor } from '../base/accountProcessor';
-import { ILogger } from '../base/logger';
+import { logger } from '../base/logger';
 import { ITransactionProcessor } from '../base/transactionProcessor';
-import { TYPES } from '../ioCTypes';
+import { TYPES, provideSingleton } from '../ioCTypes';
+import { getErrLog } from '../utils';
 
 import {
     RestError,
@@ -18,9 +19,9 @@ import {
 // TODO: Add queue so that our Api instance does not become
 // overloaded / ddos'd
 @Route('webhook')
+@provideSingleton(WebhookController)
 export class WebhookController extends Controller {
     constructor(
-        @inject(TYPES.ILogger) private readonly logger: ILogger,
         @inject(TYPES.ITransactionProcessor)
         private readonly txProcessor: ITransactionProcessor,
         @inject(TYPES.IAccountProcessor)
@@ -39,19 +40,17 @@ export class WebhookController extends Controller {
         for (let i = 0; i < txs.length; i++) {
             try {
                 if (!txs[i].transaction.signatures.length) {
-                    this.logger.data(txs[i]).warn('Received empty signatures!');
+                    logger.error('Received empty signatures!', txs[i]);
                     continue;
                 }
                 await this.txProcessor.upsertDripTransaction(
                     txs[i].transaction.signatures[0]
                 );
             } catch (e) {
-                this.logger
-                    .data({
-                        error: e,
-                        signature: txs[i].transaction.signatures[0],
-                    })
-                    .error('Failed to process transaction');
+                logger.error('Failed to process transaction', {
+                    ...getErrLog(e),
+                    signature: txs[i].transaction.signatures[0],
+                });
             }
         }
         // error out so that helius can retry
@@ -78,12 +77,11 @@ export class WebhookController extends Controller {
                     new PublicKey(accounts[i].account.parsed.pubkey)
                 );
             } catch (e) {
-                this.logger
-                    .data({
-                        error: e,
-                        signature: accounts[i].account.parsed.pubkey,
-                    })
-                    .error('Failed to process transaction');
+                logger.error('Failed to process account', {
+                    ...getErrLog(e),
+                    error: JSON.stringify(e),
+                    account: accounts[i].account.parsed.pubkey,
+                });
             }
         }
         // error out so that helius can retry
