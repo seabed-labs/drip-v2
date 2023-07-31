@@ -27,7 +27,7 @@ pub struct InitGlobalConfig<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitGlobalConfigParams {
     pub super_admin: Pubkey,
-    pub default_drip_fee_bps: u64,
+    pub default_drip_fee_bps: u16,
 }
 
 pub fn handle_init_global_config(

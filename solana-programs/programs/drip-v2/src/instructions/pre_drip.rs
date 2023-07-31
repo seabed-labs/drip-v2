@@ -35,10 +35,6 @@ pub struct PreDrip<'info> {
     )]
     pub pair_config: Box<Account<'info, PairConfig>>,
 
-    #[account(
-        mut,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Box<Account<'info, DripPosition>>,
 
     #[account(
@@ -135,8 +131,12 @@ pub fn handle_pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<(
     let drip_fee_bps = drip_position.drip_fee_bps; // 0 to 10_000 bps
     let input_token_fee_portion_bps = pair_config.input_token_drip_fee_portion_bps; // 0 to 10_000 bps
     let output_token_fee_portion_bps = 10_000 - input_token_fee_portion_bps; // 0 to 10_000 bps
-    let input_drip_fee_bps = (drip_fee_bps * input_token_fee_portion_bps) / 10_000;
-    let output_drip_fee_bps = (drip_fee_bps * output_token_fee_portion_bps) / 10_000;
+    let input_drip_fee_bps =
+        u16::try_from((u64::from(drip_fee_bps) * u64::from(input_token_fee_portion_bps)) / 10_000)
+            .unwrap();
+    let output_drip_fee_bps =
+        u16::try_from((u64::from(drip_fee_bps) * u64::from(output_token_fee_portion_bps)) / 10_000)
+            .unwrap();
 
     /* STATE UPDATES (EFFECTS) */
 
@@ -214,7 +214,10 @@ fn validate_account_relations(ctx: &Context<PreDrip>) -> Result<()> {
         drip_position.pair_config.eq(&pair_config.key()),
         DripError::PairConfigMismatch
     );
-
+    require!(
+        drip_position.key().eq(&drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         drip_position_signer.drip_position.eq(&drip_position.key()),
         DripError::DripPositionSignerMismatch

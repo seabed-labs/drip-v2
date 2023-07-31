@@ -14,28 +14,36 @@ pub struct DripPosition {
     pub input_token_account: Pubkey,
     // size: 32
     pub output_token_account: Pubkey,
-    // DripPosition.owner is the authority/owner of this position.
+    // The authority/owner of this position.
     // If this is a directly owned position, it contains a wallet address.
     // If this is a tokenized position, the owner is any wallet that has a balance of 1 for the DripPosition.drip_position_nft_mint
     // size: 32
     pub owner: DripPositionOwner,
-    // DripPosition.drip_fee_bps is the total fee bps that will be deduced from this position.
+    // The the user defined drip_amount.
+    // Input fees are deducted from this amount before every drip as defined by
+    // DripPosition.drip_fee_bps and PairConfig.input_token_drip_fee_portion_bps
+    // This field is supplied by the user in init_drip_position.
+    // size: 8
+    pub drip_amount_pre_fees: u64,
+    // The maximum slippage allowed every drip.
+    // This field is supplied by the user in init_drip_position.
+    pub max_slippage_bps: u16,
+    // The maximum deviation from oracle price allowed.
+    // This field is supplied by the user in init_drip_position.
+    pub max_price_deviation_bps: u16,
+    // The total fee bps that will be deduced from this position.
     // This value is split between input token pre swap and output token post swap based on the PairConfig.input_token_drip_fee_portion_bps
     // This value has a default value of PairConfig.default_pair_drip_fee_bps.
     // An admin with sufficient permissions can change the position fees via the (TODO) instruction.
     // size: 8
-    pub drip_fee_bps: u64,
+    pub drip_fee_bps: u16,
     // For positions that are tokenized, this mint represents a proxy to the owner.
     // Users who have a balance for this mint and have a tokenized position is a valid "owner" for this position.
     // We store this separately and not inside the owner enum
     // because we want to preserve it between tokenizations
     // size: 1 + 32
     pub drip_position_nft_mint: Option<Pubkey>,
-    // TODO: we can remove this reference to drip_position_signer
-    // since it's a PDA derived from this address!
-    // size: 32
-    pub drip_position_signer: Pubkey,
-    // DripPosition.auto_credit_enabled is a flag for enabling the auto credit feature.
+    // This is the flag for enabling the auto credit feature.
     // If this is enabled, the output tokens from each drip are transferred to the owner in the drip tx.
     // This can ONLY be enabled if the owner is of type Direct.
     // Valid Cases:
@@ -44,45 +52,39 @@ pub struct DripPosition {
     // auto credit disabled, tokenized ownership
     // size: 1
     pub auto_credit_enabled: bool,
-    // DripPosition.drip_amount_pre_fees is the user defined drip_amount.
-    // Input fees are deducted from this amount before every drip as defined by
-    // DripPosition.drip_fee_bps and PairConfig.input_token_drip_fee_portion_bps
-    // size: 8
-    pub drip_amount_pre_fees: u64,
-    // DripPosition.drip_amount_remaining_post_fees_in_current_cycle represents the maximum amount of input tokens
+    // Represents the maximum amount of input tokens
     // the dripper can request to withdraw in pre_drip.
     // This value is initialized to be drip_amount - reserved_input_fees in init_drip_position.
     // This value is reset in the last partial drip of a cycle.
     // size: 8
     pub drip_amount_remaining_post_fees_in_current_cycle: u64,
-    // DripPosition.drip_input_fees_remaining_for_current_cycle represents how much of the input tokens the protocol
+    // Represents how much of the input tokens the protocol
     // can transfer from this position this cycle.
     // This field is initialized in init_drip_position.
     // This field is reduced in post_drip.
     // This field is reset in the last post_drip of each cycle.
     // size: 8
     pub drip_input_fees_remaining_for_current_cycle: u64,
-    // DripPosition.total_input_fees_collected represents the lifetime total amount of input tokens transferred for protocol fees for this position.
+    // Represents the lifetime total amount of input tokens transferred for protocol fees for this position.
     // This field is updated in pre_drip.
     // size: 8
     pub total_input_fees_collected: u64,
-    // DripPosition.total_output_fees_collected represents the lifetime total amount of output tokens transferred for protocol fees for this position.
+    // Represents the lifetime total amount of output tokens transferred for protocol fees for this position.
     // This field is updated in post_drip.
     // size: 8
     pub total_output_fees_collected: u64,
-    // DripPosition.total_input_token_dripped represents the total amount of input tokens swapped.
+    // Represents the total amount of input tokens swapped.
     // This field is updated in post_drip.
     // size: 8
     pub total_input_token_dripped_post_fees: u64,
-    // DripPosition.total_output_token_received represents the total amount of input tokens swapped.
+    // Represents the total amount of input tokens swapped.
     // This field is updated in post_drip.
     // size: 8
     pub total_output_token_received_post_fees: u64,
-    // DripPosition.frequency_in_seconds - DripPosition.drip_max_jitter is the minimum amount of time between two full drips.
-    // A full drip occurs when DripPosition.drip_amount_filled == DripPosition.drip_amount
+    // frequency_in_seconds - drip_max_jitter is the minimum amount of time between two full drips.
     // size: 8
     pub frequency_in_seconds: u64,
-    // DripPosition.drip_max_jitter is a the max deviation that can be applied to when a drip will execute.
+    // Represents the max deviation that can be applied to when a drip will execute.
     // A random value from -DripPosition.drip_max_jitter to infinity will be added to drip_activation_timestamp
     // off chain to determine the the drip time.
     // During pre_drip, only pre-jitter can be validated, infinite post-jitter is permissible.
@@ -90,14 +92,15 @@ pub struct DripPosition {
     pub drip_max_jitter: u32,
     // size: 8
     pub drip_activation_genesis_shift: i64,
-    // DripPosition.drip_activation_timestamp represents the earliest time (solana time) when
-    // this position can drip. After a full drip is complete, this field is updated to a future time
-    // based on DripPosition.drip_activation_genesis_shift and DripPosition.frequency_in_seconds
+    // Represents the earliest time (solana time) when this position can drip.
+    // After a full drip is complete, this field is updated to a future time
+    // based on drip_activation_genesis_shift and frequency_in_seconds.
     // This field is updated in post_drip.
     // size: 8
     pub drip_activation_timestamp: i64,
     // DripPosition.cycle represents what cycle the position is in.
     // Cycle starts at 0 when initialized, and is incremented in post_drip when a drip is completed.
+    // A full drip occurs when drip_amount_remaining_post_fees_in_current_cycle == 0.
     pub cycle: u64,
 }
 

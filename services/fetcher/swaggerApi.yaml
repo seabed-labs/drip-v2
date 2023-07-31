@@ -154,10 +154,18 @@ components:
                     type: string
                 frequencyInSeconds:
                     type: string
+                maxSlippageBps:
+                    type: number
+                    format: double
+                maxPriceDeviationBps:
+                    type: number
+                    format: double
             required:
                 - owner
                 - dripAmount
                 - frequencyInSeconds
+                - maxSlippageBps
+                - maxPriceDeviationBps
             type: object
             additionalProperties: false
         InitDripPositionArgsJSON:
@@ -247,7 +255,8 @@ components:
                 superAdmin:
                     type: string
                 defaultDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - superAdmin
                 - defaultDripFeeBps
@@ -424,7 +433,8 @@ components:
         types.UpdateDefaultDripFeesParamsJSON:
             properties:
                 newDefaultDripFeesBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - newDefaultDripFeesBps
             type: object
@@ -471,7 +481,8 @@ components:
         types.UpdateDefaultPairDripFeesParamsJSON:
             properties:
                 newDefaultPairDripFeesBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - newDefaultPairDripFeesBps
             type: object
@@ -638,17 +649,22 @@ components:
                     type: string
                 outputTokenAccount:
                     type: string
-                dripFeeBps:
+                dripAmountPreFees:
                     type: string
+                maxSlippageBps:
+                    type: number
+                    format: double
+                maxPriceDeviationBps:
+                    type: number
+                    format: double
+                dripFeeBps:
+                    type: number
+                    format: double
                 dripPositionNftMint:
                     type: string
                     nullable: true
-                dripPositionSigner:
-                    type: string
                 autoCreditEnabled:
                     type: boolean
-                dripAmountPreFees:
-                    type: string
                 dripAmountRemainingPostFeesInCurrentCycle:
                     type: string
                 dripInputFeesRemainingForCurrentCycle:
@@ -677,11 +693,12 @@ components:
                 - pairConfig
                 - inputTokenAccount
                 - outputTokenAccount
+                - dripAmountPreFees
+                - maxSlippageBps
+                - maxPriceDeviationBps
                 - dripFeeBps
                 - dripPositionNftMint
-                - dripPositionSigner
                 - autoCreditEnabled
-                - dripAmountPreFees
                 - dripAmountRemainingPostFeesInCurrentCycle
                 - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected
@@ -765,7 +782,8 @@ components:
                         type: string
                     type: array
                 defaultDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
                 globalConfigSigner:
                     type: string
             required:
@@ -808,9 +826,11 @@ components:
                     type: number
                     format: double
                 defaultPairDripFeeBps:
-                    type: string
+                    type: number
+                    format: double
                 inputTokenDripFeePortionBps:
-                    type: string
+                    type: number
+                    format: double
             required:
                 - globalConfig
                 - version

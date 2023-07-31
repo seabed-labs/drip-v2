@@ -10,11 +10,6 @@ pub struct ClosePosition<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    #[account(
-        mut,
-        close = signer,
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Box<Account<'info, DripPosition>>,
 
     #[account(
@@ -53,6 +48,13 @@ pub struct ClosePosition<'info> {
 }
 
 pub fn handle_close_position(ctx: Context<ClosePosition>) -> Result<()> {
+    require!(
+        ctx.accounts
+            .drip_position
+            .key()
+            .eq(&ctx.accounts.drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         ctx.accounts
             .drip_position

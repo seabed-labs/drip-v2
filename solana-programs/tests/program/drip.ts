@@ -124,7 +124,7 @@ describe('Program - drip (pre/post)', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdminKeypair.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: provider.publicKey,
@@ -259,6 +259,8 @@ describe('Program - drip (pre/post)', () => {
                 owner: positionOwnerKeypair.publicKey,
                 dripAmount: new BN(1_000_000),
                 frequencyInSeconds: new BN(1),
+                maxSlippageBps: 100,
+                maxPriceDeviationBps: 150,
             })
             .accounts({
                 payer: positionOwnerKeypair.publicKey,

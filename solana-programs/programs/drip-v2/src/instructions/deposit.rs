@@ -23,11 +23,18 @@ pub struct DepositParams {
 }
 
 pub fn handle_deposit(ctx: Context<Deposit>, params: DepositParams) -> Result<()> {
+    let (drip_position_signer, _) = Pubkey::find_program_address(
+        &[
+            b"drip-v2-drip-position-signer",
+            ctx.accounts.drip_position.key().as_ref(),
+        ],
+        &crate::id(),
+    );
     require!(
         ctx.accounts
             .drip_position_input_token_account
             .owner
-            .eq(&ctx.accounts.drip_position.drip_position_signer),
+            .eq(&drip_position_signer),
         DripError::UnexpectedDripPositionInputTokenAccount
     );
 

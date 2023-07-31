@@ -44,7 +44,9 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             outputMint,
             payer: payerOverride,
             dripAmount,
-            dripFrequencyInSeconds,
+            frequencyInSeconds,
+            maxSlippageBps,
+            maxPriceDeviationBps,
             initialDeposit,
         } = params;
         const payer = payerOverride ?? owner;
@@ -101,7 +103,9 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 params: {
                     owner,
                     dripAmount,
-                    frequencyInSeconds: BigInt(dripFrequencyInSeconds),
+                    frequencyInSeconds: BigInt(frequencyInSeconds),
+                    maxSlippageBps: maxSlippageBps,
+                    maxPriceDeviationBps: maxPriceDeviationBps,
                 },
             },
             accounts: {
@@ -150,10 +154,10 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             signers: [dripPositionKeypair],
         };
     }
-    getDepositTransaction(params: DepositParams): Promise<Transaction> {
+    getDepositTransaction(_params: DepositParams): Promise<Transaction> {
         throw new Error('Method not implemented.');
     }
-    getWithdrawTransaction(params: WithdrawParams): Promise<Transaction> {
+    getWithdrawTransaction(_params: WithdrawParams): Promise<Transaction> {
         throw new Error('Method not implemented.');
     }
     getClosePositionTransaction(): Promise<Transaction> {

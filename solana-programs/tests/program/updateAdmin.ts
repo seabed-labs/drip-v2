@@ -27,7 +27,7 @@ describe('Program - updateAdmin', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdminKeypair.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: program.provider.publicKey,

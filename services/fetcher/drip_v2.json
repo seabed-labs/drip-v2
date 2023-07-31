@@ -478,11 +478,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -560,11 +557,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -627,11 +621,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -778,10 +769,7 @@
         {
           "name": "dripPosition",
           "isMut": false,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -868,11 +856,8 @@
         },
         {
           "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false,
-          "relations": [
-            "drip_position_signer"
-          ]
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "dripPositionSigner",
@@ -1139,8 +1124,20 @@
             }
           },
           {
-            "name": "dripFeeBps",
+            "name": "dripAmountPreFees",
             "type": "u64"
+          },
+          {
+            "name": "maxSlippageBps",
+            "type": "u16"
+          },
+          {
+            "name": "maxPriceDeviationBps",
+            "type": "u16"
+          },
+          {
+            "name": "dripFeeBps",
+            "type": "u16"
           },
           {
             "name": "dripPositionNftMint",
@@ -1149,16 +1146,8 @@
             }
           },
           {
-            "name": "dripPositionSigner",
-            "type": "publicKey"
-          },
-          {
             "name": "autoCreditEnabled",
             "type": "bool"
-          },
-          {
-            "name": "dripAmountPreFees",
-            "type": "u64"
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",
@@ -1294,11 +1283,11 @@
           },
           {
             "name": "inputDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "outputDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1356,7 +1345,7 @@
           },
           {
             "name": "defaultDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "globalConfigSigner",
@@ -1392,11 +1381,11 @@
           },
           {
             "name": "defaultPairDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "inputTokenDripFeePortionBps",
-            "type": "u64"
+            "type": "u16"
           },
           {
             "name": "inputTokenPriceOracle",
@@ -1455,6 +1444,14 @@
           {
             "name": "frequencyInSeconds",
             "type": "u64"
+          },
+          {
+            "name": "maxSlippageBps",
+            "type": "u16"
+          },
+          {
+            "name": "maxPriceDeviationBps",
+            "type": "u16"
           }
         ]
       }
@@ -1470,7 +1467,7 @@
           },
           {
             "name": "defaultDripFeeBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1516,7 +1513,7 @@
         "fields": [
           {
             "name": "newDefaultDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }
@@ -1528,7 +1525,7 @@
         "fields": [
           {
             "name": "newDefaultPairDripFeesBps",
-            "type": "u64"
+            "type": "u16"
           }
         ]
       }

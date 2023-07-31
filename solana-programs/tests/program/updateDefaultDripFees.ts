@@ -25,7 +25,7 @@ describe('Program - updateDefaultDripFees', () => {
         await program.methods
             .initGlobalConfig({
                 superAdmin: superAdminKeypair.publicKey,
-                defaultDripFeeBps: new BN(100),
+                defaultDripFeeBps: 100,
             })
             .accounts({
                 payer: program.provider.publicKey,
@@ -63,7 +63,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateDefaultDripFees({
-                newDefaultDripFeesBps: new BN(50),
+                newDefaultDripFeesBps: 50,
             })
             .accounts({
                 signer: superAdminKeypair.publicKey,
@@ -162,7 +162,7 @@ describe('Program - updateDefaultDripFees', () => {
 
         await program.methods
             .updateDefaultDripFees({
-                newDefaultDripFeesBps: new BN(50),
+                newDefaultDripFeesBps: 50,
             })
             .accounts({
                 signer: adminKeypair.publicKey,
@@ -264,7 +264,7 @@ describe('Program - updateDefaultDripFees', () => {
         await expect(
             program.methods
                 .updateDefaultDripFees({
-                    newDefaultDripFeesBps: new BN(50),
+                    newDefaultDripFeesBps: 50,
                 })
                 .accounts({
                     signer: adminKeypair.publicKey,
@@ -342,7 +342,7 @@ describe('Program - updateDefaultDripFees', () => {
         await expect(
             program.methods
                 .updateDefaultDripFees({
-                    newDefaultDripFeesBps: new BN(50),
+                    newDefaultDripFeesBps: 50,
                 })
                 .accounts({
                     signer: nonAdminKeypair.publicKey,

@@ -1,0 +1,20 @@
+{
+  "entryFile": "src/app.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/controllers/*Controller.ts"],
+  "spec": {
+      "outputDirectory": "./",
+      "specVersion": 3,
+      "specFileBaseName": "swaggerApi"
+  },
+  "contact": {
+    "name": "Dcaf Labs",
+    "email": "hello@dcaflabs.com"
+  },
+  "routes": {
+      "routesDir": "src/generated/api",
+      "routesFileName": "index.ts",
+      "iocModule": "src/ioC"
+  },
+  "yaml": true
+}

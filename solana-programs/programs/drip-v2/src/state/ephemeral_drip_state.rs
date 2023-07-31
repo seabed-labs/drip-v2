@@ -32,8 +32,8 @@ pub struct EphemeralDripState {
     pub minimum_output_expected: u64,
     // EphemeralDripState.input_reserved_for_fees is the bps to apply to the input tokens
     // size: 8
-    pub input_drip_fees_bps: u64,
+    pub input_drip_fees_bps: u16,
     // EphemeralDripState.input_reserved_for_fees is the bps to apply to the output tokens
     // size: 8
-    pub output_drip_fees_bps: u64,
+    pub output_drip_fees_bps: u16,
 }

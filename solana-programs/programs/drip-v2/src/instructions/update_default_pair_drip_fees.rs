@@ -24,7 +24,7 @@ pub struct UpdateDefaultPairDripFees<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct UpdateDefaultPairDripFeesParams {
-    pub new_default_pair_drip_fees_bps: u64,
+    pub new_default_pair_drip_fees_bps: u16,
 }
 
 pub fn handle_update_default_pair_drip_fees(

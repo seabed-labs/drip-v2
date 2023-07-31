@@ -26,9 +26,6 @@ pub struct Withdraw<'info> {
 
     pub drip_position_nft_account: Option<Account<'info, TokenAccount>>,
 
-    #[account(
-        has_one = drip_position_signer @ DripError::DripPositionSignerMismatch
-    )]
     pub drip_position: Box<Account<'info, DripPosition>>,
 
     #[account(
@@ -51,6 +48,13 @@ pub struct WithdrawParams {
 }
 
 pub fn handle_withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
+    require!(
+        ctx.accounts
+            .drip_position
+            .key()
+            .eq(&ctx.accounts.drip_position_signer.drip_position),
+        DripError::DripPositionSignerMismatch
+    );
     require!(
         ctx.accounts.drip_position.is_owned_by_signer(
             &ctx.accounts.signer,

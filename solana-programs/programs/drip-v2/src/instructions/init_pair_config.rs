@@ -34,6 +34,7 @@ pub fn handle_init_pair_config(ctx: Context<InitPairConfig>) -> Result<()> {
     ctx.accounts.pair_config.output_token_mint = ctx.accounts.output_token_mint.key();
     ctx.accounts.pair_config.default_pair_drip_fee_bps =
         ctx.accounts.global_config.default_drip_fee_bps;
+    // TODO: by default let's split 50/50?
     ctx.accounts.pair_config.input_token_drip_fee_portion_bps = MAX_DRIP_FEE_PORTION_BPS;
     ctx.accounts.pair_config.bump = *ctx.bumps.get("pair_config").unwrap();
 

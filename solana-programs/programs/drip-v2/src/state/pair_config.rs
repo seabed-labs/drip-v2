@@ -47,7 +47,7 @@ impl Deref for PriceFeed {
     }
 }
 
-pub const MAX_DRIP_FEE_PORTION_BPS: u64 = 10_000;
+pub const MAX_DRIP_FEE_PORTION_BPS: u16 = 10_000;
 
 #[account]
 #[derive(Default, InitSpace)]
@@ -57,8 +57,8 @@ pub struct PairConfig {
     pub input_token_mint: Pubkey,
     pub output_token_mint: Pubkey,
     pub bump: u8,
-    pub default_pair_drip_fee_bps: u64,
-    pub input_token_drip_fee_portion_bps: u64, // max of 10000
+    pub default_pair_drip_fee_bps: u16,        // max of 10_000
+    pub input_token_drip_fee_portion_bps: u16, // max of 10_000
     pub input_token_price_oracle: PriceOracle,
     pub output_token_price_oracle: PriceOracle,
 }
