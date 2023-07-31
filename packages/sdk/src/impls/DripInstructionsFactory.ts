@@ -67,7 +67,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         const instructions: TransactionInstruction[] = [];
 
         if (!pairConfigAccount) {
-            const initPairConfigIx = new InitPairConfig({
+            const initPairConfigIx = new InitPairConfig(this.programId, {
                 args: null,
                 accounts: {
                     payer,
@@ -79,7 +79,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 },
             });
 
-            instructions.push(initPairConfigIx.build(this.programId));
+            instructions.push(initPairConfigIx.build());
         }
 
         const dripPositionSignerPubkey = DripPDA.deriveDripPositionSigner(
@@ -98,7 +98,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 )
             );
 
-        const initDripPositionIx = new InitDripPosition({
+        const initDripPositionIx = new InitDripPosition(this.programId, {
             args: {
                 params: {
                     owner,
@@ -124,12 +124,12 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             },
         });
 
-        instructions.push(initDripPositionIx.build(this.programId));
+        instructions.push(initDripPositionIx.build());
 
         if (initialDeposit) {
             // TODO: Support wSOL
 
-            const depositIx = new Deposit({
+            const depositIx = new Deposit(this.programId, {
                 args: {
                     params: {
                         depositAmount: initialDeposit.amount,
@@ -146,7 +146,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
                 },
             });
 
-            instructions.push(depositIx.build(this.programId));
+            instructions.push(depositIx.build());
         }
 
         return {

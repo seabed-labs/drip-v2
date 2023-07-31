@@ -20,7 +20,7 @@
     "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@dcaf/anchor-client-gen": "0.28.1-beta.7",
+    "@dcaf/anchor-client-gen": "0.28.1-beta.8",
     "@types/bn.js": "5.1.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "eslint": "^8.9.0",

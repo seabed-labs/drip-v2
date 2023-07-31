@@ -386,7 +386,7 @@ export class Position implements IPosition {
                 instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
                 tokenProgram: TOKEN_PROGRAM_ID,
             };
-        const preDripIx = new PreDrip({
+        const preDripIx = new PreDrip(this.programId, {
             args: {
                 params: {
                     dripAmountToFill,
@@ -397,17 +397,17 @@ export class Position implements IPosition {
                 ...prePostCommonAccounts,
                 systemProgram: SystemProgram.programId,
             },
-        }).build(this.programId);
+        }).build();
         ixs.push(preDripIx);
         ixs.push(...swapIxs);
-        const postDripIx = new PostDrip({
+        const postDripIx = new PostDrip(this.programId, {
             args: null,
             accounts: {
                 ...prePostCommonAccounts,
                 inputTokenFeeAccount,
                 outputTokenFeeAccount,
             },
-        }).build(this.programId);
+        }).build();
         ixs.push(postDripIx);
         this.logger.info('created drip sandwich ixs');
         return ixs;

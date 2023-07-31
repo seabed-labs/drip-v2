@@ -25,7 +25,7 @@
     "test": "cross-env DRIP_PROGRAM_ID=74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk FETCHER_RPC_URL=http://localhost:8899 jest --coverage"
   },
   "devDependencies": {
-    "@dcaf/anchor-client-gen": "0.28.1-beta.7",
+    "@dcaf/anchor-client-gen": "0.28.1-beta.8",
     "@types/bn.js": "^5.1.1",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",

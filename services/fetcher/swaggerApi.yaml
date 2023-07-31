@@ -528,8 +528,6 @@ components:
                 - signer
                 - globalConfig
                 - pairConfig
-                - inputTokenPythPriceFeed
-                - outputTokenPythPriceFeed
             type: object
             additionalProperties: false
         ParsedUpdatePythPriceFeed:
