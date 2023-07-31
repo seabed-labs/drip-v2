@@ -8,7 +8,7 @@ import { Controller } from 'tsoa';
 
 import {
     IInstructionProcessor,
-    InstructionProcessor,
+    DripInstructionProcessor,
 } from '../base/InstructionProcessor';
 import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
 import { IConfig, Config } from '../base/config';
@@ -39,7 +39,7 @@ iocContainer
     .to(AccountProcessor);
 iocContainer
     .bind<IInstructionProcessor>(TYPES.IInstructionProcessor)
-    .to(InstructionProcessor);
+    .to(DripInstructionProcessor);
 iocContainer
     .bind<ITransactionProcessor>(TYPES.ITransactionProcessor)
     .to(TransactionProcessor);
