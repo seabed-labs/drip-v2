@@ -6,6 +6,7 @@ import { fluentProvide } from 'inversify-binding-decorators';
 export const TYPES = {
     IConfig: Symbol('Config'),
     IDatabase: Symbol('Database'),
+    IConnection: Symbol('Connection'),
     IAccountRepository: Symbol('AccountRepository'),
     IAccountProcessor: Symbol('AccountProcessor'),
     IInstructionProcessor: Symbol('InstructionProcessor'),

@@ -1,4 +1,5 @@
 import {
+    ClosePosition,
     CollectFees,
     Deposit,
     DetokenizeDripPosition,
@@ -16,70 +17,152 @@ import {
     UpdatePythPriceFeed,
     UpdateSuperAdmin,
     Withdraw,
+    processInstruction,
 } from '@dcaf/drip-types';
 import {
     VersionedTransactionResponse,
     MessageAccountKeys,
     MessageCompiledInstruction,
+    PublicKey,
 } from '@solana/web3.js';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 
+import { TYPES } from '../../ioCTypes';
+import { IConfig } from '../config';
 import { logger } from '../logger';
+import { notEmpty } from '../utils';
 
 import { IInstructionProcessor } from './types';
 
 @injectable()
 export class DripInstructionProcessor implements IInstructionProcessor {
+    private readonly programId: PublicKey;
+
+    constructor(@inject(TYPES.IConfig) config: IConfig) {
+        this.programId = config.programId;
+    }
+
     // TODO(mocha): create schema for these instructions
     // TODO(mocha): insert decoded ix data to db
-    upsertInstruction(
+    async upsertInstruction(
         tx: VersionedTransactionResponse,
         accountKeys: MessageAccountKeys,
         ix: MessageCompiledInstruction
     ): Promise<void> {
-        const identifier = Buffer.from(ix.data.slice(0, 8));
-        const name = identifier.toString();
-        // TODO: We can code gen these large if/else-ifs and pass in handler callbacks
-        // this ensures we never miss an ix handling and need to explicity handle it
-        // TODO: Close position missing from codegen
-        // https://github.com/dcaf-labs/anchor-client-gen/issues/16
-        if (CollectFees.isIdentifierEqual(Buffer.from(ix.data))) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(Deposit.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(DetokenizeDripPosition.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(InitDripPositionNft.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(InitDripPosition.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(InitGlobalConfig.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(InitPairConfig.identifier)) {
-            console.log(name);
-        } else if (identifier.equals(PostDrip.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(PreDrip.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(ToggleAutoCredit.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(TokenizeDripPosition.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(UpdateAdmin.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(UpdateDefaultDripFees.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(UpdateDefaultPairDripFees.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(UpdatePythPriceFeed.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(UpdateSuperAdmin.identifier)) {
-            logger.info('parsing ix', { name });
-        } else if (identifier.equals(Withdraw.identifier)) {
-            logger.info('parsing ix', { name });
-        } else {
-            logger.error('unable to parse drip instruction', { name });
+        const ixAccounts = ix.accountKeyIndexes
+            .map((i) => accountKeys.get(i))
+            .filter(notEmpty);
+        const upsertedIx = await processInstruction(
+            this.programId,
+            ix.data,
+            ixAccounts,
+            {
+                initGlobalConfigIxHandler: function (
+                    ix: InitGlobalConfig
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                initPairConfigIxHandler: function (
+                    ix: InitPairConfig
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                updateSuperAdminIxHandler: function (
+                    ix: UpdateSuperAdmin
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                updateAdminIxHandler: function (
+                    ix: UpdateAdmin
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                updateDefaultDripFeesIxHandler: function (
+                    ix: UpdateDefaultDripFees
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                updatePythPriceFeedIxHandler: function (
+                    ix: UpdatePythPriceFeed
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                updateDefaultPairDripFeesIxHandler: function (
+                    ix: UpdateDefaultPairDripFees
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                collectFeesIxHandler: function (
+                    ix: CollectFees
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                initDripPositionIxHandler: function (
+                    ix: InitDripPosition
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                initDripPositionNftIxHandler: function (
+                    ix: InitDripPositionNft
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                tokenizeDripPositionIxHandler: function (
+                    ix: TokenizeDripPosition
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                detokenizeDripPositionIxHandler: function (
+                    ix: DetokenizeDripPosition
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                toggleAutoCreditIxHandler: function (
+                    ix: ToggleAutoCredit
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                depositIxHandler: function (ix: Deposit): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                closePositionIxHandler: function (
+                    ix: ClosePosition
+                ): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                withdrawIxHandler: function (ix: Withdraw): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                preDripIxHandler: function (ix: PreDrip): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+                postDripIxHandler: function (ix: PostDrip): Promise<void> {
+                    logger.info('processing ix', { name: ix.ixName });
+                    throw new Error('Function not implemented.');
+                },
+            }
+        );
+        if (!upsertedIx) {
+            logger.warn('unknown drip ix', {
+                ixName: ix.data.slice(0, 8).toString(),
+            });
         }
-        return Promise.resolve();
     }
 }

@@ -12,4 +12,5 @@ export interface IConfig {
     get databaseUrl(): string;
     get environment(): string;
     get rpcUrl(): string;
+    get rpcWebhookUrl(): string;
 }

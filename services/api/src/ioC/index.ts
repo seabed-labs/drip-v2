@@ -14,6 +14,7 @@ import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
 import { IConfig, Config } from '../base/config';
 import { Database, IDatabase } from '../base/database';
 import { IAccountRepository, AccountRepository } from '../base/repository';
+import { Connection, IConnection } from '../base/rpcConnection';
 import {
     ITransactionProcessor,
     TransactionProcessor,
@@ -31,6 +32,10 @@ iocContainer.load(buildProviderModule());
 
 iocContainer.bind<IConfig>(TYPES.IConfig).to(Config);
 iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database).inSingletonScope();
+iocContainer
+    .bind<IConnection>(TYPES.IConnection)
+    .to(Connection)
+    .inSingletonScope();
 iocContainer
     .bind<IAccountRepository>(TYPES.IAccountRepository)
     .to(AccountRepository);
