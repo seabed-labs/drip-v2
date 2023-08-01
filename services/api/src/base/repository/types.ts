@@ -7,6 +7,7 @@ import {
     GlobalConfig,
     GlobalConfigSigner,
     PairConfig,
+    DripPositionWalletOwner,
 } from '../../generated/prismaClient';
 
 // TODO: add support for arbitrary mix-match repo methods
@@ -17,6 +18,9 @@ export interface IAccountRepository {
     ): Promise<DripPosition[]>;
 
     upsertDripPosition(a: DripPosition): Promise<DripPosition>;
+    upsertDripPositionWalletOwner(
+        a: DripPositionWalletOwner
+    ): Promise<DripPositionWalletOwner>;
     upsertDripPositionSigner(
         a: DripPositionSigner
     ): Promise<DripPositionSigner>;

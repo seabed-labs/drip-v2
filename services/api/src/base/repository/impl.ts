@@ -5,6 +5,7 @@ import {
     DripPosition,
     DripPositionNftMapping,
     DripPositionSigner,
+    DripPositionWalletOwner,
     GlobalConfig,
     GlobalConfigSigner,
     PairConfig,
@@ -21,8 +22,18 @@ export class AccountRepository implements IAccountRepository {
         private readonly db: IDatabase
     ) {}
 
+    async upsertDripPositionWalletOwner(
+        a: DripPositionWalletOwner
+    ): Promise<DripPositionWalletOwner> {
+        return this.db.dripPositionWalletOwner.upsert({
+            where: { dripPositionPublicKey: a.dripPositionPublicKey },
+            create: a,
+            update: a,
+        });
+    }
+
     async upsertDripPosition(a: DripPosition): Promise<DripPosition> {
-        return await this.db.dripPosition.upsert({
+        return this.db.dripPosition.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -32,7 +43,7 @@ export class AccountRepository implements IAccountRepository {
     async upsertDripPositionSigner(
         a: DripPositionSigner
     ): Promise<DripPositionSigner> {
-        return await this.db.dripPositionSigner.upsert({
+        return this.db.dripPositionSigner.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -42,7 +53,7 @@ export class AccountRepository implements IAccountRepository {
     async upsertDripPositionNftMapping(
         a: DripPositionNftMapping
     ): Promise<DripPositionNftMapping> {
-        return await this.db.dripPositionNftMapping.upsert({
+        return this.db.dripPositionNftMapping.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -52,7 +63,7 @@ export class AccountRepository implements IAccountRepository {
     async upsertGlobalConfigSigner(
         a: GlobalConfigSigner
     ): Promise<GlobalConfigSigner> {
-        return await this.db.globalConfigSigner.upsert({
+        return this.db.globalConfigSigner.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -60,7 +71,7 @@ export class AccountRepository implements IAccountRepository {
     }
 
     async upsertGlobalConfig(a: GlobalConfig): Promise<GlobalConfig> {
-        return await this.db.globalConfig.upsert({
+        return this.db.globalConfig.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -68,7 +79,7 @@ export class AccountRepository implements IAccountRepository {
     }
 
     async upsertPairConfig(a: PairConfig): Promise<PairConfig> {
-        return await this.db.pairConfig.upsert({
+        return this.db.pairConfig.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,
@@ -78,7 +89,7 @@ export class AccountRepository implements IAccountRepository {
     async getDripPositionsForWallet(
         walletPublicKey: Address
     ): Promise<DripPosition[]> {
-        return await this.db.$queryRaw<DripPosition[]>`SELECT drip_position.* 
+        return this.db.$queryRaw<DripPosition[]>`SELECT drip_position.* 
             FROM drip_position 
             JOIN drip_position_wallet_owner 
             ON drip_position.public_key = drip_position_wallet_owner.drip_position_public_key

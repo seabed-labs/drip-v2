@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 import {
     DripPosition,
     DripPositionNftMapping,
@@ -7,6 +9,7 @@ import {
     PairConfig,
     processAccount,
 } from '@dcaf/drip-types';
+import { getAccount } from '@solana/spl-token';
 import { AccountInfo, PublicKey } from '@solana/web3.js';
 import { inject, injectable } from 'inversify';
 
@@ -70,6 +73,29 @@ export class AccountProcessor implements IAccountProcessor {
             dripPositionAccountHandler: async (
                 account: DripPosition
             ): Promise<void> => {
+                if (account.data.owner.kind === 'Direct') {
+                    await this.accountRepo.upsertDripPositionWalletOwner({
+                        dripPositionPublicKey: address.toString(),
+                        walletPublicKey:
+                            account.data.owner.value.owner.toString(),
+                    });
+                } else {
+                    assert(
+                        account.data.dripPositionNftMint,
+                        RestError.internal(
+                            `expected dripPositionNftMint to be set for tokenized position ${address.toString()}`
+                        )
+                    );
+                    const tokenizedOwner = await this.getTokenizedOwner(
+                        account.data.dripPositionNftMint
+                    );
+                    if (tokenizedOwner) {
+                        await this.accountRepo.upsertDripPositionWalletOwner({
+                            dripPositionPublicKey: address.toString(),
+                            walletPublicKey: tokenizedOwner.toString(),
+                        });
+                    }
+                }
                 await this.accountRepo.upsertDripPosition(
                     dripPositionAccountToDbModel(address, account)
                 );
@@ -119,5 +145,22 @@ export class AccountProcessor implements IAccountProcessor {
                 data: data.toString(),
             });
         }
+    }
+
+    async getTokenizedOwner(
+        dripPositionNftMint: PublicKey
+    ): Promise<PublicKey | undefined> {
+        const nftOwners = await this.connection.getTokenLargestAccounts(
+            dripPositionNftMint
+        );
+        if (nftOwners.value.length === 1) {
+            const tokenAccount = await getAccount(
+                this.connection,
+                nftOwners.value[0].address,
+                this.connection.commitment
+            );
+            return tokenAccount.owner;
+        }
+        return undefined;
     }
 }
