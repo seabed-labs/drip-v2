@@ -2,7 +2,6 @@ import {
     DripPosition,
     DripPositionNftMapping,
     DripPositionSigner,
-    EphemeralDripState,
     GlobalConfig,
     GlobalConfigSigner,
     PairConfig,
@@ -17,6 +16,14 @@ import { IConfig } from '../config';
 import { logger } from '../logger';
 import { IAccountRepository } from '../repository';
 import { IConnection } from '../rpcConnection';
+import {
+    dripPositionAccountToDbModel,
+    dripPositionNftMappingAccountToDbModel,
+    dripPositionSignerAccountToDbModel,
+    globalConfigAccountToDbModel,
+    globalConfigSignerAccountToDbModel,
+    pairConfigAccountToDbModel,
+} from '../utils';
 
 import { IAccountProcessor } from './types';
 
@@ -60,40 +67,50 @@ export class AccountProcessor implements IAccountProcessor {
         data: Buffer
     ): Promise<void> {
         const didUpsert = await processAccount(data, {
-            dripPositionAccountHandler: function (
+            dripPositionAccountHandler: async (
                 account: DripPosition
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertDripPosition(
+                    dripPositionAccountToDbModel(address, account)
+                );
             },
-            dripPositionSignerAccountHandler: function (
+            dripPositionSignerAccountHandler: async (
                 account: DripPositionSigner
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertDripPositionSigner(
+                    dripPositionSignerAccountToDbModel(address, account)
+                );
             },
-            dripPositionNftMappingAccountHandler: function (
+            dripPositionNftMappingAccountHandler: async (
                 account: DripPositionNftMapping
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertDripPositionNftMapping(
+                    dripPositionNftMappingAccountToDbModel(address, account)
+                );
             },
-            ephemeralDripStateAccountHandler: function (
-                account: EphemeralDripState
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ephemeralDripStateAccountHandler: (): Promise<void> => {
+                throw new Error('Unexpected ephemeral state found.');
             },
-            globalConfigSignerAccountHandler: function (
+            globalConfigSignerAccountHandler: async (
                 account: GlobalConfigSigner
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertGlobalConfigSigner(
+                    globalConfigSignerAccountToDbModel(address, account)
+                );
             },
-            globalConfigAccountHandler: function (
+            globalConfigAccountHandler: async (
                 account: GlobalConfig
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertGlobalConfig(
+                    globalConfigAccountToDbModel(address, account)
+                );
             },
-            pairConfigAccountHandler: function (
+            pairConfigAccountHandler: async (
                 account: PairConfig
-            ): Promise<void> {
-                throw new Error('Function not implemented.');
+            ): Promise<void> => {
+                await this.accountRepo.upsertPairConfig(
+                    pairConfigAccountToDbModel(address, account)
+                );
             },
         });
         if (!didUpsert) {

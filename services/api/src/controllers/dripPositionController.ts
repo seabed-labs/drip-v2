@@ -37,50 +37,45 @@ export class DripPositionController extends Controller {
         );
         const res = positions.map((p) => {
             let owner: DripPositionOwnerJSON | undefined = undefined;
-            if (p.owner_kind === 'Direct') {
-                assert(p.owner_value);
+            if (p.ownerKind === 'Direct') {
+                assert(p.ownerValue);
                 owner = {
-                    kind: p.owner_kind,
+                    kind: p.ownerKind,
                     value: {
-                        owner: p.owner_value,
+                        owner: p.ownerValue,
                     },
                 };
-            } else if (p.owner_kind === 'Tokenized') {
+            } else if (p.ownerKind === 'Tokenized') {
                 owner = {
-                    kind: p.owner_kind,
+                    kind: p.ownerKind,
                 };
             }
             assert(owner);
             const apiPosition: DripPositionAccountJSON = {
-                globalConfig: p.global_config,
-                pairConfig: p.pair_config,
-                inputTokenAccount: p.input_token_account,
-                outputTokenAccount: p.output_token_account,
+                ...p,
                 owner,
-                dripAmountPreFees: p.drip_amount_pre_fees.toString(),
-                maxSlippageBps: 0,
-                maxPriceDeviationBps: 0,
-                dripFeeBps: 0,
-                dripPositionNftMint: null,
-                autoCreditEnabled: false,
+                dripAmountPreFees: p.dripAmountPreFees.toString(),
+                // maxSlippageBps: 0,
+                // maxPriceDeviationBps: 0,
+                // dripFeeBps: 0,
+                // dripPositionNftMint: null,
+                // autoCreditEnabled: false,
                 dripAmountRemainingPostFeesInCurrentCycle:
-                    p.drip_amount_remaining_post_fees_in_current_cycle.toString(),
+                    p.dripAmountRemainingPostFeesInCurrentCycle.toString(),
                 dripInputFeesRemainingForCurrentCycle:
-                    p.drip_input_fees_remaining_for_current_cycle.toString(),
-                totalInputFeesCollected:
-                    p.total_input_fees_collected.toString(),
-                totalOutputFeesCollected:
-                    p.total_output_fees_collected.toString(),
+                    p.dripInputFeesRemainingForCurrentCycle.toString(),
+                totalInputFeesCollected: p.totalInputFeesCollected.toString(),
+                totalOutputFeesCollected: p.totalOutputFeesCollected.toString(),
                 totalInputTokenDrippedPostFees:
-                    p.total_input_token_dripped_post_fees.toString(),
+                    p.totalInputTokenDrippedPostFees.toString(),
                 totalOutputTokenReceivedPostFees:
-                    p.total_output_token_received_post_fees.toString(),
-                frequencyInSeconds: p.frequency_in_seconds.toString(),
-                dripMaxJitter: p.drip_max_jitter,
+                    p.totalOutputTokenReceivedPostFees.toString(),
+                frequencyInSeconds: p.frequencyInSeconds.toString(),
+                dripMaxJitter: p.dripMaxJitter,
                 dripActivationGenesisShift:
-                    p.drip_activation_genesis_shift.toString(),
+                    p.dripActivationGenesisShift.toString(),
                 dripActivationTimestamp: Math.floor(
-                    p.drip_activation_timestamp.getTime() / 1000
+                    p.dripActivationTimestamp.getTime() / 1000
                 ).toString(),
                 cycle: p.cycle.toString(),
             };

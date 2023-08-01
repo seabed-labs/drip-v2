@@ -2101,6 +2101,7 @@ __metadata:
     "@prisma/client": ^5.0.0
     "@solana/web3.js": 1.77.3
     "@types/bn.js": ^5.1.1
+    "@types/decimal.js": ^7.4.0
     "@types/express": ^4.17.17
     "@types/jest": ^29.5.2
     "@types/node": ^20.3.1
@@ -2110,6 +2111,7 @@ __metadata:
     bn.js: ^5.2.1
     cross-env: ^7.0.3
     dbmate: ^2.5.0
+    decimal.js: ^10.4.3
     dotenv: ^16.3.1
     eslint: ^8.9.0
     eslint-plugin-prettier: ^4.2.1
@@ -6349,6 +6351,15 @@ __metadata:
   version: 2.1.2
   resolution: "@types/cookiejar@npm:2.1.2"
   checksum: f6e1903454007f86edd6c3520cbb4d553e1d4e17eaf1f77f6f75e3270f48cc828d74397a113a36942f5fe52f9fa71067bcfa738f53ad468fcca0bc52cb1cbd28
+  languageName: node
+  linkType: hard
+
+"@types/decimal.js@npm:^7.4.0":
+  version: 7.4.0
+  resolution: "@types/decimal.js@npm:7.4.0"
+  dependencies:
+    decimal.js: "*"
+  checksum: 3fe44b056fde01774b0edb6e7f4f55e5c27bf1861d48f854db4a367795137a01ff7f83110d148d4928d7c27310ebcb7213a28a62aedbbc272064b91a848844f7
   languageName: node
   linkType: hard
 
@@ -10597,6 +10608,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"decimal.js@npm:*, decimal.js@npm:^10.2.1, decimal.js@npm:^10.3.0, decimal.js@npm:^10.3.1, decimal.js@npm:^10.4.1, decimal.js@npm:^10.4.3":
+  version: 10.4.3
+  resolution: "decimal.js@npm:10.4.3"
+  checksum: 796404dcfa9d1dbfdc48870229d57f788b48c21c603c3f6554a1c17c10195fc1024de338b0cf9e1efe0c7c167eeb18f04548979bcc5fdfabebb7cc0ae3287bae
+  languageName: node
+  linkType: hard
+
 "decimal.js@npm:10.3.1":
   version: 10.3.1
   resolution: "decimal.js@npm:10.3.1"
@@ -10608,13 +10626,6 @@ __metadata:
   version: 10.4.2
   resolution: "decimal.js@npm:10.4.2"
   checksum: 536cd6816a3197f2e1aa3da4860856cb5a2db73f6fafe8cb3b924ccc63f9b7d78296acc13dccbd419bd958ccc6357921fb15467f883b37cab04bfba7044cada2
-  languageName: node
-  linkType: hard
-
-"decimal.js@npm:^10.2.1, decimal.js@npm:^10.3.0, decimal.js@npm:^10.3.1, decimal.js@npm:^10.4.1":
-  version: 10.4.3
-  resolution: "decimal.js@npm:10.4.3"
-  checksum: 796404dcfa9d1dbfdc48870229d57f788b48c21c603c3f6554a1c17c10195fc1024de338b0cf9e1efe0c7c167eeb18f04548979bcc5fdfabebb7cc0ae3287bae
   languageName: node
   linkType: hard
 
