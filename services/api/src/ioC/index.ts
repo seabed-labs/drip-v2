@@ -8,12 +8,13 @@ import { Controller } from 'tsoa';
 
 import {
     IInstructionProcessor,
-    InstructionProcessor,
+    DripInstructionProcessor,
 } from '../base/InstructionProcessor';
 import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
 import { IConfig, Config } from '../base/config';
 import { Database, IDatabase } from '../base/database';
 import { IAccountRepository, AccountRepository } from '../base/repository';
+import { Connection, IConnection } from '../base/rpcConnection';
 import {
     ITransactionProcessor,
     TransactionProcessor,
@@ -32,6 +33,10 @@ iocContainer.load(buildProviderModule());
 iocContainer.bind<IConfig>(TYPES.IConfig).to(Config);
 iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database).inSingletonScope();
 iocContainer
+    .bind<IConnection>(TYPES.IConnection)
+    .to(Connection)
+    .inSingletonScope();
+iocContainer
     .bind<IAccountRepository>(TYPES.IAccountRepository)
     .to(AccountRepository);
 iocContainer
@@ -39,7 +44,7 @@ iocContainer
     .to(AccountProcessor);
 iocContainer
     .bind<IInstructionProcessor>(TYPES.IInstructionProcessor)
-    .to(InstructionProcessor);
+    .to(DripInstructionProcessor);
 iocContainer
     .bind<ITransactionProcessor>(TYPES.ITransactionProcessor)
     .to(TransactionProcessor);

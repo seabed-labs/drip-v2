@@ -1,3 +1,13 @@
+import {
+    VersionedTransactionResponse,
+    MessageAccountKeys,
+    MessageCompiledInstruction,
+} from '@solana/web3.js';
+
 export interface IInstructionProcessor {
-    upsertDripInstruction(): Promise<void>;
+    upsertInstruction(
+        tx: VersionedTransactionResponse,
+        accountKeys: MessageAccountKeys,
+        ix: MessageCompiledInstruction
+    ): Promise<void>;
 }

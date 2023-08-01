@@ -132,7 +132,11 @@ function parseDeposit(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedDeposit: ParsedDeposit } {
-    const parsedIx = Deposit.fromDecoded(ixData.data as DepositArgs, accounts);
+    const parsedIx = Deposit.fromDecoded(
+        programId,
+        ixData.data as DepositArgs,
+        accounts
+    );
     return {
         parsedDeposit: {
             name: DripV2InstructionNames.deposit,
@@ -146,7 +150,7 @@ function parseToggleAutoCredit(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedToggleAutoCredit: ParsedToggleAutoCredit } {
-    const parsedIx = ToggleAutoCredit.fromDecoded(accounts);
+    const parsedIx = ToggleAutoCredit.fromDecoded(programId, accounts);
     return {
         parsedToggleAutoCredit: {
             name: DripV2InstructionNames.toggleAutoCredit,
@@ -161,7 +165,7 @@ function parseDetokenizeDripPosition(
 ): {
     parsedDetokenizeDripPosition: Omit<ParsedDetokenizeDripPosition, 'index'>;
 } {
-    const parsedIx = DetokenizeDripPosition.fromDecoded(accounts);
+    const parsedIx = DetokenizeDripPosition.fromDecoded(programId, accounts);
     return {
         parsedDetokenizeDripPosition: {
             name: DripV2InstructionNames.detokenizeDripPosition,
@@ -174,7 +178,7 @@ function parseTokenizeDripPosition(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedTokenizeDripPosition: Omit<ParsedTokenizeDripPosition, 'index'> } {
-    const parsedIx = TokenizeDripPosition.fromDecoded(accounts);
+    const parsedIx = TokenizeDripPosition.fromDecoded(programId, accounts);
     return {
         parsedTokenizeDripPosition: {
             name: DripV2InstructionNames.tokenizeDripPosition,
@@ -187,7 +191,7 @@ function parseInitDripPositionNft(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedInitDripPositionNft: ParsedInitDripPositionNft } {
-    const parsedIx = InitDripPositionNft.fromDecoded(accounts);
+    const parsedIx = InitDripPositionNft.fromDecoded(programId, accounts);
     return {
         parsedInitDripPositionNft: {
             name: DripV2InstructionNames.initDripPositionNft,
@@ -201,6 +205,7 @@ function parseInitDripPosition(
     accounts: PublicKey[]
 ): { parsedInitDripPosition: ParsedInitDripPosition } {
     const parsedIx = InitDripPosition.fromDecoded(
+        programId,
         ixData.data as InitDripPositionArgs,
         accounts
     );
@@ -218,6 +223,7 @@ function parseUpdateDefaultPairDripFees(
     accounts: PublicKey[]
 ): { parsedUpdateDefaultPairDripFees: ParsedUpdateDefaultPairDripFees } {
     const parsedIx = UpdateDefaultPairDripFees.fromDecoded(
+        programId,
         ixData.data as UpdateDefaultPairDripFeesArgs,
         accounts
     );
@@ -234,7 +240,7 @@ function parseUpdatePythPriceFeed(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedUpdatePythPriceFeed: ParsedUpdatePythPriceFeed } {
-    const parsedIx = UpdatePythPriceFeed.fromDecoded(accounts);
+    const parsedIx = UpdatePythPriceFeed.fromDecoded(programId, accounts);
     return {
         parsedUpdatePythPriceFeed: {
             name: DripV2InstructionNames.updatePythPriceFeed,
@@ -248,6 +254,7 @@ function parseUpdateDefaultDripFees(
     accounts: PublicKey[]
 ): { parsedUpdateDefaultDripFees: ParsedUpdateDefaultDripFees } {
     const parsedIx = UpdateDefaultDripFees.fromDecoded(
+        programId,
         ixData.data as UpdateDefaultDripFeesArgs,
         accounts
     );
@@ -265,6 +272,7 @@ function parseUpdateAdmin(
     accounts: PublicKey[]
 ): { parsedUpdateAdmin: ParsedUpdateAdmin } {
     const parsedIx = UpdateAdmin.fromDecoded(
+        programId,
         ixData.data as UpdateAdminArgs,
         accounts
     );
@@ -281,7 +289,7 @@ function parseUpdateSuperAdmin(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedUpdateSuperAdmin: ParsedUpdateSuperAdmin } {
-    const parsedIx = UpdateSuperAdmin.fromDecoded(accounts);
+    const parsedIx = UpdateSuperAdmin.fromDecoded(programId, accounts);
     return {
         parsedUpdateSuperAdmin: {
             name: DripV2InstructionNames.updateSuperAdmin,
@@ -294,7 +302,7 @@ function parseInitPairConfig(
     ixData: Instruction,
     accounts: PublicKey[]
 ): { parsedInitPairConfig: ParsedInitPairConfig } {
-    const parsedIx = InitPairConfig.fromDecoded(accounts);
+    const parsedIx = InitPairConfig.fromDecoded(programId, accounts);
     return {
         parsedInitPairConfig: {
             name: DripV2InstructionNames.initPairConfig,
@@ -308,6 +316,7 @@ function parseInitGlobalConfig(
     accounts: PublicKey[]
 ): { parsedInitGlobalConfig: ParsedInitGlobalConfig } {
     const parsedIx = InitGlobalConfig.fromDecoded(
+        programId,
         ixData.data as InitGlobalConfigArgs,
         accounts
     );

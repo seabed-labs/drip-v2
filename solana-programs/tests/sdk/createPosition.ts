@@ -25,6 +25,8 @@ import {
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { assert, expect } from 'chai';
 
+import { delay } from '../utils';
+
 import { newTransaction } from './utils';
 
 describe('SDK - createPosition', () => {
@@ -80,7 +82,7 @@ describe('SDK - createPosition', () => {
             program.programId
         );
 
-        const initGlobalConfigIx = new InitGlobalConfig({
+        const initGlobalConfigIx = new InitGlobalConfig(program.programId, {
             args: {
                 params: {
                     superAdmin: superAdminKeypair.publicKey,
@@ -95,12 +97,38 @@ describe('SDK - createPosition', () => {
             },
         });
 
-        await provider.sendAndConfirm(
+        // Test Decoding
+        const initGlobalConfigTxSig = await provider.sendAndConfirm(
             (
                 await newTransaction(provider.connection)
-            ).add(initGlobalConfigIx.build(program.programId)),
+            ).add(initGlobalConfigIx.build()),
             [globalConfigKeypair],
             { maxRetries: 3 }
+        );
+        await delay(400);
+        const initGlobalConfigTx = await provider.connection.getTransaction(
+            initGlobalConfigTxSig,
+            {
+                commitment: 'confirmed',
+                maxSupportedTransactionVersion: 0,
+            }
+        );
+        assert(initGlobalConfigTx);
+        const ixData =
+            initGlobalConfigTx.transaction.message.compiledInstructions[0].data;
+        const allAccounts =
+            initGlobalConfigTx.transaction.message.getAccountKeys();
+        const accounts =
+            initGlobalConfigTx.transaction.message.compiledInstructions[0].accountKeyIndexes.map(
+                (i) => allAccounts.get(i)!
+            );
+        const decodedInitGlobalConfigIx = InitGlobalConfig.decode(
+            program.programId,
+            ixData,
+            accounts
+        );
+        expect(decodedInitGlobalConfigIx.toJSON()).to.deep.equal(
+            initGlobalConfigIx.toJSON()
         );
 
         dripClient = DripClient.withProvider(

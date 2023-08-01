@@ -73,7 +73,7 @@ export class WebhookController extends Controller {
         const res: string[] = [];
         for (let i = 0; i < accounts.length; i++) {
             try {
-                await this.accountProcessor.upsertDripAccount(
+                await this.accountProcessor.upsertAccountByAddress(
                     new PublicKey(accounts[i].account.parsed.pubkey)
                 );
             } catch (e) {
