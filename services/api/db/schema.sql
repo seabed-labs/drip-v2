@@ -42,7 +42,7 @@ CREATE TABLE public."DripPosition" (
     "globalConfig" character varying(44) NOT NULL,
     "pairConfig" character varying(44) NOT NULL,
     "inputTokenAccount" character varying(44) NOT NULL,
-    "outputTokenAccount" character varying(33) NOT NULL,
+    "outputTokenAccount" character varying(44) NOT NULL,
     "ownerValue" character varying(44),
     "ownerKind" public.ownerkind NOT NULL,
     "dripAmountPreFees" numeric NOT NULL,

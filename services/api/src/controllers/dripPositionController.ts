@@ -55,11 +55,6 @@ export class DripPositionController extends Controller {
                 ...p,
                 owner,
                 dripAmountPreFees: p.dripAmountPreFees.toString(),
-                // maxSlippageBps: 0,
-                // maxPriceDeviationBps: 0,
-                // dripFeeBps: 0,
-                // dripPositionNftMint: null,
-                // autoCreditEnabled: false,
                 dripAmountRemainingPostFeesInCurrentCycle:
                     p.dripAmountRemainingPostFeesInCurrentCycle.toString(),
                 dripInputFeesRemainingForCurrentCycle:

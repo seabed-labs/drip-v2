@@ -49,6 +49,7 @@ export class AccountProcessor implements IAccountProcessor {
         }
         return this.upsertAccountData(address, accountInfo);
     }
+
     async upsertAccountData(
         address: PublicKey,
         accountInfo: AccountInfo<Buffer>
@@ -69,16 +70,23 @@ export class AccountProcessor implements IAccountProcessor {
         address: PublicKey,
         data: Buffer
     ): Promise<void> {
-        const didUpsert = await processAccount(data, {
+        const didUpsert = await processAccount<boolean>(data, {
             dripPositionAccountHandler: async (
                 account: DripPosition
-            ): Promise<void> => {
+            ): Promise<boolean> => {
                 if (account.data.owner.kind === 'Direct') {
-                    await this.accountRepo.upsertDripPositionWalletOwner({
+                    const dripPositionWalletOwner = {
                         dripPositionPublicKey: address.toString(),
                         walletPublicKey:
                             account.data.owner.value.owner.toString(),
-                    });
+                    };
+                    logger.info(
+                        'upserting drip position wallet owner direct',
+                        dripPositionWalletOwner
+                    );
+                    await this.accountRepo.upsertDripPositionWalletOwner(
+                        dripPositionWalletOwner
+                    );
                 } else {
                     assert(
                         account.data.dripPositionNftMint,
@@ -90,59 +98,90 @@ export class AccountProcessor implements IAccountProcessor {
                         account.data.dripPositionNftMint
                     );
                     if (tokenizedOwner) {
-                        await this.accountRepo.upsertDripPositionWalletOwner({
+                        const dripPositionWalletOwner = {
                             dripPositionPublicKey: address.toString(),
-                            walletPublicKey: tokenizedOwner.toString(),
-                        });
+                            walletPublicKey: tokenizedOwner?.toString(),
+                        };
+                        logger.info(
+                            'upserting drip position wallet owner tokenized',
+                            dripPositionWalletOwner
+                        );
+                        await this.accountRepo.upsertDripPositionWalletOwner(
+                            dripPositionWalletOwner
+                        );
+                    } else {
+                        logger.info(
+                            'drip position does not have tokenized owner',
+                            {
+                                dripPositionPublicKey: address.toString(),
+                            }
+                        );
                     }
                 }
-                await this.accountRepo.upsertDripPosition(
-                    dripPositionAccountToDbModel(address, account)
-                );
+                const dbModel = dripPositionAccountToDbModel(address, account);
+                logger.info('inserting drip position', {
+                    address,
+                    account: dbModel,
+                });
+                return !!(await this.accountRepo.upsertDripPosition(dbModel));
             },
             dripPositionSignerAccountHandler: async (
                 account: DripPositionSigner
-            ): Promise<void> => {
-                await this.accountRepo.upsertDripPositionSigner(
+            ): Promise<boolean> => {
+                logger.info('upserting drip position signer', {
+                    dripPositionSigner: address.toString(),
+                });
+                return !!(await this.accountRepo.upsertDripPositionSigner(
                     dripPositionSignerAccountToDbModel(address, account)
-                );
+                ));
             },
             dripPositionNftMappingAccountHandler: async (
                 account: DripPositionNftMapping
-            ): Promise<void> => {
-                await this.accountRepo.upsertDripPositionNftMapping(
+            ): Promise<boolean> => {
+                logger.info('upserting drip position nft mapping', {
+                    dripPositionNftMapping: address.toString(),
+                });
+                return !!(await this.accountRepo.upsertDripPositionNftMapping(
                     dripPositionNftMappingAccountToDbModel(address, account)
-                );
+                ));
             },
-            ephemeralDripStateAccountHandler: (): Promise<void> => {
+            ephemeralDripStateAccountHandler: (): Promise<boolean> => {
                 throw new Error('Unexpected ephemeral state found.');
             },
             globalConfigSignerAccountHandler: async (
                 account: GlobalConfigSigner
-            ): Promise<void> => {
-                await this.accountRepo.upsertGlobalConfigSigner(
+            ): Promise<boolean> => {
+                logger.info('upserting global config signer', {
+                    globalConfigSigner: address.toString(),
+                });
+                return !!(await this.accountRepo.upsertGlobalConfigSigner(
                     globalConfigSignerAccountToDbModel(address, account)
-                );
+                ));
             },
             globalConfigAccountHandler: async (
                 account: GlobalConfig
-            ): Promise<void> => {
-                await this.accountRepo.upsertGlobalConfig(
+            ): Promise<boolean> => {
+                logger.info('upserting global config', {
+                    globalConfig: address.toString(),
+                });
+                return !!(await this.accountRepo.upsertGlobalConfig(
                     globalConfigAccountToDbModel(address, account)
-                );
+                ));
             },
             pairConfigAccountHandler: async (
                 account: PairConfig
-            ): Promise<void> => {
-                await this.accountRepo.upsertPairConfig(
+            ): Promise<boolean> => {
+                logger.info('upserting pair config', {
+                    pairConfig: address.toString(),
+                });
+                return !!(await this.accountRepo.upsertPairConfig(
                     pairConfigAccountToDbModel(address, account)
-                );
+                ));
             },
         });
         if (!didUpsert) {
             logger.warn('could not upsert drip account', {
                 address: address.toString(),
-                data: data.toString(),
             });
         }
     }

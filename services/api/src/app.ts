@@ -5,6 +5,7 @@ import express, {
     Request as ExpressRequest,
     NextFunction,
 } from 'express';
+import { ValidateError } from 'tsoa';
 
 import { logger } from './base/logger';
 import { RestError } from './controllers/types';
@@ -35,18 +36,33 @@ app.use(function errorHandler(
     next: NextFunction
 ): ExpressResponse | void {
     if (err) {
-        logger.error('uncaught server error', {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errObj: Record<string, any> = {
             ...getErrLog(err),
-        });
+            path: req.path,
+        };
+        if (err instanceof ValidateError) {
+            errObj.fields = err.fields;
+            logger.error('uncaught server error', errObj);
+            return res.status(422).json({
+                error: 'Validation Failed',
+                details: err?.fields,
+            });
+        }
         if (err instanceof RestError) {
+            logger.error('uncaught server error', errObj);
             res.status(err.status).send({
-                error: err.toJSON(),
+                error: err.message,
+                details: err.toJSON(),
             });
         } else {
+            logger.error('uncaught server error', errObj);
             res.status(500).send({
                 error: JSON.stringify(err),
             });
         }
+    } else if (res.statusCode >= 400) {
+        logger.error('returning error', { statusCode: res.statusCode });
     }
     next();
 });

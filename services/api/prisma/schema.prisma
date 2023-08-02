@@ -17,7 +17,7 @@ model DripPosition {
   globalConfig                              String    @db.VarChar(44)
   pairConfig                                String    @db.VarChar(44)
   inputTokenAccount                         String    @db.VarChar(44)
-  outputTokenAccount                        String    @db.VarChar(33)
+  outputTokenAccount                        String    @db.VarChar(44)
   ownerValue                                String?   @db.VarChar(44)
   ownerKind                                 ownerkind
   dripAmountPreFees                         Decimal   @db.Decimal

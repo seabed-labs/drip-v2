@@ -52,110 +52,110 @@ export class DripInstructionProcessor implements IInstructionProcessor {
         const ixAccounts = ix.accountKeyIndexes
             .map((i) => accountKeys.get(i))
             .filter(notEmpty);
-        const upsertedIx = await processInstruction(
+        const upsertedIx = await processInstruction<boolean>(
             this.programId,
             ix.data,
             ixAccounts,
             {
                 initGlobalConfigIxHandler: function (
                     ix: InitGlobalConfig
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 initPairConfigIxHandler: function (
                     ix: InitPairConfig
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 updateSuperAdminIxHandler: function (
                     ix: UpdateSuperAdmin
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 updateAdminIxHandler: function (
                     ix: UpdateAdmin
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 updateDefaultDripFeesIxHandler: function (
                     ix: UpdateDefaultDripFees
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 updatePythPriceFeedIxHandler: function (
                     ix: UpdatePythPriceFeed
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 updateDefaultPairDripFeesIxHandler: function (
                     ix: UpdateDefaultPairDripFees
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 collectFeesIxHandler: function (
                     ix: CollectFees
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 initDripPositionIxHandler: function (
                     ix: InitDripPosition
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 initDripPositionNftIxHandler: function (
                     ix: InitDripPositionNft
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 tokenizeDripPositionIxHandler: function (
                     ix: TokenizeDripPosition
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 detokenizeDripPositionIxHandler: function (
                     ix: DetokenizeDripPosition
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 toggleAutoCreditIxHandler: function (
                     ix: ToggleAutoCredit
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
-                depositIxHandler: function (ix: Deposit): Promise<void> {
+                depositIxHandler: function (ix: Deposit): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
                 closePositionIxHandler: function (
                     ix: ClosePosition
-                ): Promise<void> {
+                ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
-                withdrawIxHandler: function (ix: Withdraw): Promise<void> {
+                withdrawIxHandler: function (ix: Withdraw): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
-                preDripIxHandler: function (ix: PreDrip): Promise<void> {
+                preDripIxHandler: function (ix: PreDrip): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
-                postDripIxHandler: function (ix: PostDrip): Promise<void> {
+                postDripIxHandler: function (ix: PostDrip): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
-                    throw new Error('Function not implemented.');
+                    return Promise.resolve(true);
                 },
             }
         );

@@ -6808,7 +6808,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/superagent@npm:*":
+"@types/superagent@npm:*, @types/superagent@npm:^4.1.18":
   version: 4.1.18
   resolution: "@types/superagent@npm:4.1.18"
   dependencies:
@@ -20912,6 +20912,7 @@ download-git-repo@latest:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@solana/spl-token": ^0.3.8
+    "@types/superagent": ^4.1.18
     "@typescript-eslint/eslint-plugin": ^5.60.1
     "@typescript-eslint/parser": ^5.60.1
     eslint: ^8.43.0

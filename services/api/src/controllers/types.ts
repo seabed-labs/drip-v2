@@ -35,6 +35,7 @@ export type Response<T> =
       }
     | {
           error: string;
+          details?: string;
       };
 ////////////////////////////////////////////////////////////////////////
 // Request Responses

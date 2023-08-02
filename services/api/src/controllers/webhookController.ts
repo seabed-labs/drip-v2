@@ -46,6 +46,7 @@ export class WebhookController extends Controller {
                 await this.txProcessor.upsertDripTransaction(
                     txs[i].transaction.signatures[0]
                 );
+                res.push(txs[i].transaction.signatures[0]);
             } catch (e) {
                 logger.error('Failed to process transaction', {
                     ...getErrLog(e),
@@ -53,8 +54,12 @@ export class WebhookController extends Controller {
                 });
             }
         }
-        // error out so that helius can retry
+        logger.warn(`upserted ${res.length} of ${txs.length} transactions `);
         if (res.length !== txs.length) {
+            logger.warn(
+                `upserted ${res.length} transactions but expected ${txs.length}`
+            );
+            // error out so that helius can retry
             this.setStatus(503);
         } else {
             this.setStatus(201);
@@ -76,6 +81,7 @@ export class WebhookController extends Controller {
                 await this.accountProcessor.upsertAccountByAddress(
                     new PublicKey(accounts[i].account.parsed.pubkey)
                 );
+                res.push(accounts[i].account.parsed.pubkey);
             } catch (e) {
                 logger.error('Failed to process account', {
                     ...getErrLog(e),
@@ -84,8 +90,12 @@ export class WebhookController extends Controller {
                 });
             }
         }
-        // error out so that helius can retry
+        logger.warn(`upserted ${res.length} of ${accounts.length} accounts `);
         if (res.length !== accounts.length) {
+            logger.warn(
+                `upserted ${res.length} accounts but expected ${accounts.length}`
+            );
+            // error out so that helius can retry
             this.setStatus(503);
         } else {
             this.setStatus(201);

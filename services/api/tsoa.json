@@ -1,6 +1,6 @@
 {
   "entryFile": "src/app.ts",
-  "noImplicitAdditionalProperties": "throw-on-extras",
+  "noImplicitAdditionalProperties": "silently-remove-extras",
   "controllerPathGlobs": ["src/controllers/*Controller.ts"],
   "spec": {
       "outputDirectory": "./",

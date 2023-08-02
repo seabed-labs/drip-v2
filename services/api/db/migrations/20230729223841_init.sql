@@ -16,7 +16,7 @@ CREATE TABLE "GlobalConfigSigner" (
     "bump" int NOT NULL
 );
 
-CREATE TYPE OracleKind as ENUM ('Unavailable', 'Pyth');
+CREATE TYPE oraclekind as ENUM ('Unavailable', 'Pyth');
 
 CREATE TABLE "PairConfig" (
     "publicKey" varchar(44) PRIMARY KEY,
@@ -27,9 +27,9 @@ CREATE TABLE "PairConfig" (
     "bump" int NOT NULL,
     "defaultPairDripFeeBps" int NOT NULL,
     "inputTokenDripFeePortionBps" int NOT NULL,
-    "inputTokenPriceOracleKind" OracleKind NOT NULL,
+    "inputTokenPriceOracleKind" oraclekind NOT NULL,
     "inputTokenPriceOracleValue" varchar(44),
-    "outputTokenPriceOracleKind" OracleKind NOT NULL,
+    "outputTokenPriceOracleKind" oraclekind NOT NULL,
     "outputTokenPriceOracleValue" varchar(44)
 );
 
@@ -47,16 +47,16 @@ CREATE TABLE "DripPositionNftMapping" (
     "bump" int NOT NULL
 );
 
-CREATE TYPE OwnerKind as ENUM ('Direct', 'Tokenized');
+CREATE TYPE ownerkind as ENUM ('Direct', 'Tokenized');
 
 CREATE TABLE "DripPosition" (
     "publicKey" varchar(44) PRIMARY KEY,
     "globalConfig" varchar(44) NOT NULL,
     "pairConfig" varchar(44) NOT NULL,
     "inputTokenAccount" varchar(44) NOT NULL,
-    "outputTokenAccount" varchar(33) NOT NULL,
+    "outputTokenAccount" varchar(44) NOT NULL,
     "ownerValue" varchar(44),
-    "ownerKind" OwnerKind NOT NULL,
+    "ownerKind" ownerkind NOT NULL,
     "dripAmountPreFees" numeric NOT NULL,
     "maxSlippageBps" int NOT NULL,
     "maxPriceDeviationBps" int NOT NULL,
@@ -96,13 +96,13 @@ CREATE TABLE "DripPositionWalletOwner" (
 )
 
 -- migrate:down
-DROP TABLE "GlobalConfig";
-DROP TABLE "GlobalConfigSigner";
-DROP TABLE "PairConfig";
-DROP TABLE "DripPositionSigner";
-DROP TABLE "DripPositionNftMapping";
-DROP TABLE "DripPosition";
-DROP TABLE "TokenAccount";
-DROP TABLE "DripPositionWalletOwner";
-DROP TYPE "OwnerKind";
-DROP TYPE "OracleKind";
+DROP TABLE "GlobalConfig" CASCADE;
+DROP TABLE "GlobalConfigSigner" CASCADE;
+DROP TABLE "PairConfig" CASCADE;
+DROP TABLE "DripPositionSigner" CASCADE;
+DROP TABLE "DripPositionNftMapping" CASCADE;
+DROP TABLE "DripPosition" CASCADE;
+DROP TABLE "TokenAccount" CASCADE;
+DROP TABLE "DripPositionWalletOwner" CASCADE;
+DROP TYPE "ownerkind" CASCADE;
+DROP TYPE "oraclekind" CASCADE;

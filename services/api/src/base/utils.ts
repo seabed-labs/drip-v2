@@ -33,7 +33,15 @@ export function dripPositionAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        globalConfig: accountJson.globalConfig,
+        pairConfig: accountJson.pairConfig,
+        inputTokenAccount: accountJson.inputTokenAccount,
+        outputTokenAccount: accountJson.outputTokenAccount,
+        maxSlippageBps: accountJson.maxSlippageBps,
+        maxPriceDeviationBps: accountJson.maxPriceDeviationBps,
+        dripFeeBps: accountJson.dripFeeBps,
+        dripPositionNftMint: accountJson.dripPositionNftMint,
+        autoCreditEnabled: accountJson.autoCreditEnabled,
         ownerKind: accountJson.owner.kind,
         ownerValue:
             'value' in accountJson.owner ? accountJson.owner.value.owner : null,
@@ -75,7 +83,9 @@ export function dripPositionSignerAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        dripPosition: accountJson.dripPosition,
+        version: accountJson.version,
+        bump: accountJson.bump,
     };
 }
 
@@ -86,7 +96,9 @@ export function dripPositionNftMappingAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        dripPosition: accountJson.dripPosition,
+        dripPositionNftMint: accountJson.dripPositionNftMint,
+        bump: accountJson.bump,
     };
 }
 
@@ -97,7 +109,9 @@ export function globalConfigSignerAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        globalConfig: accountJson.globalConfig,
+        bump: accountJson.bump,
+        version: accountJson.version,
     };
 }
 
@@ -108,7 +122,11 @@ export function globalConfigAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        version: accountJson.version,
+        globalConfigSigner: accountJson.globalConfigSigner,
+        superAdmin: accountJson.superAdmin,
+        admins: accountJson.admins,
+        defaultDripFeeBps: accountJson.defaultDripFeeBps,
         adminPermissions: accountJson.adminPermissions.map(
             (p) => new Decimal(p)
         ),
@@ -122,7 +140,13 @@ export function pairConfigAccountToDbModel(
     const accountJson = a.toJSON();
     return {
         publicKey: address.toString(),
-        ...accountJson,
+        globalConfig: accountJson.globalConfig,
+        version: accountJson.version,
+        bump: accountJson.bump,
+        inputTokenMint: accountJson.inputTokenMint,
+        outputTokenMint: accountJson.outputTokenMint,
+        defaultPairDripFeeBps: accountJson.defaultPairDripFeeBps,
+        inputTokenDripFeePortionBps: accountJson.inputTokenDripFeePortionBps,
         inputTokenPriceOracleKind: accountJson.inputTokenPriceOracle.kind,
         inputTokenPriceOracleValue:
             'value' in accountJson.inputTokenPriceOracle

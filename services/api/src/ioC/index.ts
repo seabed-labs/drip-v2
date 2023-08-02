@@ -23,7 +23,7 @@ import { PrismaClient } from '../generated/prismaClient';
 import { TYPES } from '../ioCTypes';
 
 // https://tsoa-community.github.io/docs/di.html
-const iocContainer = new Container();
+const iocContainer = new Container({ skipBaseClassChecks: true });
 // Makes tsoa's Controller injectable
 decorate(injectable(), Controller);
 decorate(injectable(), PrismaClient);
