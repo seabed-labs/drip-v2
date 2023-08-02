@@ -1,8 +1,8 @@
 # 0.27.0 and below is under project serum
-FROM projectserum/build:v0.27.0
+# FROM projectserum/build:v0.27.0
 
 # 0.28.0 and later are under backpackapp
-# FROM backpackapp/build:v0.28.0
+FROM backpackapp/build:v0.28.0
 
 WORKDIR /project
 
@@ -21,6 +21,7 @@ RUN yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -
 COPY packages/drip-types/package.json packages/drip-types/
 COPY packages/sdk/package.json packages/sdk/
 COPY solana-programs/package.json solana-programs/
+COPY solana-programs/tsconfig.json solana-programs/
 RUN cd solana-programs && yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
 
 COPY packages/drip-types packages/drip-types

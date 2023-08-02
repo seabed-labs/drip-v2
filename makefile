@@ -1,4 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner api-inner dripper-inner lint-fix-inner test-inner
+all: root program-inner drip-types-inner sdk-inner fetcher-inner api-inner dripper-inner mock-helius-inner lint-fix-inner test-inner
 
 root:
 	yarn install
@@ -57,9 +57,25 @@ api-inner:
 dripper-inner:
 	cd services/dripper && yarn install && yarn build
 
+mock-helius-inner:
+	docker build -t mock-helius https://github.com/dcaf-labs/mock-helius.git#main
+
 test-inner:
 	cd solana-programs && cargo test
 	cd solana-programs && anchor test
 
 testd:
 	cd solana-programs && anchor run testd
+
+# run-solana:
+# 	cd solana-programs && yarn run localnet &
+# 	sleep 10
+
+# run-api:
+# 	cd services/api && yarn run start:dev &
+
+# run-mock-helius:
+# 	docker run -d --name drip-v2-mock-helius --env-file ./services/mock-helius/.env mock-helius
+
+# run-db:
+# 	docker-compose --file ./docker-compose.yaml up -d

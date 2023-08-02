@@ -6,89 +6,108 @@ services:
         ports:
             - 5432:5432
         environment:
-            - POSTGRES_USER=docker
-            - POSTGRES_PASSWORD=docker
-            - POSTGRES_DB=micro
+            - POSTGRES_USER=drip
+            - POSTGRES_PASSWORD=drip
+            - POSTGRES_DB=drip
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -d micro -U docker']
+            test: ['CMD-SHELL', 'pg_isready -d drip -U drip']
             interval: 5s
             timeout: 5s
             retries: 3
 
-    redis:
-        image: redis:7.0-alpine
-        ports:
-            - 6379:6379
-        command: redis-server --requirepass docker
-        healthcheck:
-            test: ['CMD', 'redis-cli', 'ping']
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # redis:
+    #     image: redis:7.0-alpine
+    #     ports:
+    #         - 6379:6379
+    #     command: redis-server --requirepass docker
+    #     healthcheck:
+    #         test: ['CMD', 'redis-cli', 'ping']
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 3
 
-    rabbitmq:
-        image: rabbitmq:3.9-management
-        ports:
-            - '5672:5672'
-            - '15672:15672'
-        environment:
-            RABBITMQ_DEFAULT_USER: docker
-            RABBITMQ_DEFAULT_PASS: docker
-        healthcheck:
-            test: ['CMD', 'rabbitmq-diagnostics -q ping']
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # rabbitmq:
+    #     image: rabbitmq:3.9-management
+    #     ports:
+    #         - '5672:5672'
+    #         - '15672:15672'
+    #     environment:
+    #         RABBITMQ_DEFAULT_USER: docker
+    #         RABBITMQ_DEFAULT_PASS: docker
+    #     healthcheck:
+    #         test: ['CMD', 'rabbitmq-diagnostics -q ping']
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 3
 
-    solana:
-        build:
-            context: .
-            dockerfile: ./build/solana.dockerfile
-            args:
-                SOLANA_CLI: v1.14.17
-                ANCHOR_CLI: v0.27.0
-        ports:
-            - '8899:8899'
-            - '8900:8900'
-            - '9900:9900'
-        healthcheck:
-            test: ['CMD', 'curl', '--fail', 'http://localhost:8899/health || exit 1']
-            interval: 5s
-            timeout: 5s
-            retries: 3
-        volumes:
-          - ./solana-programs/mocks:/project/solana-programs/mocks
+    # Doesn't work on macos
+    # Run manually via yarn run localnet in solana-programs/
+    # solana:
+    #     build:
+    #         context: .
+    #         dockerfile: ./build/solana.dockerfile
+    #         args:
+    #             SOLANA_CLI: v1.14.17
+    #             ANCHOR_CLI: v0.27.0
+    #     ports:
+    #         - '8899:8899'
+    #         - '8900:8900'
+    #         - '9900:9900'
+    #     healthcheck:
+    #         test: ['CMD', 'curl', '--fail', 'http://localhost:8899/health']
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 10
+    #     volumes:
+    #         - ./solana-programs/mocks:/project/solana-programs/mocks
 
-    drip-api:
-        build:
-            context: .
-            dockerfile: ./services/api/cmd/Dockerfile
-        ports:
-            - '20000:20000'
-        environment:
-            - ENV=docker
-        healthcheck:
-            test: ['CMD', 'curl', '--fail', 'http://localhost:20000/ || exit 1']
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # drip-api:
+    #     build:
+    #         context: .
+    #         dockerfile: ./build/api.dockerfile
+    #     network_mode: 'host'
+    #     ports:
+    #         - 3000:3000
+    #     environment:
+    #         - DATABASE_URL=postgres://drip:drip@localhost:5432/drip?sslmode=disable
+    #         - ENVIRONMENT=local
+    #         - DRIP_PROGRAM_ID=74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
+    #         - RPC_URL=http://host.docker.internal:8899
+    # healthcheck:
+    #     test: ['CMD', 'curl', '--fail', 'http://host.docker.internal:3000']
+    #     interval: 5s
+    #     timeout: 5s
+    #     retries: 3
 
-    drip-fetcher:
-        build:
-            context: .
-            dockerfile: ./build/fetcher.dockerfile
-        ports:
-            - '3000:3000'
-        environment:
-            PORT: 3000
-            FETCHER_RPC_URL: "http://solana:8899"
-            DRIP_PROGRAM_ID: 74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
-        healthcheck:
-            test: ['CMD', 'curl', '--fail', 'http://localhost:3000/ || exit 1']
-            interval: 5s
-            timeout: 5s
-            retries: 3
+    # drip-fetcher:
+    #     build:
+    #         context: .
+    #         dockerfile: ./build/fetcher.dockerfile
+    #     ports:
+    #         - '3000:3000'
+    #     environment:
+    #         PORT: 3000
+    #         FETCHER_RPC_URL: 'http://solana:8899'
+    #         DRIP_PROGRAM_ID: 74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
+    #     healthcheck:
+    #         test: ['CMD', 'curl', '--fail', 'http://localhost:3000/ || exit 1']
+    #         interval: 5s
+    #         timeout: 5s
+    #         retries: 3
 
-networks:
-    default:
-        name: local
+    # mock_helius:
+    #     build: git@github.com:dcaf-labs/mock-helius.git#main
+    #     depends_on:
+    #         drip-api:
+    #             condition: service_healthy
+    #     #     solana:
+    #     #         condition: service_healthy
+    #     network_mode: 'host'
+    #     environment:
+    #         - RPC_REST_URL=http://host.docker.internal:8899
+    #         - RPC_WEBSOCKET_URL=ws://host.docker.internal:8900
+    #         - SHOULD_BACKFILL_ACCOUNTS=true
+    #         - SHOULD_BACKFILL_TRANSACTIONS=true
+    #         - PROGRAM_ID=74XYB4agZ83msRxmTGvNDc8D2z8T55mfGfz3FAneNSKk
+    #         - ACCOUNT_WEBHOOK_URL=http://host.docker.internal:3000/webhook/account
+    #         - TRANSACTION_WEBHOOK_URL=http://host.docker.internal:3000/webhook/tx

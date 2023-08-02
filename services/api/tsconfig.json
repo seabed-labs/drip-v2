@@ -9,9 +9,10 @@
         "jest.config.js"
     ],
     "compilerOptions": {
-        "rootDir": "./src" /* Specify the root folder within your source files. */,
-        "outDir": "./dist" /* Specify an output folder for all emitted files. */,
-
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "skipDefaultLibCheck": true,
+        "skipLibCheck": true,
         /* Module Resolution Options */
         "moduleResolution": "node",
         "resolveJsonModule": true,

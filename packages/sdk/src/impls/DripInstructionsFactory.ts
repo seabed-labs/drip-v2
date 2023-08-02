@@ -25,7 +25,7 @@ import {
     IDripInstructionsFactory,
     WithdrawParams,
 } from '../types';
-import { DripPDA } from '../utils';
+import { derivePairConfig, deriveDripPositionSigner } from '../utils';
 
 export class DripInstructionsFactory implements IDripInstructionsFactory {
     public constructor(
@@ -51,7 +51,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
         } = params;
         const payer = payerOverride ?? owner;
 
-        const pairConfigPubkey = DripPDA.derivePairConfig(
+        const pairConfigPubkey = derivePairConfig(
             this.globalConfig,
             inputMint,
             outputMint,
@@ -82,7 +82,7 @@ export class DripInstructionsFactory implements IDripInstructionsFactory {
             instructions.push(initPairConfigIx.build());
         }
 
-        const dripPositionSignerPubkey = DripPDA.deriveDripPositionSigner(
+        const dripPositionSignerPubkey = deriveDripPositionSigner(
             dripPositionKeypair.publicKey,
             this.programId
         );

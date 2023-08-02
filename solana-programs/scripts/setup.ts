@@ -279,6 +279,8 @@ export async function createPosition(
 
     const initDripPositionTxSig = await program.methods
         .initDripPosition({
+            maxSlippageBps: 100,
+            maxPriceDeviationBps: 100,
             dripAmount: dripAmount,
             frequencyInSeconds: new BN(30),
             owner: positionOwner,
@@ -341,7 +343,7 @@ export async function setupGlobalConfig(
     const initGlobalConfigTxSig = await program.methods
         .initGlobalConfig({
             superAdmin: superAdmin.publicKey,
-            defaultDripFeeBps: new BN(100),
+            defaultDripFeeBps: 100,
         })
         .accounts({
             payer: provider.publicKey,

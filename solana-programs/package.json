@@ -3,7 +3,6 @@
     "version": "0.1.0",
     "author": "Dcaf Labs",
     "license": "UNLICENSED",
-    "type": "module",
     "scripts": {
         "clean": "rm -rf target && rm -rf node_modules",
         "lint": "yarn run lint:eslint && yarn run lint:prettier",
@@ -14,7 +13,7 @@
         "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore",
         "localnet": "ANCHOR_WALLET=./local.json yarn run ts-node ./scripts/localnet.ts",
         "drip": "ANCHOR_WALLET=./local.json yarn run ts-node ./scripts/drip.ts",
-        "test": "ANCHOR_WALLET=./local.json node ./scripts/test.js"
+        "test": "ANCHOR_WALLET=./local.json yarn run ts-node ./scripts/test.ts"
     },
     "dependencies": {
         "@coral-xyz/anchor": "0.27.0",
@@ -25,6 +24,7 @@
         "@solana/web3.js": "^1.77.3",
         "bip39": "^3.1.0",
         "child_process": "^1.0.2",
+        "dotenv": "^16.3.1",
         "ed25519-hd-key": "^1.3.0",
         "node-fetch": "2.6.11",
         "ts-node": "^10.9.1",
@@ -45,7 +45,6 @@
         "eslint-plugin-prettier": "^4.2.1",
         "mocha": "^9.0.3",
         "prettier": "^2.5.1",
-        "ts-mocha": "^10.0.0",
-        "typescript": "^4.3.5"
+        "ts-mocha": "^10.0.0"
     }
 }

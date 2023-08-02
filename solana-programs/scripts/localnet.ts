@@ -1,9 +1,28 @@
 import fs from 'fs/promises';
 import { spawn } from 'node:child_process';
 
-import { BN, getProvider, workspace, Program } from '@coral-xyz/anchor';
+import {
+    getProvider,
+    workspace,
+    Program,
+    AnchorProvider,
+} from '@coral-xyz/anchor';
 import { associatedAddress } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { DripV2 } from '@dcaf/drip-types';
+import {
+    deriveDripPositionSigner,
+    deriveGlobalConfigSigner,
+    derivePairConfig,
+} from '@dcaf/drip';
+import {
+    AdminPermission,
+    AdminStateUpdate,
+    Deposit,
+    DripV2,
+    InitDripPosition,
+    InitGlobalConfig,
+    InitPairConfig,
+    UpdateAdmin,
+} from '@dcaf/drip-types';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
@@ -66,7 +85,7 @@ async function getRawTransaction(txSig: string) {
 // TODO: Refactor to use setup.ts
 async function setup() {
     const program = workspace.DripV2 as Program<DripV2>;
-    const provider = getProvider();
+    const provider = getProvider() as AnchorProvider;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const providerPubkey = provider.publicKey!;
 
@@ -79,68 +98,80 @@ async function setup() {
     });
 
     console.log(`Funding mint authority ${mintAuthority.publicKey.toBase58()}`);
-    await provider.sendAndConfirm?.(
-        new Transaction(await provider.connection.getLatestBlockhash()).add(
-            fundMintAuthorityIx
-        )
-    );
+    await provider.sendAndConfirm?.(new Transaction().add(fundMintAuthorityIx));
 
     const globalConfigKeypair = new Keypair();
-    const [globalSignerPubkey] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from('drip-v2-global-signer'),
-            globalConfigKeypair.publicKey.toBuffer(),
-        ],
+    const globalSignerPubkey = deriveGlobalConfigSigner(
+        globalConfigKeypair.publicKey,
         program.programId
     );
     console.log(
         `Initializing global config ${globalConfigKeypair.publicKey.toBase58()}`
     );
-    const initGlobalConfigTxSig = await program.methods
-        .initGlobalConfig({
-            superAdmin: superAdmin.publicKey,
-            defaultDripFeeBps: new BN(100),
-        })
-        .accounts({
+    const initGlobalConfigIx = new InitGlobalConfig(program.programId, {
+        args: {
+            params: {
+                superAdmin: superAdmin.publicKey,
+                defaultDripFeeBps: 100,
+            },
+        },
+        accounts: {
             payer: provider.publicKey,
             globalConfig: globalConfigKeypair.publicKey,
             systemProgram: SystemProgram.programId,
             globalConfigSigner: globalSignerPubkey,
-        })
-        .signers([globalConfigKeypair])
-        .rpc();
+        },
+    }).build();
+
+    const initGlobalConfigTxSig = await provider.sendAndConfirm(
+        new Transaction().add(initGlobalConfigIx),
+        [globalConfigKeypair],
+        { maxRetries: 3 }
+    );
 
     console.log(
         `Adding provider pubkey as admin ${provider.publicKey?.toBase58()}`
     );
-    const addProviderAsAdminTxSig = await program.methods
-        .updateAdmin({
-            adminIndex: new BN(0),
-            adminChange: {
-                setAdminAndResetPermissions: [providerPubkey],
+    const updateAdminIx = new UpdateAdmin(program.programId, {
+        args: {
+            params: {
+                adminIndex: BigInt(0),
+                adminChange: new AdminStateUpdate.SetAdminAndResetPermissions([
+                    providerPubkey,
+                ]),
             },
-        })
-        .accounts({
+        },
+        accounts: {
             signer: superAdmin.publicKey,
             globalConfig: globalConfigKeypair.publicKey,
-        })
-        .signers([superAdmin])
-        .rpc();
+        },
+    }).build();
+    const addProviderAsAdminTxSig = await provider.sendAndConfirm(
+        new Transaction().add(updateAdminIx),
+        [superAdmin],
+        { maxRetries: 3 }
+    );
 
     console.log('Setting provider pubkey admin perm to dripper');
-    const setProviderPermToDripperTxSig = await program.methods
-        .updateAdmin({
-            adminIndex: new BN(0),
-            adminChange: {
-                addPermission: [{ drip: {} }],
+    const setProviderPermToDripperIx = new UpdateAdmin(program.programId, {
+        args: {
+            params: {
+                adminIndex: BigInt(0),
+                adminChange: new AdminStateUpdate.AddPermission([
+                    new AdminPermission.Drip(),
+                ]),
             },
-        })
-        .accounts({
+        },
+        accounts: {
             signer: superAdmin.publicKey,
             globalConfig: globalConfigKeypair.publicKey,
-        })
-        .signers([superAdmin])
-        .rpc();
+        },
+    }).build();
+    const setProviderPermToDripperTxSig = await provider.sendAndConfirm(
+        new Transaction().add(setProviderPermToDripperIx),
+        [superAdmin],
+        { maxRetries: 3 }
+    );
 
     const inputTokenMintKeypair = Keypair.generate();
     console.log(
@@ -168,28 +199,30 @@ async function setup() {
         outputTokenMintKeypair
     );
 
-    const [pairConfigPubkey] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from('drip-v2-pair-config'),
-            globalConfigKeypair.publicKey.toBuffer(),
-            inputTokenMint.toBuffer(),
-            outputTokenMint.toBuffer(),
-        ],
+    const pairConfigPubkey = derivePairConfig(
+        globalConfigKeypair.publicKey,
+        inputTokenMint,
+        outputTokenMint,
         program.programId
     );
 
     console.log(`Initializing pair config ${pairConfigPubkey.toBase58()}`);
-    const initPairConfigTxSig = await program.methods
-        .initPairConfig()
-        .accounts({
+    const initPairConfigIx = new InitPairConfig(program.programId, {
+        args: null,
+        accounts: {
             payer: provider.publicKey,
             globalConfig: globalConfigKeypair.publicKey,
             inputTokenMint,
             outputTokenMint,
             pairConfig: pairConfigPubkey,
             systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+        },
+    }).build();
+    const initPairConfigTxSig = await provider.sendAndConfirm(
+        new Transaction().add(initPairConfigIx),
+        [],
+        { maxRetries: 3 }
+    );
 
     const dripPositions: {
         initTx: string;
@@ -197,16 +230,13 @@ async function setup() {
         depositTx: string;
     }[] = [];
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         console.log('Processing position ', i);
         const dripPositionOwnerKeypair = new Keypair();
         const dripPositionKeypair = new Keypair();
 
-        const [dripPositionSignerPubkey] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from('drip-v2-drip-position-signer'),
-                dripPositionKeypair.publicKey.toBuffer(),
-            ],
+        const dripPositionSignerPubkey = deriveDripPositionSigner(
+            dripPositionKeypair.publicKey,
             program.programId
         );
 
@@ -220,13 +250,17 @@ async function setup() {
                 2
             )
         );
-        const initDripPositionTxSig = await program.methods
-            .initDripPosition({
-                owner: dripPositionOwnerKeypair.publicKey,
-                dripAmount: new BN(100),
-                frequencyInSeconds: new BN(3600),
-            })
-            .accounts({
+        const initDripPositionIx = new InitDripPosition(program.programId, {
+            args: {
+                params: {
+                    maxPriceDeviationBps: 100,
+                    maxSlippageBps: 100,
+                    owner: dripPositionOwnerKeypair.publicKey,
+                    dripAmount: BigInt(100),
+                    frequencyInSeconds: BigInt(3600),
+                },
+            },
+            accounts: {
                 payer: providerPubkey,
                 globalConfig: globalConfigKeypair.publicKey,
                 pairConfig: pairConfigPubkey,
@@ -245,9 +279,13 @@ async function setup() {
                 systemProgram: SystemProgram.programId,
                 tokenProgram: TOKEN_PROGRAM_ID,
                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            })
-            .signers([dripPositionKeypair])
-            .rpc();
+            },
+        }).build();
+        const initDripPositionTxSig = await provider.sendAndConfirm(
+            new Transaction().add(initDripPositionIx),
+            [dripPositionKeypair],
+            { maxRetries: 3 }
+        );
 
         let depositTx: string;
         if (i % 2 === 0) {
@@ -294,11 +332,13 @@ async function setup() {
             console.log(
                 `Depositing via program into drip position ${dripPositionKeypair.publicKey.toBase58()}`
             );
-            depositTx = await program.methods
-                .deposit({
-                    depositAmount: new BN(1000e6),
-                })
-                .accounts({
+            const depositIx = new Deposit(program.programId, {
+                args: {
+                    params: {
+                        depositAmount: BigInt(1000e6),
+                    },
+                },
+                accounts: {
                     signer: dripPositionOwnerKeypair.publicKey,
                     sourceInputTokenAccount: dripPositionOwnerInputTokenAccount,
                     dripPositionInputTokenAccount: associatedAddress({
@@ -307,9 +347,13 @@ async function setup() {
                     }),
                     dripPosition: dripPositionKeypair.publicKey,
                     tokenProgram: TOKEN_PROGRAM_ID,
-                })
-                .signers([dripPositionOwnerKeypair])
-                .rpc();
+                },
+            }).build();
+            depositTx = await provider.sendAndConfirm(
+                new Transaction().add(depositIx),
+                [dripPositionOwnerKeypair],
+                { maxRetries: 3 }
+            );
         }
 
         dripPositions.push({
@@ -368,7 +412,7 @@ process.on('SIGINT', () => {
 
 localnet.stdout.on('data', (data: any) => {
     const logData = `${data}`;
-    if (logData && !logData.includes('Processed Slot')) {
+    if (logData.trim() && !logData.includes('Processed Slot')) {
         console.log(logData);
     }
     if (logData?.includes('JSON RPC URL')) {

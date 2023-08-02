@@ -13,8 +13,12 @@ import {
     deriveGlobalConfigSigner,
     derivePairConfig,
 } from '@dcaf/drip/dist/utils/pda';
-import { DripV2, PostDripAccounts, PreDripAccounts } from '@dcaf/drip-types';
-import { DripPosition } from '@dcaf/drip-types/src/accounts';
+import {
+    DripV2,
+    PostDripAccounts,
+    PreDripAccounts,
+    DripPosition,
+} from '@dcaf/drip-types';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     createAssociatedTokenAccountInstruction,

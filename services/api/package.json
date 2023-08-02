@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true && rm -rf src/generated",
     "prepack": "yarn run build",
-    "build": "yarn run build:db-types && yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc",
+    "build": "yarn run build:db-types && yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc && cp -r ./src/generated/prismaClient ./dist/generated/prismaClient",
     "build:db-types": "yarn run prisma generate",
     "build:db-types-introspection": "yarn migrate:up && yarn run prisma db pull && yarn run build:db-types",
     "build:anchor-types": "yarn run anchor-client-gen ./drip_v2.json ./src/generated/anchor",

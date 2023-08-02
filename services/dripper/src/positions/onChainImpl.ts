@@ -1,9 +1,6 @@
 import assert from 'assert';
 
-import {
-    DripPosition,
-    DripPosition as DripPositionClass,
-} from '@dcaf/drip-types/src/accounts';
+import { DripPosition } from '@dcaf/drip-types';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import { Logger } from 'winston';
@@ -44,7 +41,7 @@ export class OnChainPositionsFetcher implements IPositionsFetcher {
                             /** offset into program account data to start comparison */
                             offset: 0,
                             /** data to match, as base-58 encoded string and limited to less than 129 bytes */
-                            bytes: bs58.encode(DripPositionClass.discriminator),
+                            bytes: bs58.encode(DripPosition.discriminator),
                         },
                     },
                 ],

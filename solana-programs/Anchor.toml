@@ -15,3 +15,6 @@ wallet = "./local.json"
 [scripts]
 test = "yarn test"
 testd = "TEST_MODE=debug anchor test"
+
+[test]
+startup_wait = 10000

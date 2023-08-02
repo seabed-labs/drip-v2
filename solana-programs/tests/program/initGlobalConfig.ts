@@ -1,6 +1,5 @@
 import {
     AnchorProvider,
-    BN,
     Program,
     getProvider,
     setProvider,

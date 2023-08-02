@@ -1,1 +1,1 @@
-export * as DripPDA from './pda';
+export * from './pda';

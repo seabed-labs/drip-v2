@@ -6,13 +6,18 @@ import {
     setProvider,
     workspace,
 } from '@coral-xyz/anchor';
-import { DripClient, DripPDA, IDripClient, isTxSuccessful } from '@dcaf/drip';
+import {
+    DripClient,
+    IDripClient,
+    deriveGlobalConfigSigner,
+    isTxSuccessful,
+} from '@dcaf/drip';
 import {
     DripPositionAccountJSON,
     DripV2,
     InitGlobalConfig,
+    DripPosition,
 } from '@dcaf/drip-types';
-import { DripPosition } from '@dcaf/drip-types/src/accounts';
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
@@ -77,7 +82,7 @@ describe('SDK - createPosition', () => {
         const globalConfigKeypair = Keypair.generate();
 
         globalConfigPubkey = globalConfigKeypair.publicKey;
-        const globalConfigSignerPubkey = DripPDA.deriveGlobalConfigSigner(
+        const globalConfigSignerPubkey = deriveGlobalConfigSigner(
             globalConfigKeypair.publicKey,
             program.programId
         );

@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import { BorshCoder, Instruction } from '@coral-xyz/anchor';
-import { IDL } from '@dcaf/drip-types/src/drip_v2';
+import { IDL } from '@dcaf/drip-types';
 import {
     DepositArgs,
     InitDripPosition,

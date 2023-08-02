@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
-import process from 'node:process';
 import console from 'node:console';
+import process from 'node:process';
 
 let testCommand =
     'yarn run ts-mocha -p ./tsconfig.json -t 1000000 --parallel tests/**/*.ts';

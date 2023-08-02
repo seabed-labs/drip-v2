@@ -9,7 +9,7 @@ import {
     DripPositionSignerAccountJSON,
     GlobalConfigAccountJSON,
     GlobalConfigSignerAccountJSON,
-} from '@dcaf/drip-types/src/accounts';
+} from '@dcaf/drip-types';
 
 import {
     DripPositionJSONWrapper,
