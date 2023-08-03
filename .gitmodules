@@ -1,0 +1,3 @@
+[submodule "services/mock-helius"]
+	path = services/mock-helius
+	url = https://github.com/dcaf-labs/mock-helius
