@@ -3,6 +3,7 @@ all: root program-inner drip-types-inner sdk-inner fetcher-inner api-inner dripp
 root:
 	yarn install
 	cd ui/xnft && yarn install
+	cd services/mock-helius && yarn install
 
 clean: root
 	yarn workspaces foreach run clean
@@ -58,7 +59,8 @@ dripper-inner:
 	cd services/dripper && yarn install && yarn build
 
 mock-helius-inner:
-	docker build -t mock-helius https://github.com/dcaf-labs/mock-helius.git#main
+	# docker build -t mock-helius https://github.com/dcaf-labs/mock-helius.git#main
+	cd services/dripper && yarn install && yarn build
 
 test-inner:
 	cd solana-programs && cargo test
