@@ -22,7 +22,7 @@ export class DripPositionController extends Controller {
     ) {
         super();
     }
-    @Get(`/positions/{wallet}`)
+    @Get(`/{wallet}/positions/`)
     public async getDripPositionsForWallet(
         @Path('wallet') walletAddress: string
     ): Promise<GetWalletPositionsResponse> {
