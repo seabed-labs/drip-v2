@@ -5,6 +5,75 @@ components:
     requestBodies: {}
     responses: {}
     schemas:
+        PingResponse:
+            properties:
+                message:
+                    type: string
+            required:
+                - message
+            type: object
+        Extensions:
+            properties:
+                coingeckoId:
+                    type: string
+            required:
+                - coingeckoId
+            type: object
+            additionalProperties: false
+        TokenMintMetadata:
+            properties:
+                address:
+                    type: string
+                chainId:
+                    type: number
+                    format: double
+                decimals:
+                    type: number
+                    format: double
+                name:
+                    type: string
+                symbol:
+                    type: string
+                logoURI:
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+                extensions:
+                    $ref: '#/components/schemas/Extensions'
+            required:
+                - address
+                - chainId
+                - decimals
+                - name
+                - symbol
+                - logoURI
+                - tags
+            type: object
+            additionalProperties: false
+        Response_TokenMintMetadata-Array_:
+            anyOf:
+                -
+                    properties:
+                        data:
+                            items:
+                                $ref: '#/components/schemas/TokenMintMetadata'
+                            type: array
+                    required:
+                        - data
+                    type: object
+                -
+                    properties:
+                        details:
+                            type: string
+                        error:
+                            type: string
+                    required:
+                        - error
+                    type: object
+        GetTokenListResponse:
+            $ref: '#/components/schemas/Response_TokenMintMetadata-Array_'
         DripPositionOwner.DirectJSON:
             properties:
                 kind:
@@ -137,15 +206,8 @@ components:
                     required:
                         - error
                     type: object
-        GetWalletPositions:
+        GetWalletPositionsResponse:
             $ref: '#/components/schemas/Response_DripPositionAccountJSON-Array_'
-        PingResponse:
-            properties:
-                message:
-                    type: string
-            required:
-                - message
-            type: object
         WebhookResponse:
             properties:
                 processed:
@@ -216,24 +278,6 @@ info:
         name: 'Dcaf Labs'
 openapi: 3.0.0
 paths:
-    '/positions/{wallet}':
-        get:
-            operationId: GetDripPositionsForWallet
-            responses:
-                '200':
-                    description: Ok
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetWalletPositions'
-            security: []
-            parameters:
-                -
-                    in: path
-                    name: wallet
-                    required: true
-                    schema:
-                        type: string
     /:
         get:
             operationId: Ping
@@ -246,6 +290,36 @@ paths:
                                 $ref: '#/components/schemas/PingResponse'
             security: []
             parameters: []
+    /tokens:
+        get:
+            operationId: GetTokens
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetTokenListResponse'
+            security: []
+            parameters: []
+    '/wallet/positions/{wallet}':
+        get:
+            operationId: GetDripPositionsForWallet
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetWalletPositionsResponse'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: wallet
+                    required: true
+                    schema:
+                        type: string
     /webhook/tx:
         post:
             operationId: SubmitTx

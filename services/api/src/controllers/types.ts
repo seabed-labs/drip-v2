@@ -1,5 +1,7 @@
 import { DripPositionAccountJSON } from '@dcaf/drip-types';
 
+import { TokenMintMetadata } from '../base/tokenList';
+
 export class RestError extends Error {
     constructor(readonly status: number, readonly message: string) {
         super(`${status}: ${message ?? ''}`);
@@ -49,7 +51,9 @@ export type WebhookResponse = {
     processed: string[];
 };
 
-export type GetWalletPositions = Response<DripPositionAccountJSON[]>;
+export type GetWalletPositionsResponse = Response<DripPositionAccountJSON[]>;
+
+export type GetTokenListResponse = Response<TokenMintMetadata[]>;
 
 ////////////////////////////////////////////////////////////////////////
 // Request Bodies

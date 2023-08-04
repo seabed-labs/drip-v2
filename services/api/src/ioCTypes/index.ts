@@ -7,6 +7,7 @@ export const TYPES = {
     IConfig: Symbol('Config'),
     IDatabase: Symbol('Database'),
     IConnection: Symbol('Connection'),
+    ITokenListClient: Symbol('TokenListClient'),
     IAccountRepository: Symbol('AccountRepository'),
     IAccountProcessor: Symbol('AccountProcessor'),
     IInstructionProcessor: Symbol('InstructionProcessor'),

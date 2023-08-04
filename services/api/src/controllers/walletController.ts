@@ -11,9 +11,9 @@ import { Controller, Get, Path, Route } from 'tsoa';
 import { IAccountRepository } from '../base/repository';
 import { TYPES, provideSingleton } from '../ioCTypes';
 
-import { GetWalletPositions } from './types';
+import { GetWalletPositionsResponse } from './types';
 
-@Route('/positions')
+@Route('wallet')
 @provideSingleton(DripPositionController)
 export class DripPositionController extends Controller {
     constructor(
@@ -22,10 +22,10 @@ export class DripPositionController extends Controller {
     ) {
         super();
     }
-    @Get(`/{wallet}`)
+    @Get(`/positions/{wallet}`)
     public async getDripPositionsForWallet(
         @Path('wallet') walletAddress: string
-    ): Promise<GetWalletPositions> {
+    ): Promise<GetWalletPositionsResponse> {
         if (!PublicKey.isOnCurve(walletAddress)) {
             this.setStatus(400);
             return {
