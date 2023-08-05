@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { injectable } from 'inversify';
 
 import { Environment, Environments, IConfig } from './types';
@@ -10,6 +10,7 @@ export class Config implements IConfig {
     private readonly _rpcUrl: string;
     private readonly _rpcWebhookUrl: string;
     private readonly _environment: Environment;
+    private readonly _tokenMintAuthority: Keypair | undefined;
 
     constructor() {
         const programId = process.env.DRIP_PROGRAM_ID;
@@ -39,11 +40,24 @@ export class Config implements IConfig {
                 )}`
             );
         }
+        this._environment = environment as Environment;
         this._programId = new PublicKey(programId);
         this._databaseUrl = databaseUrl;
-        this._environment = environment as Environment;
         this._rpcUrl = rpcUrl;
         this._rpcWebhookUrl = rpcWebhookUrl;
+
+        if (
+            this._environment !== Environment.production &&
+            process.env.TOKEN_MINT_AUTHORITY
+        ) {
+            const keypairData = JSON.parse(process.env.TOKEN_MINT_AUTHORITY);
+            const secretKey = Uint8Array.from(keypairData);
+            this._tokenMintAuthority = Keypair.fromSecretKey(secretKey);
+        }
+    }
+
+    get tokenMintAuthority(): Keypair | undefined {
+        return this._tokenMintAuthority;
     }
 
     get programId(): PublicKey {

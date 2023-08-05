@@ -55,6 +55,14 @@ export type GetWalletPositionsResponse = Response<DripPositionAccountJSON[]>;
 
 export type GetTokenListResponse = Response<TokenMintMetadata[]>;
 
+export type GetTokenResponse = Response<TokenMintMetadata>;
+
+export type MintTestTokenBody = {
+    amount: string;
+    to: string;
+};
+
+export type MintTestToken = Response<string>;
 ////////////////////////////////////////////////////////////////////////
 // Request Bodies
 ////////////////////////////////////////////////////////////////////////

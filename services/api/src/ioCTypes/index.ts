@@ -12,6 +12,7 @@ export const TYPES = {
     IAccountProcessor: Symbol('AccountProcessor'),
     IInstructionProcessor: Symbol('InstructionProcessor'),
     ITransactionProcessor: Symbol('TransactionProcessor'),
+    ITokenMinter: Symbol('TokenMinter'),
 };
 
 export const provideSingleton = function <T>(

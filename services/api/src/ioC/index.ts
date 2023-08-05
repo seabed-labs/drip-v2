@@ -11,11 +11,12 @@ import {
     DripInstructionProcessor,
 } from '../base/InstructionProcessor';
 import { IAccountProcessor, AccountProcessor } from '../base/accountProcessor';
-import { IConfig, Config } from '../base/config';
+import { IConfig, Config, Environment } from '../base/config';
 import { Database, IDatabase } from '../base/database';
 import { IAccountRepository, AccountRepository } from '../base/repository';
 import { Connection, IConnection } from '../base/rpcConnection';
-import { ITokenListClient, JupiterTokenList } from '../base/tokenList';
+import { ITokenListClient, TokenList } from '../base/tokenList';
+import { ITokenMinter, TestTokenMinter } from '../base/tokenMinter';
 import {
     ITransactionProcessor,
     TransactionProcessor,
@@ -31,7 +32,8 @@ decorate(injectable(), PrismaClient);
 // make inversify aware of inversify-binding-decorators
 iocContainer.load(buildProviderModule());
 
-iocContainer.bind<IConfig>(TYPES.IConfig).to(Config);
+const config = new Config();
+iocContainer.bind<IConfig>(TYPES.IConfig).toConstantValue(config);
 iocContainer.bind<IDatabase>(TYPES.IDatabase).to(Database).inSingletonScope();
 iocContainer
     .bind<IConnection>(TYPES.IConnection)
@@ -39,7 +41,7 @@ iocContainer
     .inSingletonScope();
 iocContainer
     .bind<ITokenListClient>(TYPES.ITokenListClient)
-    .to(JupiterTokenList)
+    .to(TokenList)
     .inSingletonScope();
 iocContainer
     .bind<IAccountRepository>(TYPES.IAccountRepository)
@@ -53,6 +55,12 @@ iocContainer
 iocContainer
     .bind<ITransactionProcessor>(TYPES.ITransactionProcessor)
     .to(TransactionProcessor);
+if (
+    config.environment !== Environment.production &&
+    config.tokenMintAuthority
+) {
+    iocContainer.bind<ITokenMinter>(TYPES.ITokenMinter).to(TestTokenMinter);
+}
 
 // export according to tsoa convention
 export { iocContainer };

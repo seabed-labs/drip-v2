@@ -74,6 +74,56 @@ components:
                     type: object
         GetTokenListResponse:
             $ref: '#/components/schemas/Response_TokenMintMetadata-Array_'
+        Response_TokenMintMetadata_:
+            anyOf:
+                -
+                    properties:
+                        data:
+                            $ref: '#/components/schemas/TokenMintMetadata'
+                    required:
+                        - data
+                    type: object
+                -
+                    properties:
+                        details:
+                            type: string
+                        error:
+                            type: string
+                    required:
+                        - error
+                    type: object
+        GetTokenResponse:
+            $ref: '#/components/schemas/Response_TokenMintMetadata_'
+        Response_string_:
+            anyOf:
+                -
+                    properties:
+                        data:
+                            type: string
+                    required:
+                        - data
+                    type: object
+                -
+                    properties:
+                        details:
+                            type: string
+                        error:
+                            type: string
+                    required:
+                        - error
+                    type: object
+        MintTestToken:
+            $ref: '#/components/schemas/Response_string_'
+        MintTestTokenBody:
+            properties:
+                to:
+                    type: string
+                amount:
+                    type: string
+            required:
+                - to
+                - amount
+            type: object
         DripPositionOwner.DirectJSON:
             properties:
                 kind:
@@ -302,7 +352,49 @@ paths:
                                 $ref: '#/components/schemas/GetTokenListResponse'
             security: []
             parameters: []
-    '/wallet/positions/{wallet}':
+    '/tokens/{tokenMint}':
+        get:
+            operationId: GetToken
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetTokenResponse'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: tokenMint
+                    required: true
+                    schema:
+                        type: string
+    '/tokens/{tokenMint}/mint':
+        post:
+            operationId: MintTo
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MintTestToken'
+            security: []
+            parameters:
+                -
+                    in: path
+                    name: tokenMint
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MintTestTokenBody'
+    '/wallet/{wallet}/positions':
         get:
             operationId: GetDripPositionsForWallet
             responses:
