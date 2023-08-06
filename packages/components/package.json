@@ -1,0 +1,65 @@
+{
+  "name": "@dcaf/components",
+  "version": "1.0.0",
+  "description": "Shared ui components.",
+  "author": "Seabed Labs",
+  "license": "MIT",
+  "repository": "Seabed Labs/components",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.modern.js",
+  "source": "src/index.tsx",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "prepare": "run-s build",
+    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
+    "lint": "yarn run lint:eslint && yarn run lint:prettier",
+    "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
+    "lint:eslint": "eslint --ignore-path .gitignore --ext .ts . ",
+    "lint:prettier": "prettier \"*/**/*{.js,.ts,.yaml}\" --check --ignore-path .gitignore",
+    "lint:eslint:fix": "eslint --ignore-path .gitignore --fix --ext .ts . ",
+    "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
+  },
+  "peerDependencies": {
+    "react": "^16.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^12.12.38",
+    "@types/react": "^16.9.27",
+    "@types/react-dom": "^16.9.7",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^7.0.2",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-config-standard-jsx": "^11.0.0",
+    "eslint-config-standard-react": "^13.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "gh-pages": "^2.2.0",
+    "microbundle-crl": "^0.13.10",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1",
+    "typescript": "^3.7.5"
+  },
+  "files": [
+    "dist"
+  ]
+}
