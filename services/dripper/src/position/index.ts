@@ -9,6 +9,6 @@ export interface IPosition {
     account: DripPositionAccount;
     accountWithAddress: DripPositionAccountWithAddress;
 
-    toJSON: DripPositionAccountJSON;
+    toJSON(): DripPositionAccountJSON;
     drip(provider: AnchorProvider): Promise<string>;
 }
