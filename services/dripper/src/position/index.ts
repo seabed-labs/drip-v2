@@ -5,10 +5,10 @@ import { PublicKey } from '@solana/web3.js';
 import { DripPositionAccountWithAddress } from '../types';
 
 export interface IPosition {
-    get address(): PublicKey;
-    get account(): DripPositionAccount;
-    get accountWithAddress(): DripPositionAccountWithAddress;
+    address: PublicKey;
+    account: DripPositionAccount;
+    accountWithAddress: DripPositionAccountWithAddress;
 
-    toJSON(): DripPositionAccountJSON;
+    toJSON: DripPositionAccountJSON;
     drip(provider: AnchorProvider): Promise<string>;
 }

@@ -1,10 +1,10 @@
 import { Cluster, PublicKey } from '@solana/web3.js';
 
 export interface IConfig {
-    get programId(): PublicKey;
-    get dripperSeedPhrase(): string;
-    get solanaCluster(): Cluster;
-    get rpcUrl(): string;
+    programId: PublicKey;
+    dripperSeedPhrase: string;
+    solanaCluster: Cluster;
+    rpcUrl: string;
 }
 
 export * from './impl';
