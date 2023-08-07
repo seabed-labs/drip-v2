@@ -12,7 +12,7 @@ import {
     deriveDripPositionSigner,
     deriveGlobalConfigSigner,
     derivePairConfig,
-} from '@dcaf/drip';
+} from '@dcaf/drip-sdk';
 import {
     AdminPermission,
     AdminStateUpdate,
