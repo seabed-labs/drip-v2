@@ -3,5 +3,10 @@
     "compilerOptions": {
         "rootDir": "./",
         "outDir": "./dist"
-    }
+    },
+    "references": [
+        {
+            "path": "../packages/drip-types"
+        }
+    ]
 }

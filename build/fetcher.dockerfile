@@ -11,12 +11,12 @@ COPY yarn.lock .
 RUN yarn install --production --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
 
 COPY packages/drip-types/package.json packages/drip-types/
-COPY packages/sdk/package.json packages/sdk/
+COPY packages/drip-sdk/package.json packages/drip-sdk/
 COPY services/fetcher/package.json services/fetcher/
 RUN cd services/fetcher && yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
 
 COPY packages/drip-types/ packages/drip-types
-COPY packages/sdk/ packages/sdk
+COPY packages/drip-sdk/ packages/sdk
 COPY services/fetcher/ services/fetcher
 
 WORKDIR /project/services/fetcher

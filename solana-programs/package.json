@@ -4,7 +4,7 @@
     "author": "Dcaf Labs",
     "license": "UNLICENSED",
     "scripts": {
-        "build": "anchor build && cp ./target/idl/drip_v2.json ./idl/drip_v2.json",
+        "build": "anchor build && cp ./target/idl/drip_v2.json ./idl/drip_v2.json  && cp ./target/types/drip_v2.ts ./idl/drip_v2.ts",
         "clean": "rm -rf target && rm -rf node_modules",
         "lint": "yarn run lint:eslint && yarn run lint:prettier",
         "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",

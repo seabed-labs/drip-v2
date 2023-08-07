@@ -7,7 +7,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "yarn run build",
+    "prepack": "yarn run build && cp ../../solana-programs/idl/drip_v2.ts ./src/drip_v2.ts",
     "build": "yarn run build:anchor-types && yarn run build:tsc",
     "build:tsc": "yarn run tsc",
     "build:anchor-types": "yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src",

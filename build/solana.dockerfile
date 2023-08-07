@@ -19,7 +19,7 @@ COPY yarn.lock .
 RUN yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
 
 COPY packages/drip-types/package.json packages/drip-types/
-COPY packages/sdk/package.json packages/sdk/
+COPY packages/drip-sdk/package.json packages/drip-sdk/
 COPY solana-programs/package.json solana-programs/
 COPY solana-programs/tsconfig.json solana-programs/
 RUN cd solana-programs && yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache

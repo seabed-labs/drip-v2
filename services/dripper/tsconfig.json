@@ -25,7 +25,7 @@
             "path": "../../packages/drip-types"
         },
         {
-            "path": "../../packages/sdk"
+            "path": "../../packages/drip-sdk"
         }
     ],
     "ts-node": {
