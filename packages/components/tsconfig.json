@@ -20,7 +20,7 @@
     },
     "references": [
         {
-            "path": "../packages/drip-types"
+            "path": "../drip-types"
         }
     ],
     "include": ["src"],
