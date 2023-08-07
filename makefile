@@ -1,4 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner fetcher-inner api-inner dripper-inner mock-helius-inner lint-fix-inner test-inner
+all: root program-inner drip-types-inner sdk-inner components-inner fetcher-inner api-inner dripper-inner mock-helius-inner lint-fix-inner test-inner
 
 root:
 	yarn install
@@ -14,7 +14,7 @@ lint-fix: root lint-fix-inner
 lint: root lint-inner
 
 lint-fix-inner:
-	yarn workspaces foreach run lint:fix
+	yarn workspaces foreach --parallel run lint:fix
 	cd solana-programs && cargo clippy --fix --allow-dirty -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
 	cd solana-programs && cargo fix --allow-dirty && cargo fmt
 
@@ -48,6 +48,9 @@ drip-types-inner:
 
 sdk-inner:
 	cd packages/sdk && yarn install && yarn build
+
+components-inner:
+	cd packages/components && yarn install && yarn build
 
 fetcher-inner:
 	cd services/fetcher && yarn install && yarn build

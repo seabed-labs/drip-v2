@@ -1,0 +1,58 @@
+{
+  "name": "components",
+  "version": "1.0.0",
+  "description": "Made with create-react-library",
+  "author": "Seabed Labs",
+  "license": "MIT",
+  "repository": "Seabed Labs/components",
+  "main": "dist/index.js",
+  "module": "dist/index.modern.js",
+  "source": "src/index.tsx",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "build": "microbundle-crl --no-compress --format modern,cjs",
+    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "prepare": "run-s build",
+    "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
+    "lint": "yarn run lint:eslint && yarn run lint:prettier",
+    "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
+    "lint:eslint": "eslint --ignore-path .gitignore --ext .tsx --ext .ts --ext .js --ext .yaml .",
+    "lint:eslint:fix": "yarn run lint:eslint --fix",
+    "prettier:base": "prettier \"*/**/*{.js,.ts,.tsx,.yaml}\" --ignore-path .gitignore",
+    "lint:prettier": "yarn run prettier:base --check",
+    "lint:prettier:fix": "yarn run prettier:base --write"
+  },
+  "peerDependencies": {
+    "react": "^16.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^12.12.38",
+    "@types/react": "^16.9.27",
+    "@types/react-dom": "^16.9.7",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^7.0.2",
+    "eslint": "^8.43.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "gh-pages": "^2.2.0",
+    "microbundle-crl": "^0.13.10",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1",
+    "typescript": "^3.7.5"
+  },
+  "files": [
+    "dist"
+  ]
+}

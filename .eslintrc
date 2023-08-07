@@ -1,10 +1,11 @@
 {
     "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
         "plugin:prettier/recommended",
         "plugin:import/recommended",
-        "plugin:import/typescript",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:import/typescript"
     ],
     "rules": {
         "import/order": [
@@ -29,8 +30,22 @@
                 "newlines-between": "always",
                 "alphabetize": { "order": "asc" }
             }
-        ]
+        ],
+        "import/namespace": 0
     },
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "ecmaFeatures": {
+            "legacyDecorators": true,
+            "jsx": true
+        }
+    },
+    "settings": {
+        "react": {
+            "version": "16"
+        }
+    },
+    "plugins": ["react"],
     "ignorePatterns": ["dist", "node_modules"],
     "root": true
 }
