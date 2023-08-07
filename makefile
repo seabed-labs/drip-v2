@@ -1,4 +1,4 @@
-all: root program-inner drip-types-inner sdk-inner components-inner fetcher-inner api-inner dripper-inner mock-helius-inner lint-fix-inner test-inner
+all: root program-inner drip-types-inner sdk-inner components-inner api-inner dripper-inner mock-helius-inner lint-fix-inner test-inner
 
 root:
 	yarn install
@@ -52,8 +52,8 @@ sdk-inner:
 components-inner:
 	cd packages/components && yarn install && yarn build
 
-fetcher-inner:
-	cd services/fetcher && yarn install && yarn build
+# fetcher-inner:
+# 	cd services/fetcher && yarn install && yarn build
 
 api-inner:
 	cd services/api && yarn install && yarn build

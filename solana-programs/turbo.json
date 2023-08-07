@@ -1,0 +1,13 @@
+{
+    "extends": ["//"],
+    "pipeline": {
+        "build": {
+            "inputs": ["programs/**/*.rs", "*.toml", "*.lock"],
+            "outputs": ["idl/", "target/"]
+        },
+        "test": {
+            "inputs": ["test/**/*.ts"],
+            "dependsOn": ["build"]
+        }
+    }
+  }

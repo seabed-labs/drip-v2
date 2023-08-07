@@ -12,7 +12,7 @@ import {
     deriveEphemeralDripState,
     deriveGlobalConfigSigner,
     derivePairConfig,
-} from '@dcaf/drip/dist/utils/pda';
+} from '@dcaf/drip-sdk';
 import {
     DripV2,
     PostDripAccounts,

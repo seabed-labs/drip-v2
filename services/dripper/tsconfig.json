@@ -5,11 +5,11 @@
         "./node_modules",
         "./dist",
         "test",
-        "jest.config.js"
+        "jest.config.ts"
     ],
     "compilerOptions": {
-        "rootDir": "./src" /* Specify the root folder within your source files. */,
-        "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+        "rootDir": "./src",
+        "outDir": "./dist",
 
         /* Module Resolution Options */
         "moduleResolution": "node",

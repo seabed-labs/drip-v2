@@ -1,4 +1,4 @@
-import '../setup';
+import './setup';
 import {
     AnchorProvider,
     Program,
@@ -6,12 +6,6 @@ import {
     setProvider,
     workspace,
 } from '@coral-xyz/anchor';
-import {
-    DripClient,
-    IDripClient,
-    deriveGlobalConfigSigner,
-    isTxSuccessful,
-} from '@dcaf/drip';
 import {
     DripPositionAccountJSON,
     DripV2,
@@ -30,9 +24,14 @@ import {
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { assert, expect } from 'chai';
 
-import { delay } from '../utils';
+import {
+    DripClient,
+    IDripClient,
+    deriveGlobalConfigSigner,
+    isTxSuccessful,
+} from '../src';
 
-import { newTransaction } from './utils';
+import { newTransaction, delay } from './utils';
 
 describe('SDK - createPosition', () => {
     // TODO: for debugging with yarn run localnet

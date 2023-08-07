@@ -5,7 +5,7 @@ import {
     deriveGlobalConfigSigner,
     deriveDripPositionSigner,
     deriveEphemeralDripState,
-} from '@dcaf/drip/src/utils/pda';
+} from '@dcaf/drip-sdk/src/utils/pda';
 import {
     DripPosition,
     DripPositionAccount,

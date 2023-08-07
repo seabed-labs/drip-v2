@@ -5,3 +5,7 @@ export async function newTransaction(
 ): Promise<Transaction> {
     return new Transaction(await connection.getLatestBlockhash('finalized'));
 }
+
+export function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
