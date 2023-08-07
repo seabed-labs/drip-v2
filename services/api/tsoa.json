@@ -5,7 +5,7 @@
   "spec": {
       "outputDirectory": "./",
       "specVersion": 3,
-      "specFileBaseName": "swaggerApi"
+      "specFileBaseName": "api"
   },
   "contact": {
     "name": "Dcaf Labs",

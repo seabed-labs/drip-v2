@@ -1,5 +1,11 @@
 # Drip V2
 
+## Getting Started
+
+```bash
+turbo run build
+```
+
 ## Contributing
 
 1. Follow https://www.conventionalcommits.org/en/v1.0.0/

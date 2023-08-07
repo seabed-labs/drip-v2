@@ -1,0 +1,16 @@
+{
+    "extends": ["//"],
+    "pipeline": {
+        "build": {
+            "inputs": [
+                "src/**/*.tsx",
+                "src/**/*.ts",
+                "*.js",
+                "*.json",
+                "*.html"
+            ],
+            "outputs": ["dist/**/*", "web-build/"],
+            "dependsOn": ["^build"]
+        }
+    }
+  }

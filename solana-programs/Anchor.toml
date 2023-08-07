@@ -13,8 +13,8 @@ cluster = "Localnet"
 wallet = "./local.json"
 
 [scripts]
-test = "yarn test"
-testd = "TEST_MODE=debug anchor test"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 --parallel test/**/*.ts"
+testd = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/**/*.ts"
 
 [test]
 startup_wait = 10000
