@@ -1,9 +1,6 @@
 import assert from 'assert';
 
-import {
-    DripPositionAccountJSON,
-    DripPositionOwnerJSON,
-} from '@dcaf/drip-types';
+import { DripPositionAccountJSON } from '@dcaf/drip-types';
 import { PublicKey } from '@solana/web3.js';
 import { inject } from 'inversify';
 import { Controller, Get, Path, Route } from 'tsoa';
@@ -36,24 +33,10 @@ export class DripPositionController extends Controller {
             walletAddress
         );
         const res = positions.map((p) => {
-            let owner: DripPositionOwnerJSON | undefined = undefined;
-            if (p.ownerKind === 'Direct') {
-                assert(p.ownerValue);
-                owner = {
-                    kind: p.ownerKind,
-                    value: {
-                        owner: p.ownerValue,
-                    },
-                };
-            } else if (p.ownerKind === 'Tokenized') {
-                owner = {
-                    kind: p.ownerKind,
-                };
-            }
-            assert(owner);
+            assert(p.ownerValue);
             const apiPosition: DripPositionAccountJSON = {
                 ...p,
-                owner,
+                owner: p.ownerValue!,
                 dripAmountPreFees: p.dripAmountPreFees.toString(),
                 dripAmountRemainingPostFeesInCurrentCycle:
                     p.dripAmountRemainingPostFeesInCurrentCycle.toString(),

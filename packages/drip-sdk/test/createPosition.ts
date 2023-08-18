@@ -199,12 +199,7 @@ describe('SDK - createPosition', () => {
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
-            owner: {
-                kind: 'Direct',
-                value: {
-                    owner: positionOwner.publicKey.toBase58(),
-                },
-            },
+            owner: positionOwner.publicKey.toBase58(),
             dripFeeBps: 100,
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
@@ -332,12 +327,7 @@ describe('SDK - createPosition', () => {
         );
         expect(dripPositionAccount?.toJSON()).to.deep.include({
             globalConfig: globalConfigPubkey.toBase58(),
-            owner: {
-                kind: 'Direct',
-                value: {
-                    owner: positionOwner.publicKey.toBase58(),
-                },
-            },
+            owner: positionOwner.publicKey.toBase58(),
             dripFeeBps: 100,
             autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(

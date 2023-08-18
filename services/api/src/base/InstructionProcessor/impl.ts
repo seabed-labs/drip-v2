@@ -2,21 +2,17 @@ import {
     ClosePosition,
     CollectFees,
     Deposit,
-    DetokenizeDripPosition,
     InitDripPosition,
-    InitDripPositionNft,
     InitGlobalConfig,
     InitPairConfig,
     PostDrip,
     PreDrip,
     ToggleAutoCredit,
-    TokenizeDripPosition,
     UpdateAdmin,
     UpdateDefaultDripFees,
     UpdateDefaultPairDripFees,
     UpdatePythPriceFeed,
     UpdateSuperAdmin,
-    Withdraw,
     processInstruction,
 } from '@dcaf/drip-types';
 import {
@@ -111,24 +107,6 @@ export class DripInstructionProcessor implements IInstructionProcessor {
                     logger.info('processing ix', { name: ix.ixName });
                     return Promise.resolve(true);
                 },
-                initDripPositionNftIxHandler: function (
-                    ix: InitDripPositionNft
-                ): Promise<boolean> {
-                    logger.info('processing ix', { name: ix.ixName });
-                    return Promise.resolve(true);
-                },
-                tokenizeDripPositionIxHandler: function (
-                    ix: TokenizeDripPosition
-                ): Promise<boolean> {
-                    logger.info('processing ix', { name: ix.ixName });
-                    return Promise.resolve(true);
-                },
-                detokenizeDripPositionIxHandler: function (
-                    ix: DetokenizeDripPosition
-                ): Promise<boolean> {
-                    logger.info('processing ix', { name: ix.ixName });
-                    return Promise.resolve(true);
-                },
                 toggleAutoCreditIxHandler: function (
                     ix: ToggleAutoCredit
                 ): Promise<boolean> {
@@ -142,10 +120,6 @@ export class DripInstructionProcessor implements IInstructionProcessor {
                 closePositionIxHandler: function (
                     ix: ClosePosition
                 ): Promise<boolean> {
-                    logger.info('processing ix', { name: ix.ixName });
-                    return Promise.resolve(true);
-                },
-                withdrawIxHandler: function (ix: Withdraw): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
                     return Promise.resolve(true);
                 },

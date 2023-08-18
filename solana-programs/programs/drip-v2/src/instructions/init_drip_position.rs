@@ -1,7 +1,7 @@
 use crate::{
     common::math::split_drip_amount_from_fees,
     errors::DripError,
-    state::{DripPosition, DripPositionOwner, DripPositionSigner, GlobalConfig, PairConfig},
+    state::{DripPosition, DripPositionSigner, GlobalConfig, PairConfig},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -123,9 +123,7 @@ pub fn handle_init_drip_position(
     );
 
     drip_position.global_config = ctx.accounts.global_config.key();
-    drip_position.owner = DripPositionOwner::Direct {
-        owner: params.owner,
-    };
+    drip_position.owner = params.owner;
     drip_position.input_token_account = ctx.accounts.input_token_account.key();
     drip_position.output_token_account = ctx.accounts.output_token_account.key();
     drip_position.pair_config = ctx.accounts.pair_config.key();
