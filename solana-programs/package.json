@@ -14,8 +14,7 @@
         "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore",
         "localnet": "ANCHOR_WALLET=./local.json yarn run ts-node ./scripts/localnet.ts",
         "drip": "ANCHOR_WALLET=./local.json yarn run ts-node ./scripts/drip.ts",
-        "test": "anchor test",
-        "testd": "anchor testd"
+        "test": "anchor test"
     },
     "dependencies": {
         "@coral-xyz/anchor": "0.27.0",

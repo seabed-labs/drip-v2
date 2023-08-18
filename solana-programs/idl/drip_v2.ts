@@ -469,22 +469,6 @@ export type DripV2 = {
       ]
     },
     {
-      "name": "toggleAutoCredit",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deposit",
       "accounts": [
         {
@@ -909,10 +893,6 @@ export type DripV2 = {
             "type": {
               "option": "publicKey"
             }
-          },
-          {
-            "name": "autoCreditEnabled",
-            "type": "bool"
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",
@@ -2046,22 +2026,6 @@ export const IDL: DripV2 = {
       ]
     },
     {
-      "name": "toggleAutoCredit",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deposit",
       "accounts": [
         {
@@ -2486,10 +2450,6 @@ export const IDL: DripV2 = {
             "type": {
               "option": "publicKey"
             }
-          },
-          {
-            "name": "autoCreditEnabled",
-            "type": "bool"
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",

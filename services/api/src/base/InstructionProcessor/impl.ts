@@ -7,7 +7,6 @@ import {
     InitPairConfig,
     PostDrip,
     PreDrip,
-    ToggleAutoCredit,
     UpdateAdmin,
     UpdateDefaultDripFees,
     UpdateDefaultPairDripFees,
@@ -103,12 +102,6 @@ export class DripInstructionProcessor implements IInstructionProcessor {
                 },
                 initDripPositionIxHandler: function (
                     ix: InitDripPosition
-                ): Promise<boolean> {
-                    logger.info('processing ix', { name: ix.ixName });
-                    return Promise.resolve(true);
-                },
-                toggleAutoCreditIxHandler: function (
-                    ix: ToggleAutoCredit
                 ): Promise<boolean> {
                     logger.info('processing ix', { name: ix.ixName });
                     return Promise.resolve(true);

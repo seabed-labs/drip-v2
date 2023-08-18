@@ -469,22 +469,6 @@
       ]
     },
     {
-      "name": "toggleAutoCredit",
-      "accounts": [
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dripPosition",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "deposit",
       "accounts": [
         {
@@ -909,10 +893,6 @@
             "type": {
               "option": "publicKey"
             }
-          },
-          {
-            "name": "autoCreditEnabled",
-            "type": "bool"
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",

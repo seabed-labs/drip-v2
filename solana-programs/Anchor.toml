@@ -13,8 +13,8 @@ cluster = "Localnet"
 wallet = "./local.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 --parallel test/**/*.ts"
-testd = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/**/*.ts"
+# test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 --parallel test/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/**/*.ts --parallel"
 
 [test]
 startup_wait = 10000

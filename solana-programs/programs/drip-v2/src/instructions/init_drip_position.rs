@@ -132,7 +132,6 @@ pub fn handle_init_drip_position(
     drip_position.max_slippage_bps = params.max_slippage_bps;
     drip_position.max_price_deviation_bps = params.max_price_deviation_bps;
 
-    // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
     drip_position.drip_amount_pre_fees = params.drip_amount;
     drip_position.drip_amount_remaining_post_fees_in_current_cycle =
         drip_amounts.drip_amount_post_fees;
@@ -140,7 +139,6 @@ pub fn handle_init_drip_position(
     drip_position.frequency_in_seconds = params.frequency_in_seconds;
     drip_position.total_input_token_dripped_post_fees = 0;
     drip_position.total_output_token_received_post_fees = 0;
-    drip_position.auto_credit_enabled = false;
 
     let drip_time = drip_position.get_init_drip_timestamp()?;
     drip_position.drip_activation_genesis_shift = drip_time.drip_activation_genesis_shift;

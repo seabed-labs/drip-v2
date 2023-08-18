@@ -150,8 +150,6 @@ components:
                 dripPositionNftMint:
                     type: string
                     nullable: true
-                autoCreditEnabled:
-                    type: boolean
                 dripAmountRemainingPostFeesInCurrentCycle:
                     type: string
                 dripInputFeesRemainingForCurrentCycle:
@@ -186,7 +184,6 @@ components:
                 - maxPriceDeviationBps
                 - dripFeeBps
                 - dripPositionNftMint
-                - autoCreditEnabled
                 - dripAmountRemainingPostFeesInCurrentCycle
                 - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected

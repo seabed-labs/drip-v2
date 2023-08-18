@@ -40,15 +40,6 @@ pub struct DripPosition {
     // because we want to preserve it between tokenizations
     // size: 1 + 32
     pub drip_position_nft_mint: Option<Pubkey>,
-    // This is the flag for enabling the auto credit feature.
-    // If this is enabled, the output tokens from each drip are transferred to the owner in the drip tx.
-    // This can ONLY be enabled if the owner is of type Direct.
-    // Valid Cases:
-    // auto credit enabled, direct ownership
-    // auto credit disabled, direct ownership
-    // auto credit disabled, tokenized ownership
-    // size: 1
-    pub auto_credit_enabled: bool,
     // Represents the maximum amount of input tokens
     // the dripper can request to withdraw in pre_drip.
     // This value is initialized to be drip_amount - reserved_input_fees in init_drip_position.
