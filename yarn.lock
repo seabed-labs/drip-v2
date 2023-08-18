@@ -2576,7 +2576,6 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     mocha: ^10.2.0
     prettier: ^2.5.1
-    start-server-and-test: ^2.0.0
     tiny-invariant: ^1.3.1
     ts-mocha: ^10.0.0
     typescript: ^5.1.3
@@ -28323,26 +28322,6 @@ __metadata:
     start-server-and-test: src/bin/start.js
     start-test: src/bin/start.js
   checksum: 0df9a4710ea45ddb1a9f719e0865faa8e26a973beff693dfe244ae2d914bfc6eed4d2db8529cdcad3d53658c4655356e5aca3520485a3ef4d9d9f320956b0e7d
-  languageName: node
-  linkType: hard
-
-"start-server-and-test@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "start-server-and-test@npm:2.0.0"
-  dependencies:
-    arg: ^5.0.2
-    bluebird: 3.7.2
-    check-more-types: 2.24.0
-    debug: 4.3.4
-    execa: 5.1.1
-    lazy-ass: 1.6.0
-    ps-tree: 1.2.0
-    wait-on: 7.0.1
-  bin:
-    server-test: src/bin/start.js
-    start-server-and-test: src/bin/start.js
-    start-test: src/bin/start.js
-  checksum: 8788e59ad78275332c78325a804504ac558f06a112d47cb5bc3d012d2bda46add72c863cae2357836fe245ee4e22e2fec0b6d47dbdf5e0f0f5cfd1a57544d100
   languageName: node
   linkType: hard
 
