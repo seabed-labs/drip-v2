@@ -33,10 +33,9 @@ export class DripPositionController extends Controller {
             walletAddress
         );
         const res = positions.map((p) => {
-            assert(p.ownerValue);
             const apiPosition: DripPositionAccountJSON = {
                 ...p,
-                owner: p.ownerValue,
+                owner: p.owner,
                 dripAmountPreFees: p.dripAmountPreFees.toString(),
                 dripAmountRemainingPostFeesInCurrentCycle:
                     p.dripAmountRemainingPostFeesInCurrentCycle.toString(),

@@ -2,7 +2,6 @@ import { Address } from '@coral-xyz/anchor';
 
 import {
     DripPosition,
-    DripPositionNftMapping,
     DripPositionSigner,
     GlobalConfig,
     GlobalConfigSigner,
@@ -24,9 +23,6 @@ export interface IAccountRepository {
     upsertDripPositionSigner(
         a: DripPositionSigner
     ): Promise<DripPositionSigner>;
-    upsertDripPositionNftMapping(
-        a: DripPositionNftMapping
-    ): Promise<DripPositionNftMapping>;
     upsertGlobalConfigSigner(
         a: GlobalConfigSigner
     ): Promise<GlobalConfigSigner>;

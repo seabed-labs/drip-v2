@@ -147,9 +147,6 @@ components:
                 dripFeeBps:
                     type: number
                     format: double
-                dripPositionNftMint:
-                    type: string
-                    nullable: true
                 dripAmountRemainingPostFeesInCurrentCycle:
                     type: string
                 dripInputFeesRemainingForCurrentCycle:
@@ -183,7 +180,6 @@ components:
                 - maxSlippageBps
                 - maxPriceDeviationBps
                 - dripFeeBps
-                - dripPositionNftMint
                 - dripAmountRemainingPostFeesInCurrentCycle
                 - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected

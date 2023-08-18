@@ -140,21 +140,4 @@ export class AccountProcessor implements IAccountProcessor {
             });
         }
     }
-
-    async getTokenizedOwner(
-        dripPositionNftMint: PublicKey
-    ): Promise<PublicKey | undefined> {
-        const nftOwners = await this.connection.getTokenLargestAccounts(
-            dripPositionNftMint
-        );
-        if (nftOwners.value.length === 1) {
-            const tokenAccount = await getAccount(
-                this.connection,
-                nftOwners.value[0].address,
-                this.connection.commitment
-            );
-            return tokenAccount.owner;
-        }
-        return undefined;
-    }
 }

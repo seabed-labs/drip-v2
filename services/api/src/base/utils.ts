@@ -38,12 +38,7 @@ export function dripPositionAccountToDbModel(
         maxSlippageBps: accountJson.maxSlippageBps,
         maxPriceDeviationBps: accountJson.maxPriceDeviationBps,
         dripFeeBps: accountJson.dripFeeBps,
-        dripPositionNftMint: accountJson.dripPositionNftMint,
-        // TODO: Remove
-        autoCreditEnabled: true,
-        // TODO: Change
-        ownerKind: 'Direct',
-        ownerValue: accountJson.owner,
+        owner: accountJson.owner,
         dripAmountPreFees: new Decimal(accountJson.dripAmountPreFees),
         dripAmountRemainingPostFeesInCurrentCycle: new Decimal(
             accountJson.dripAmountRemainingPostFeesInCurrentCycle

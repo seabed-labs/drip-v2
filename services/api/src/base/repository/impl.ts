@@ -3,7 +3,6 @@ import { inject, injectable } from 'inversify';
 
 import {
     DripPosition,
-    DripPositionNftMapping,
     DripPositionSigner,
     DripPositionWalletOwner,
     GlobalConfig,
@@ -44,16 +43,6 @@ export class AccountRepository implements IAccountRepository {
         a: DripPositionSigner
     ): Promise<DripPositionSigner> {
         return this.db.dripPositionSigner.upsert({
-            where: { publicKey: a.publicKey },
-            create: a,
-            update: a,
-        });
-    }
-
-    async upsertDripPositionNftMapping(
-        a: DripPositionNftMapping
-    ): Promise<DripPositionNftMapping> {
-        return this.db.dripPositionNftMapping.upsert({
             where: { publicKey: a.publicKey },
             create: a,
             update: a,

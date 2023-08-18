@@ -889,12 +889,6 @@
             "type": "u16"
           },
           {
-            "name": "dripPositionNftMint",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",
             "type": "u64"
           },

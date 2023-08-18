@@ -19,16 +19,6 @@ CREATE TYPE public.oraclekind AS ENUM (
 );
 
 
---
--- Name: ownerkind; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.ownerkind AS ENUM (
-    'Direct',
-    'Tokenized'
-);
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -43,14 +33,11 @@ CREATE TABLE public."DripPosition" (
     "pairConfig" character varying(44) NOT NULL,
     "inputTokenAccount" character varying(44) NOT NULL,
     "outputTokenAccount" character varying(44) NOT NULL,
-    "ownerValue" character varying(44),
-    "ownerKind" public.ownerkind NOT NULL,
+    owner character varying(44) NOT NULL,
     "dripAmountPreFees" numeric NOT NULL,
     "maxSlippageBps" integer NOT NULL,
     "maxPriceDeviationBps" integer NOT NULL,
     "dripFeeBps" integer NOT NULL,
-    "dripPositionNftMint" character varying(44),
-    "autoCreditEnabled" boolean NOT NULL,
     "dripAmountRemainingPostFeesInCurrentCycle" numeric NOT NULL,
     "dripInputFeesRemainingForCurrentCycle" numeric NOT NULL,
     "totalInputFeesCollected" numeric NOT NULL,
@@ -62,18 +49,6 @@ CREATE TABLE public."DripPosition" (
     "dripActivationGenesisShift" integer NOT NULL,
     "dripActivationTimestamp" timestamp with time zone NOT NULL,
     cycle numeric NOT NULL
-);
-
-
---
--- Name: DripPositionNftMapping; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public."DripPositionNftMapping" (
-    "publicKey" character varying(44) NOT NULL,
-    "dripPositionNftMint" character varying(44) NOT NULL,
-    "dripPosition" character varying(44) NOT NULL,
-    bump integer NOT NULL
 );
 
 
@@ -172,14 +147,6 @@ CREATE TABLE public."TokenAccount" (
 CREATE TABLE public.schema_migrations (
     version character varying(128) NOT NULL
 );
-
-
---
--- Name: DripPositionNftMapping DripPositionNftMapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public."DripPositionNftMapping"
-    ADD CONSTRAINT "DripPositionNftMapping_pkey" PRIMARY KEY ("publicKey");
 
 
 --

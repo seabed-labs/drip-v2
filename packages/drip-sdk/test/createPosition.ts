@@ -201,7 +201,6 @@ describe('SDK - createPosition', () => {
             globalConfig: globalConfigPubkey.toBase58(),
             owner: positionOwner.publicKey.toBase58(),
             dripFeeBps: 100,
-            autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
                 [
                     Buffer.from('drip-v2-pair-config'),
@@ -222,7 +221,6 @@ describe('SDK - createPosition', () => {
             totalOutputTokenReceivedPostFees: '0',
             totalInputFeesCollected: '0',
             totalOutputFeesCollected: '0',
-            dripPositionNftMint: null,
             dripMaxJitter: 0,
             dripInputFeesRemainingForCurrentCycle: '10',
             dripAmountRemainingPostFeesInCurrentCycle: '990',
@@ -329,7 +327,6 @@ describe('SDK - createPosition', () => {
             globalConfig: globalConfigPubkey.toBase58(),
             owner: positionOwner.publicKey.toBase58(),
             dripFeeBps: 100,
-            autoCreditEnabled: false,
             pairConfig: PublicKey.findProgramAddressSync(
                 [
                     Buffer.from('drip-v2-pair-config'),
@@ -350,7 +347,6 @@ describe('SDK - createPosition', () => {
             totalOutputTokenReceivedPostFees: '0',
             totalInputFeesCollected: '0',
             totalOutputFeesCollected: '0',
-            dripPositionNftMint: null,
             dripMaxJitter: 0,
             dripInputFeesRemainingForCurrentCycle: '10',
             dripAmountRemainingPostFeesInCurrentCycle: '990',

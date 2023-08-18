@@ -889,12 +889,6 @@ export type DripV2 = {
             "type": "u16"
           },
           {
-            "name": "dripPositionNftMint",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",
             "type": "u64"
           },
@@ -2444,12 +2438,6 @@ export const IDL: DripV2 = {
           {
             "name": "dripFeeBps",
             "type": "u16"
-          },
-          {
-            "name": "dripPositionNftMint",
-            "type": {
-              "option": "publicKey"
-            }
           },
           {
             "name": "dripAmountRemainingPostFeesInCurrentCycle",

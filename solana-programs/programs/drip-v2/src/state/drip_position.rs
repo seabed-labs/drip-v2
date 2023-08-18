@@ -34,12 +34,6 @@ pub struct DripPosition {
     // An admin with sufficient permissions can change the position fees via the (TODO) instruction.
     // size: 8
     pub drip_fee_bps: u16,
-    // For positions that are tokenized, this mint represents a proxy to the owner.
-    // Users who have a balance for this mint and have a tokenized position is a valid "owner" for this position.
-    // We store this separately and not inside the owner enum
-    // because we want to preserve it between tokenizations
-    // size: 1 + 32
-    pub drip_position_nft_mint: Option<Pubkey>,
     // Represents the maximum amount of input tokens
     // the dripper can request to withdraw in pre_drip.
     // This value is initialized to be drip_amount - reserved_input_fees in init_drip_position.
