@@ -40,14 +40,6 @@ CREATE TABLE "DripPositionSigner" (
     "bump" int NOT NULL
 );
 
-CREATE TABLE "DripPositionNftMapping" (
-    "publicKey" varchar(44) PRIMARY KEY,
-    "dripPositionNftMint" varchar(44) NOT NULL,
-    "dripPosition" varchar(44) NOT NULL,
-    "bump" int NOT NULL
-);
-
-CREATE TYPE ownerkind as ENUM ('Direct', 'Tokenized');
 
 CREATE TABLE "DripPosition" (
     "publicKey" varchar(44) PRIMARY KEY,
@@ -55,14 +47,11 @@ CREATE TABLE "DripPosition" (
     "pairConfig" varchar(44) NOT NULL,
     "inputTokenAccount" varchar(44) NOT NULL,
     "outputTokenAccount" varchar(44) NOT NULL,
-    "ownerValue" varchar(44),
-    "ownerKind" ownerkind NOT NULL,
+    "owner" varchar(44) NOT NULL,
     "dripAmountPreFees" numeric NOT NULL,
     "maxSlippageBps" int NOT NULL,
     "maxPriceDeviationBps" int NOT NULL,
     "dripFeeBps" int NOT NULL,
-    "dripPositionNftMint" varchar(44),
-    "autoCreditEnabled" boolean NOT NULL,
     "dripAmountRemainingPostFeesInCurrentCycle" numeric NOT NULL,
     "dripInputFeesRemainingForCurrentCycle" numeric NOT NULL,
     "totalInputFeesCollected" numeric NOT NULL,
@@ -100,9 +89,7 @@ DROP TABLE "GlobalConfig" CASCADE;
 DROP TABLE "GlobalConfigSigner" CASCADE;
 DROP TABLE "PairConfig" CASCADE;
 DROP TABLE "DripPositionSigner" CASCADE;
-DROP TABLE "DripPositionNftMapping" CASCADE;
 DROP TABLE "DripPosition" CASCADE;
 DROP TABLE "TokenAccount" CASCADE;
 DROP TABLE "DripPositionWalletOwner" CASCADE;
-DROP TYPE "ownerkind" CASCADE;
 DROP TYPE "oraclekind" CASCADE;

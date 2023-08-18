@@ -13,37 +13,27 @@ model schema_migrations {
 }
 
 model DripPosition {
-  publicKey                                 String    @id @db.VarChar(44)
-  globalConfig                              String    @db.VarChar(44)
-  pairConfig                                String    @db.VarChar(44)
-  inputTokenAccount                         String    @db.VarChar(44)
-  outputTokenAccount                        String    @db.VarChar(44)
-  ownerValue                                String?   @db.VarChar(44)
-  ownerKind                                 ownerkind
-  dripAmountPreFees                         Decimal   @db.Decimal
+  publicKey                                 String   @id @db.VarChar(44)
+  globalConfig                              String   @db.VarChar(44)
+  pairConfig                                String   @db.VarChar(44)
+  inputTokenAccount                         String   @db.VarChar(44)
+  outputTokenAccount                        String   @db.VarChar(44)
+  owner                                     String   @db.VarChar(44)
+  dripAmountPreFees                         Decimal  @db.Decimal
   maxSlippageBps                            Int
   maxPriceDeviationBps                      Int
   dripFeeBps                                Int
-  dripPositionNftMint                       String?   @db.VarChar(44)
-  autoCreditEnabled                         Boolean
-  dripAmountRemainingPostFeesInCurrentCycle Decimal   @db.Decimal
-  dripInputFeesRemainingForCurrentCycle     Decimal   @db.Decimal
-  totalInputFeesCollected                   Decimal   @db.Decimal
-  totalOutputFeesCollected                  Decimal   @db.Decimal
-  totalInputTokenDrippedPostFees            Decimal   @db.Decimal
-  totalOutputTokenReceivedPostFees          Decimal   @db.Decimal
-  frequencyInSeconds                        Decimal   @db.Decimal
+  dripAmountRemainingPostFeesInCurrentCycle Decimal  @db.Decimal
+  dripInputFeesRemainingForCurrentCycle     Decimal  @db.Decimal
+  totalInputFeesCollected                   Decimal  @db.Decimal
+  totalOutputFeesCollected                  Decimal  @db.Decimal
+  totalInputTokenDrippedPostFees            Decimal  @db.Decimal
+  totalOutputTokenReceivedPostFees          Decimal  @db.Decimal
+  frequencyInSeconds                        Decimal  @db.Decimal
   dripMaxJitter                             Int
   dripActivationGenesisShift                Int
-  dripActivationTimestamp                   DateTime  @db.Timestamptz(6)
-  cycle                                     Decimal   @db.Decimal
-}
-
-model DripPositionNftMapping {
-  publicKey           String @id @db.VarChar(44)
-  dripPositionNftMint String @db.VarChar(44)
-  dripPosition        String @db.VarChar(44)
-  bump                Int
+  dripActivationTimestamp                   DateTime @db.Timestamptz(6)
+  cycle                                     Decimal  @db.Decimal
 }
 
 model DripPositionSigner {
@@ -102,11 +92,6 @@ model TokenAccount {
   isNative          Boolean
   rentExemptReserve Decimal? @db.Decimal
   closeAuthority    String?  @db.VarChar(44)
-}
-
-enum ownerkind {
-  Direct
-  Tokenized
 }
 
 enum oraclekind {

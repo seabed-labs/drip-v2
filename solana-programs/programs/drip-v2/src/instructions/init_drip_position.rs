@@ -1,7 +1,7 @@
 use crate::{
     common::math::split_drip_amount_from_fees,
     errors::DripError,
-    state::{DripPosition, DripPositionOwner, DripPositionSigner, GlobalConfig, PairConfig},
+    state::{DripPosition, DripPositionSigner, GlobalConfig, PairConfig},
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -123,9 +123,7 @@ pub fn handle_init_drip_position(
     );
 
     drip_position.global_config = ctx.accounts.global_config.key();
-    drip_position.owner = DripPositionOwner::Direct {
-        owner: params.owner,
-    };
+    drip_position.owner = params.owner;
     drip_position.input_token_account = ctx.accounts.input_token_account.key();
     drip_position.output_token_account = ctx.accounts.output_token_account.key();
     drip_position.pair_config = ctx.accounts.pair_config.key();
@@ -134,7 +132,6 @@ pub fn handle_init_drip_position(
     drip_position.max_slippage_bps = params.max_slippage_bps;
     drip_position.max_price_deviation_bps = params.max_price_deviation_bps;
 
-    // At the program level, auto credit IS NOT coupled to direct/tokenized ownership
     drip_position.drip_amount_pre_fees = params.drip_amount;
     drip_position.drip_amount_remaining_post_fees_in_current_cycle =
         drip_amounts.drip_amount_post_fees;
@@ -142,7 +139,6 @@ pub fn handle_init_drip_position(
     drip_position.frequency_in_seconds = params.frequency_in_seconds;
     drip_position.total_input_token_dripped_post_fees = 0;
     drip_position.total_output_token_received_post_fees = 0;
-    drip_position.auto_credit_enabled = false;
 
     let drip_time = drip_position.get_init_drip_timestamp()?;
     drip_position.drip_activation_genesis_shift = drip_time.drip_activation_genesis_shift;

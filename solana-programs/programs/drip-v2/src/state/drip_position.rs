@@ -1,7 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, TokenAccount};
-
-use crate::errors::DripError;
 
 #[account]
 #[derive(Default, InitSpace)]
@@ -15,10 +12,10 @@ pub struct DripPosition {
     // size: 32
     pub output_token_account: Pubkey,
     // The authority/owner of this position.
-    // If this is a directly owned position, it contains a wallet address.
-    // If this is a tokenized position, the owner is any wallet that has a balance of 1 for the DripPosition.drip_position_nft_mint
+    // Funds will be withdraw to the ata of this address
+    // This address must sign to perform a close/deposit instruction
     // size: 32
-    pub owner: DripPositionOwner,
+    pub owner: Pubkey,
     // The the user defined drip_amount.
     // Input fees are deducted from this amount before every drip as defined by
     // DripPosition.drip_fee_bps and PairConfig.input_token_drip_fee_portion_bps
@@ -37,21 +34,6 @@ pub struct DripPosition {
     // An admin with sufficient permissions can change the position fees via the (TODO) instruction.
     // size: 8
     pub drip_fee_bps: u16,
-    // For positions that are tokenized, this mint represents a proxy to the owner.
-    // Users who have a balance for this mint and have a tokenized position is a valid "owner" for this position.
-    // We store this separately and not inside the owner enum
-    // because we want to preserve it between tokenizations
-    // size: 1 + 32
-    pub drip_position_nft_mint: Option<Pubkey>,
-    // This is the flag for enabling the auto credit feature.
-    // If this is enabled, the output tokens from each drip are transferred to the owner in the drip tx.
-    // This can ONLY be enabled if the owner is of type Direct.
-    // Valid Cases:
-    // auto credit enabled, direct ownership
-    // auto credit disabled, direct ownership
-    // auto credit disabled, tokenized ownership
-    // size: 1
-    pub auto_credit_enabled: bool,
     // Represents the maximum amount of input tokens
     // the dripper can request to withdraw in pre_drip.
     // This value is initialized to be drip_amount - reserved_input_fees in init_drip_position.
@@ -189,80 +171,10 @@ impl DripPosition {
     }
 }
 
-impl DripPosition {
-    pub fn is_tokenized(&self) -> bool {
-        matches!(self.owner, DripPositionOwner::Tokenized)
-    }
-
-    pub fn is_directly_owned_by(&self, signer: Pubkey) -> bool {
-        match self.owner {
-            DripPositionOwner::Direct { owner } => signer.eq(&owner),
-            _ => false,
-        }
-    }
-
-    pub fn has_associated_nft_mint(&self, nft_mint: &Pubkey) -> bool {
-        match self.drip_position_nft_mint {
-            Some(key) => key.eq(nft_mint),
-            _ => false,
-        }
-    }
-
-    pub fn is_owned_by_signer<'info>(
-        &self,
-        signer: &Signer<'info>,
-        drip_position_nft_mint: &Option<Account<'info, Mint>>,
-        drip_position_nft_account: &Option<Account<'info, TokenAccount>>,
-    ) -> Result<bool> {
-        match self.owner {
-            DripPositionOwner::Tokenized => {
-                match (
-                    self.drip_position_nft_mint,
-                    drip_position_nft_mint,
-                    drip_position_nft_account,
-                ) {
-                    (Some(expected_nft_mint), Some(actual_nft_mint), Some(nft_account)) => {
-                        Ok(expected_nft_mint.eq(&actual_nft_mint.key())
-                            && actual_nft_mint.key().eq(&nft_account.mint)
-                            && signer.key().eq(&nft_account.owner)
-                            && nft_account.amount.eq(&1))
-                    }
-                    _ => err!(DripError::InsufficientInfoForTokenizedOwnerCheck),
-                }
-            }
-            DripPositionOwner::Direct { owner } => Ok(owner.eq(signer.key)),
-        }
-    }
-}
-
-#[derive(Clone, AnchorSerialize, AnchorDeserialize, InitSpace)]
-pub enum DripPositionOwner {
-    Direct { owner: Pubkey },
-    Tokenized,
-}
-
-impl Default for DripPositionOwner {
-    fn default() -> Self {
-        Self::Direct {
-            owner: Pubkey::default(),
-        }
-    }
-}
-
 #[account]
 #[derive(Default, InitSpace)]
 pub struct DripPositionSigner {
     pub version: u8,
-    pub drip_position: Pubkey,
-    pub bump: u8,
-}
-
-#[account]
-#[derive(Default, InitSpace)]
-// The goal of this account is to be able to get from the tokenized position NFT pubkey to the position pubkey by walking through an intermediary PDA
-pub struct DripPositionNftMapping {
-    pub version: u8,
-    pub drip_position_nft_mint: Pubkey,
     pub drip_position: Pubkey,
     pub bump: u8,
 }

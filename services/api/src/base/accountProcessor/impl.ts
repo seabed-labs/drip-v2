@@ -2,7 +2,6 @@ import assert from 'assert';
 
 import {
     DripPosition,
-    DripPositionNftMapping,
     DripPositionSigner,
     GlobalConfig,
     GlobalConfigSigner,
@@ -21,7 +20,6 @@ import { IAccountRepository } from '../repository';
 import { IConnection } from '../rpcConnection';
 import {
     dripPositionAccountToDbModel,
-    dripPositionNftMappingAccountToDbModel,
     dripPositionSignerAccountToDbModel,
     globalConfigAccountToDbModel,
     globalConfigSignerAccountToDbModel,
@@ -74,50 +72,17 @@ export class AccountProcessor implements IAccountProcessor {
             dripPositionAccountHandler: async (
                 account: DripPosition
             ): Promise<boolean> => {
-                if (account.data.owner.kind === 'Direct') {
-                    const dripPositionWalletOwner = {
-                        dripPositionPublicKey: address.toString(),
-                        walletPublicKey:
-                            account.data.owner.value.owner.toString(),
-                    };
-                    logger.info(
-                        'upserting drip position wallet owner direct',
-                        dripPositionWalletOwner
-                    );
-                    await this.accountRepo.upsertDripPositionWalletOwner(
-                        dripPositionWalletOwner
-                    );
-                } else {
-                    assert(
-                        account.data.dripPositionNftMint,
-                        RestError.internal(
-                            `expected dripPositionNftMint to be set for tokenized position ${address.toString()}`
-                        )
-                    );
-                    const tokenizedOwner = await this.getTokenizedOwner(
-                        account.data.dripPositionNftMint
-                    );
-                    if (tokenizedOwner) {
-                        const dripPositionWalletOwner = {
-                            dripPositionPublicKey: address.toString(),
-                            walletPublicKey: tokenizedOwner?.toString(),
-                        };
-                        logger.info(
-                            'upserting drip position wallet owner tokenized',
-                            dripPositionWalletOwner
-                        );
-                        await this.accountRepo.upsertDripPositionWalletOwner(
-                            dripPositionWalletOwner
-                        );
-                    } else {
-                        logger.info(
-                            'drip position does not have tokenized owner',
-                            {
-                                dripPositionPublicKey: address.toString(),
-                            }
-                        );
-                    }
-                }
+                const dripPositionWalletOwner = {
+                    dripPositionPublicKey: address.toString(),
+                    walletPublicKey: account.data.owner.toString(),
+                };
+                logger.info(
+                    'upserting drip position wallet owner',
+                    dripPositionWalletOwner
+                );
+                await this.accountRepo.upsertDripPositionWalletOwner(
+                    dripPositionWalletOwner
+                );
                 const dbModel = dripPositionAccountToDbModel(address, account);
                 logger.info('inserting drip position', {
                     address,
@@ -133,16 +98,6 @@ export class AccountProcessor implements IAccountProcessor {
                 });
                 return !!(await this.accountRepo.upsertDripPositionSigner(
                     dripPositionSignerAccountToDbModel(address, account)
-                ));
-            },
-            dripPositionNftMappingAccountHandler: async (
-                account: DripPositionNftMapping
-            ): Promise<boolean> => {
-                logger.info('upserting drip position nft mapping', {
-                    dripPositionNftMapping: address.toString(),
-                });
-                return !!(await this.accountRepo.upsertDripPositionNftMapping(
-                    dripPositionNftMappingAccountToDbModel(address, account)
                 ));
             },
             ephemeralDripStateAccountHandler: (): Promise<boolean> => {
@@ -184,22 +139,5 @@ export class AccountProcessor implements IAccountProcessor {
                 address: address.toString(),
             });
         }
-    }
-
-    async getTokenizedOwner(
-        dripPositionNftMint: PublicKey
-    ): Promise<PublicKey | undefined> {
-        const nftOwners = await this.connection.getTokenLargestAccounts(
-            dripPositionNftMint
-        );
-        if (nftOwners.value.length === 1) {
-            const tokenAccount = await getAccount(
-                this.connection,
-                nftOwners.value[0].address,
-                this.connection.commitment
-            );
-            return tokenAccount.owner;
-        }
-        return undefined;
     }
 }

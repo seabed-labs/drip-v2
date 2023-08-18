@@ -1,6 +1,5 @@
 import {
     DripPosition,
-    DripPositionNftMapping,
     DripPositionSigner,
     GlobalConfig,
     GlobalConfigSigner,
@@ -11,7 +10,6 @@ import { PublicKey } from '@solana/web3.js';
 import {
     DripPosition as DripPositionDb,
     DripPositionSigner as DripPositionSignerDb,
-    DripPositionNftMapping as DripPositionNftMappingDb,
     GlobalConfigSigner as GlobalConfigSignerDb,
     GlobalConfig as GlobalConfigDb,
     PairConfig as PairConfigDb,
@@ -40,11 +38,7 @@ export function dripPositionAccountToDbModel(
         maxSlippageBps: accountJson.maxSlippageBps,
         maxPriceDeviationBps: accountJson.maxPriceDeviationBps,
         dripFeeBps: accountJson.dripFeeBps,
-        dripPositionNftMint: accountJson.dripPositionNftMint,
-        autoCreditEnabled: accountJson.autoCreditEnabled,
-        ownerKind: accountJson.owner.kind,
-        ownerValue:
-            'value' in accountJson.owner ? accountJson.owner.value.owner : null,
+        owner: accountJson.owner,
         dripAmountPreFees: new Decimal(accountJson.dripAmountPreFees),
         dripAmountRemainingPostFeesInCurrentCycle: new Decimal(
             accountJson.dripAmountRemainingPostFeesInCurrentCycle
@@ -85,19 +79,6 @@ export function dripPositionSignerAccountToDbModel(
         publicKey: address.toString(),
         dripPosition: accountJson.dripPosition,
         version: accountJson.version,
-        bump: accountJson.bump,
-    };
-}
-
-export function dripPositionNftMappingAccountToDbModel(
-    address: PublicKey,
-    a: DripPositionNftMapping
-): DripPositionNftMappingDb {
-    const accountJson = a.toJSON();
-    return {
-        publicKey: address.toString(),
-        dripPosition: accountJson.dripPosition,
-        dripPositionNftMint: accountJson.dripPositionNftMint,
         bump: accountJson.bump,
     };
 }

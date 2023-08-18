@@ -85,32 +85,12 @@ pub mod drip_v2 {
         handle_init_drip_position(ctx, params)
     }
 
-    pub fn init_drip_position_nft(ctx: Context<InitDripPositionNft>) -> Result<()> {
-        handle_init_drip_position_nft(ctx)
-    }
-
-    pub fn tokenize_drip_position(ctx: Context<TokenizeDripPosition>) -> Result<()> {
-        handle_tokenize_drip_position(ctx)
-    }
-
-    pub fn detokenize_drip_position(ctx: Context<DetokenizeDripPosition>) -> Result<()> {
-        handle_detokenize_drip_position(ctx)
-    }
-
-    pub fn toggle_auto_credit(ctx: Context<ToggleAutoCredit>) -> Result<()> {
-        handle_toggle_auto_credit(ctx)
-    }
-
     pub fn deposit(ctx: Context<Deposit>, params: DepositParams) -> Result<()> {
         handle_deposit(ctx, params)
     }
 
     pub fn close_position(ctx: Context<ClosePosition>) -> Result<()> {
         handle_close_position(ctx)
-    }
-
-    pub fn withdraw(ctx: Context<Withdraw>, params: WithdrawParams) -> Result<()> {
-        handle_withdraw(ctx, params)
     }
 
     pub fn pre_drip(ctx: Context<PreDrip>, params: PreDripParams) -> Result<()> {

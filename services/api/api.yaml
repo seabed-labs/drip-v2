@@ -124,42 +124,6 @@ components:
                 - to
                 - amount
             type: object
-        DripPositionOwner.DirectJSON:
-            properties:
-                kind:
-                    type: string
-                    enum:
-                        - Direct
-                    nullable: false
-                value:
-                    properties:
-                        owner:
-                            type: string
-                    required:
-                        - owner
-                    type: object
-            required:
-                - kind
-                - value
-            type: object
-            additionalProperties: false
-        DripPositionOwner.TokenizedJSON:
-            properties:
-                kind:
-                    type: string
-                    enum:
-                        - Tokenized
-                    nullable: false
-            required:
-                - kind
-            type: object
-            additionalProperties: false
-        types.DripPositionOwnerJSON:
-            anyOf:
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.DirectJSON'
-                -
-                    $ref: '#/components/schemas/DripPositionOwner.TokenizedJSON'
         DripPositionAccountJSON:
             properties:
                 globalConfig:
@@ -171,7 +135,7 @@ components:
                 outputTokenAccount:
                     type: string
                 owner:
-                    $ref: '#/components/schemas/types.DripPositionOwnerJSON'
+                    type: string
                 dripAmountPreFees:
                     type: string
                 maxSlippageBps:
@@ -183,11 +147,6 @@ components:
                 dripFeeBps:
                     type: number
                     format: double
-                dripPositionNftMint:
-                    type: string
-                    nullable: true
-                autoCreditEnabled:
-                    type: boolean
                 dripAmountRemainingPostFeesInCurrentCycle:
                     type: string
                 dripInputFeesRemainingForCurrentCycle:
@@ -221,8 +180,6 @@ components:
                 - maxSlippageBps
                 - maxPriceDeviationBps
                 - dripFeeBps
-                - dripPositionNftMint
-                - autoCreditEnabled
                 - dripAmountRemainingPostFeesInCurrentCycle
                 - dripInputFeesRemainingForCurrentCycle
                 - totalInputFeesCollected
