@@ -3,6 +3,15 @@
 ## Getting Started
 
 ```bash
+# dependencies
+-   rust 1.72.0
+-   node 18.17.1
+-   yarn 3.6.0
+-   solana 1.16.10
+-   anchor 0.28.0
+```
+
+```bash
 turbo run build
 ```
 
@@ -79,7 +88,7 @@ WIP
 
 ### Setup on-chain stuff
 
-1. Navigate to `solana-programs`
+1. Navigate to `program-library`
 2. Start up the node (Retry after running `yarn` if you have problems)
 
 ```bash
@@ -87,7 +96,7 @@ yarn localnet
 ```
 
 3. Wait for the logs to say `DONE SETUP` (DO NOT KILL THE PROCESS, THIS IS THE BLOCKCHAIN NODE - LEAVE IT RUNNING)
-4. Open `solana-programs/mocks/setup.json` and you should see a `dripPositions` field. This field holds `positionPubkey` sub-fields that are valid pubkeys for real drip position accounts that have been created in your local node.
+4. Open `program-library/mocks/setup.json` and you should see a `dripPositions` field. This field holds `positionPubkey` sub-fields that are valid pubkeys for real drip position accounts that have been created in your local node.
 
 ### Setup fetcher
 

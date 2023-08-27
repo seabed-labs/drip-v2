@@ -2426,9 +2426,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dcaf/anchor-client-gen@npm:0.28.1-beta.10":
-  version: 0.28.1-beta.10
-  resolution: "@dcaf/anchor-client-gen@npm:0.28.1-beta.10"
+"@dcaf/anchor-client-gen@npm:0.28.1-beta.11":
+  version: 0.28.1-beta.11
+  resolution: "@dcaf/anchor-client-gen@npm:0.28.1-beta.11"
   dependencies:
     "@coral-xyz/anchor": 0.28.0
     "@coral-xyz/borsh": ^0.28.0
@@ -2442,7 +2442,7 @@ __metadata:
     ts-morph: ^18.0.0
   bin:
     anchor-client-gen: dist/main.js
-  checksum: a095a7b026176b89523d5eb806391e6188bb30a9515018b07627f004301d922c7ae2b0a0f1ba5eea26d6368de14e5933964da16fa074bb3d8847e8edd2ae0c03
+  checksum: 1d6482c78141ce15d0b223d35cab4b23859c314ebfbda988a39093c0f8af51b5d124661da79ce5ab3eb9c0ddf3ef2344740eb76e2b340dcaca57525cd750388f
   languageName: node
   linkType: hard
 
@@ -2451,7 +2451,7 @@ __metadata:
   resolution: "@dcaf/drip-api@workspace:services/api"
   dependencies:
     "@coral-xyz/anchor": 0.27.0
-    "@dcaf/anchor-client-gen": 0.28.1-beta.10
+    "@dcaf/anchor-client-gen": 0.28.1-beta.11
     "@dcaf/drip-program": "*"
     "@dcaf/drip-sdk": "*"
     "@dcaf/drip-types": 0.1.0
@@ -2526,9 +2526,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dcaf/drip-program@*, @dcaf/drip-program@workspace:solana-programs":
+"@dcaf/drip-program@*, @dcaf/drip-program@workspace:program-library":
   version: 0.0.0-use.local
-  resolution: "@dcaf/drip-program@workspace:solana-programs"
+  resolution: "@dcaf/drip-program@workspace:program-library"
   dependencies:
     "@coral-xyz/anchor": 0.27.0
     "@solana/spl-token": 0.3.8
@@ -2587,7 +2587,7 @@ __metadata:
   resolution: "@dcaf/drip-types@workspace:packages/drip-types"
   dependencies:
     "@coral-xyz/anchor": 0.27.0
-    "@dcaf/anchor-client-gen": 0.28.1-beta.10
+    "@dcaf/anchor-client-gen": 0.28.1-beta.11
     "@dcaf/drip-program": "*"
     "@solana/web3.js": ^1.77.3
     "@types/bn.js": 5.1.1

@@ -4,7 +4,7 @@
     "private": true,
     "packageManager": "yarn@3.6.0",
     "workspaces": [
-        "solana-programs",
+        "program-library",
         "packages/*",
         "services/*",
         "ui/*"

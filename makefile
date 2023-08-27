@@ -7,7 +7,7 @@ root:
 
 clean: root
 	yarn workspaces foreach run clean
-	cd solana-programs && cargo clean
+	cd program-library && cargo clean
 
 lint-fix: root lint-fix-inner
 
@@ -15,12 +15,12 @@ lint: root lint-inner
 
 lint-fix-inner:
 	yarn workspaces foreach --parallel run lint:fix
-	cd solana-programs && cargo clippy --fix --allow-dirty -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
-	cd solana-programs && cargo fix --allow-dirty && cargo fmt
+	cd program-library && cargo clippy --fix --allow-dirty -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
+	cd program-library && cargo fix --allow-dirty && cargo fmt
 
 lint-inner:
-	cd solana-programs && cargo clippy -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
-	cd solana-programs && cargo check
+	cd program-library && cargo clippy -- -D warnings --A clippy::too_many_arguments --A clippy::borrowed_box -A clippy::result_large_err
+	cd program-library && cargo check
 	yarn workspaces foreach run lint
 
 test: program-inner drip-types-inner sdk-inner test-inner
@@ -34,7 +34,7 @@ sdk: program-inner drip-types-inner sdk-inner
 drip-types: root program-inner drip-types-inner
 
 program-inner:
-	cd solana-programs && yarn build
+	cd program-library && yarn build
 
 drip-types-inner:
 	cd packages/drip-types && yarn install && yarn build
@@ -56,14 +56,14 @@ mock-helius-inner:
 	cd services/dripper && yarn install && yarn build
 
 test-inner:
-	cd solana-programs && cargo test
-	cd solana-programs && anchor test
+	cd program-library && cargo test
+	cd program-library && anchor test
 
 testd:
-	cd solana-programs && anchor run testd
+	cd program-library && anchor run testd
 
 # run-solana:
-# 	cd solana-programs && yarn run localnet &
+# 	cd program-library && yarn run localnet &
 # 	sleep 10
 
 # run-api:

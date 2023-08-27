@@ -6,12 +6,12 @@ FROM backpackapp/build:v0.28.0
 
 WORKDIR /project
 
-COPY solana-programs/local.json solana-programs/
-COPY solana-programs/Cargo.lock solana-programs/
-COPY solana-programs/Cargo.toml solana-programs/
-COPY solana-programs/Anchor.toml solana-programs/
-COPY solana-programs/programs solana-programs/programs/
-RUN cd solana-programs && anchor build
+COPY program-library/local.json program-library/
+COPY program-library/Cargo.lock program-library/
+COPY program-library/Cargo.toml program-library/
+COPY program-library/Anchor.toml program-library/
+COPY program-library/programs program-library/programs/
+RUN cd program-library && anchor build
 
 COPY tsconfig.json .
 COPY package.json .
@@ -20,16 +20,16 @@ RUN yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -
 
 COPY packages/drip-types/package.json packages/drip-types/
 COPY packages/drip-sdk/package.json packages/drip-sdk/
-COPY solana-programs/package.json solana-programs/
-COPY solana-programs/tsconfig.json solana-programs/
-RUN cd solana-programs && yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
+COPY program-library/package.json program-library/
+COPY program-library/tsconfig.json program-library/
+RUN cd program-library && yarn install --pure-lockfile --non-interactive --cache-folder ./ycache; rm -rf ./ycache
 
 COPY packages/drip-types packages/drip-types
 COPY packages/sdk packages/sdk
 
-COPY solana-programs/scripts solana-programs/scripts
+COPY program-library/scripts program-library/scripts
 ENV RUST_BACKTRACE=1
 
-WORKDIR /project/solana-programs
+WORKDIR /project/program-library
 
 CMD [ "yarn", "run", "localnet" ]
