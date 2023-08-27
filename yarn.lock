@@ -2446,9 +2446,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dcaf/drip-api@workspace:services/api":
+"@dcaf/drip-api@workspace:apps/api":
   version: 0.0.0-use.local
-  resolution: "@dcaf/drip-api@workspace:services/api"
+  resolution: "@dcaf/drip-api@workspace:apps/api"
   dependencies:
     "@coral-xyz/anchor": 0.27.0
     "@dcaf/anchor-client-gen": 0.28.1-beta.11
@@ -2489,9 +2489,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dcaf/drip-dripper@workspace:services/dripper":
+"@dcaf/drip-dripper@workspace:apps/dripper":
   version: 0.0.0-use.local
-  resolution: "@dcaf/drip-dripper@workspace:services/dripper"
+  resolution: "@dcaf/drip-dripper@workspace:apps/dripper"
   dependencies:
     "@coral-xyz/anchor": 0.27.0
     "@dcaf/drip-sdk": "*"
@@ -2600,9 +2600,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dcaf/drip-xnft@workspace:ui/xnft":
+"@dcaf/drip-xnft@workspace:apps/xnft":
   version: 0.0.0-use.local
-  resolution: "@dcaf/drip-xnft@workspace:ui/xnft"
+  resolution: "@dcaf/drip-xnft@workspace:apps/xnft"
   dependencies:
     "@babel/core": ^7.21.3
     "@coral-xyz/anchor": ^0.27.0
@@ -21781,9 +21781,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mock-helius@workspace:services/mock-helius":
+"mock-helius@workspace:apps/mock-helius":
   version: 0.0.0-use.local
-  resolution: "mock-helius@workspace:services/mock-helius"
+  resolution: "mock-helius@workspace:apps/mock-helius"
   dependencies:
     "@solana/web3.js": ^1.78.2
     "@types/node": ^20.4.5
