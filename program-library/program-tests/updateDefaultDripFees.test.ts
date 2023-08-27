@@ -1,3 +1,5 @@
+import './setup.util';
+
 import {
     AnchorProvider,
     BN,
@@ -8,7 +10,6 @@ import {
 import { DripV2 } from '@dcaf/drip-types';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
-import '../setup';
 
 describe('Program - updateDefaultDripFees', () => {
     setProvider(AnchorProvider.env());

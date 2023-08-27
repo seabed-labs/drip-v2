@@ -1,3 +1,5 @@
+import './setup.util';
+
 import {
     AnchorProvider,
     Program,
@@ -7,7 +9,6 @@ import {
 import { DripV2 } from '@dcaf/drip-types';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { expect } from 'chai';
-import '../setup';
 
 describe('Program - updateSuperAdmin', () => {
     setProvider(AnchorProvider.env());

@@ -43,7 +43,7 @@ services:
     #         retries: 3
 
     # Doesn't work on macos
-    # Run manually via yarn run localnet in solana-programs/
+    # Run manually via yarn run localnet in program-library/
     # solana:
     #     build:
     #         context: .
@@ -61,7 +61,7 @@ services:
     #         timeout: 5s
     #         retries: 10
     #     volumes:
-    #         - ./solana-programs/mocks:/project/solana-programs/mocks
+    #         - ./program-library/mocks:/project/program-library/mocks
 
     # drip-api:
     #     build:

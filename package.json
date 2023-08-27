@@ -4,11 +4,15 @@
     "private": true,
     "packageManager": "yarn@3.6.0",
     "workspaces": [
-        "solana-programs",
+        "program-library",
         "packages/*",
-        "services/*",
-        "ui/*"
+        "apps/*"
     ],
+    "scripts": {
+        "install:helius": "cd apps/mock-helius && yarn install",
+        "install:xnft": "cd apps/xnft && yarn install",
+        "postinstall": "yarn install:helius && yarn install:xnft"
+    },
     "dependencies": {
         "@solana/spl-token": "^0.3.8",
         "@types/superagent": "^4.1.18"

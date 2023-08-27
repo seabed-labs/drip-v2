@@ -13,7 +13,7 @@
     "build": "yarn run build:db-types && yarn run build:anchor-types && yarn run build:api-spec && yarn run build:tsc && cp -r ./src/generated/prismaClient ./dist/generated/prismaClient",
     "build:db-types": "yarn run prisma generate",
     "build:db-types-introspection": "yarn migrate:up && yarn run prisma db pull && yarn run build:db-types",
-    "build:anchor-types": "yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src/generated/anchor",
+    "build:anchor-types": "yarn run anchor-client-gen ../../program-library/idl/drip_v2.json ./src/generated/anchor",
     "build:api-spec": "yarn run tsoa spec-and-routes --yaml",
     "build:tsc": "yarn run tsc",
     "start": "node dist/index.js",
@@ -28,7 +28,7 @@
     "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@dcaf/anchor-client-gen": "0.28.1-beta.10",
+    "@dcaf/anchor-client-gen": "0.28.1-beta.11",
     "@dcaf/drip-program": "*",
     "@types/bn.js": "^5.1.1",
     "@types/decimal.js": "^7.4.0",

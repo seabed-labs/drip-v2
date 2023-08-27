@@ -7,10 +7,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "yarn run build && cp ../../solana-programs/idl/drip_v2.ts ./src/drip_v2.ts",
+    "prepack": "yarn run build && cp ../../program-library/idl/drip_v2.ts ./src/drip_v2.ts",
     "build": "yarn run build:anchor-types && yarn run build:tsc",
     "build:tsc": "yarn run tsc",
-    "build:anchor-types": "yarn run anchor-client-gen ../../solana-programs/idl/drip_v2.json ./src",
+    "build:anchor-types": "yarn run anchor-client-gen ../../program-library/idl/drip_v2.json ./src",
     "clean": "rm -rf dist | true && rm -rf tsconfig.tsbuildinfo | true",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
@@ -20,7 +20,7 @@
     "lint:prettier:fix": "prettier --write \"*/**/*{.js,.ts,.yaml}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@dcaf/anchor-client-gen": "0.28.1-beta.10",
+    "@dcaf/anchor-client-gen": "0.28.1-beta.11",
     "@dcaf/drip-program": "*",
     "@types/bn.js": "5.1.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",

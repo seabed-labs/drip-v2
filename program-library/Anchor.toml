@@ -1,3 +1,6 @@
+anchor_version = "0.28.0"
+solana_version = "1.16.10"
+
 [features]
 seeds = true
 skip-lint = false
@@ -13,8 +16,7 @@ cluster = "Localnet"
 wallet = "./local.json"
 
 [scripts]
-# test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 --parallel test/**/*.ts"
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/**/*.ts --parallel"
+test = "node scripts/test.js"
 
 [test]
 startup_wait = 10000
