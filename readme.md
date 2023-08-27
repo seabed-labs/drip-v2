@@ -100,7 +100,7 @@ yarn localnet
 
 ### Setup fetcher
 
-1. Naviate to `services/fetcher`
+1. Naviate to `apps/fetcher`
 2. Create a `.env` file with the following contents
 
 ```
